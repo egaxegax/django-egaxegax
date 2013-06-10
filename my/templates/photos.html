@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block keywords %}, {% trans 'photos' %}{% endblock %}
+{% block title %}{% trans 'Photos' %} - {% endblock %}
+{% block pagestyle %}
+#topmenu li.photomenu { background-color: #DDDDDD; }
+#viewcont { position: fixed; left:0; top:0; height: 100%; width: 100%; }
+#viewphoto { max-width:805px; border:3px solid #AAAAFF; background-color: #D6D6D6; }
+#viewheader,#viewfooter { position:relative; background-color: #E4E4E4; height:1.5em; padding: 0 5px 0 20px; }
+#viewheader .lfloat { position:absolute; top:50%; height:1.5em; margin-top: -0.75em; }
+#viewfooter { text-align:left; }
+{% endblock %}
+{% block pageheader %}{% trans 'Photos' %}{% endblock %}
+{% block content %}
+<p>Подборка разных фотографий о природе, местах, людях. Смотрите, добавляйте свои работы.</p>
+{% if photos.object_list %}
+  <p class="smaller">
+  {% if photos.has_previous %}
+    <a class="nodecor" href="{% url my.views.list_photos %}?page={{ photos.previous_page_number }}"><img height="128px" src='/media/img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
+  {% endif %}
+  {% for photo in photos.object_list %}
+    <a class="nodecor" href="{% url my.views.list_photos id=photo.id %}?page={{ photos.number }}"><img src="{{ photo.thumb_url }}=s128" title="{{ photo.title }}" alt="{{ photo.title }}"/></a>
+  {% endfor %}
+  {% if photos.has_next %}
+    <a class="nodecor" href="{% url my.views.list_photos %}?page={{ photos.next_page_number }}"><img height="128px" src='/media/img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
+  {% endif %}
+  </p>
+{% else %}
+  <p>{% trans 'No photos' %}.</p>
+{% endif %}
+{% if user.is_authenticated %}
+  <p class="smaller"><a href="{% url my.views.add_photo %}">{% trans 'Add photo' %}</a></p>
+{% else %}
+  <p class="smaller">{% trans 'Please authorize to upload photos' %}.</p>
+{% endif %}
+{% for photo in view %}
+  <table id="viewcont">
+  <tr><td align="center" valign="center">
+    <div id="viewphoto">
+      <div id="viewheader">
+        <div class="rfloat">
+          <a class="nodecor" href="#" onclick="document.getElementById('viewcont').style.display='none';" title="{% trans 'Close' %}"><b>X</b></a>
+        </div>
+        <div class="smaller lfloat">
+          <a class="nodecor" href="" title="{% trans 'Title' %}">{{ photo.title }}</a> | 
+          {% if photo.album %}<a class="nodecor" href="" title="{% trans 'Album' %}">{{ photo.album }}</a>{% endif %}
+        </div>     
+      </div>
+      <div id="viewcontent">
+        <a class="nodecor" href="{% url my.views.get_photo id=photo.id %}" target="_blank">
+          <img src="{{ photo.thumb_url }}=s800" title="{% trans 'Click to view full size' %}" alt="{{ v.title }}" />
+        </a>
+      </div>
+    {% if user.is_authenticated and user.id == photo.author.id %}
+      <div id="viewfooter" class="smaller"><a href="{% url my.views.delete_photo id=photo.id %}">{% trans 'Delete' %}</div>
+    {% endif %}
+    </div>
+  </div>
+  </td></tr>
+  </table>
+{% endfor %}
+{% endblock %}

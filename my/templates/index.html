@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block pagestyle %}
+#topmenu li.mainmenu { background-color: #DDDDDD; }
+{% endblock %}
+{% block pageheader %}{% trans 'Main' %}{% endblock %}
+{% block content %}
+<p>
+  Портал пользователя egaxegax. Фото, тексты, сообщения от автора. Заходите, смотрите,пишите заметки, оставляйте комментарии.
+</p>
+<p class="smaller">
+  P.S. Вся информация на портале может быть изменена или удалена автором.
+  Заранее приношу извинения за неудобства.
+</p>
+<img width=120px height=120px src='/media/img/xage_glad.png' />
+{% endblock %}

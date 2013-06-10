@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load filetransfers %}
+{% block pageheader %}{% trans 'Add user' %}{% endblock %}
+{% block content %}
+<form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
+  {% render_upload_data upload_data %}
+<table>
+  {{ form.as_table }}
+  {{ form_profile.as_table }}
+  <tr><th/><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
+</table>
+</form>
+{% endblock %}

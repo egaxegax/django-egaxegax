@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>{% load i18n %}
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<meta name="description" content="{% trans 'Portal of Gregory Nimerov. Photos, notes from author' %}"/>
+<meta name="keywords" content="{% trans 'Egax Portal' %}, egaxegax, {% trans 'Gregory Nimerov' %}{% block keywords %}{% endblock %}"/>
+<meta name="google-site-verification" content="tDIIwt3nNSOeRwaSbOPKjWIuVvKvi6E7YCLV_WOnCqE" />
+<title>{% block title %}{% endblock %}{% trans 'Egax Portal' %}</title>
+<link rel='shortcut icon' href='/media/img/favicon.ico?1322400151' />
+<style type="text/css">
+body { font-family: Verdana,Helvetica,sans-serif; background-color: #DDDDDD; }
+#topnav { height: 27px; background: url("/media/img/kremlin_fon_top.jpg") no-repeat scroll left top #D6D6D6; }
+#topnav .logo { width: 415px; text-align: center; }
+#author span,a { vertical-align: top; }
+#topban { height: 70px; background: url("/media/img/kremlin_fon_center.jpg") no-repeat scroll left top #DDDDDD; }
+#topban .ads { padding-left: 315px; }
+#topmenu { height: 27px; background: url("/media/img/kremlin_fon_bt.jpg") no-repeat scroll left top #D6D6D6; text-align: right; }
+#topmenu li { padding: 0 15px 0 15px; }
+#pageheader { min-height: 27px; background: url("/media/img/kremlin_fon_bb.jpg") no-repeat scroll left top #DDDDDD; }
+#pageheader,#content { width: auto; padding: 0 10em; }
+#pageheader { margin: 0 0 1em 0; }
+#content { min-height:280px; }
+#footer { text-align: center; color: #ADADAD; }
+a.nodecor { text-decoration:none; }
+.inl li { display: inline; }
+.nomarg { margin: 0 0 0 0; }
+.nopad { padding: 0 0 0 0; }
+.lfloat { float: left; text-align: left;}
+.rfloat { float: right; text-align: right;}
+.smaller { font-size: smaller; }{% block pagestyle %}{% endblock %}</style>{% block pagestylelink %}{% endblock %}
+</head>
+<body class="nomarg">
+<div id="topnav">
+  <div id="author" class="rfloat">  
+    {% if user.is_authenticated %}
+      <img width="26px" height="26px" src="{% url my.views.get_avatar %}" title="{{ user.username }}"/>
+      <span>
+        {% trans 'Welcome,' %} {{ user.username }}
+        [<a href="{% url django.contrib.auth.views.logout %}?b={{ logback }}">{% trans 'Log out' %}</a>]
+      </span>
+    {% else %}
+      {% trans 'Logged out' %}
+      [<a href="{% url django.contrib.auth.views.login %}?b={{ logback }}">{% trans 'Log in' %}</a>]      
+    {% endif %}
+    &nbsp;
+  </div>
+  <div class="logo">
+    <img src="/media/img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
+  </div>
+</div>
+<div id="topban">
+  <div class="ads">
+<center>
+<script language="JavaScript"> var loc = ''; </script>
+<script language="JavaScript1.4">try{ var loc = escape(top.location.href); }catch(e){;}</script>
+<script language="JavaScript">document.write("<sc"+"ript language='JavaScript' src='http://ad6.bannerbank.ru/bb.cgi?cmd=ad&hreftarget=_blank&pubid=173549900&pg=1&r=js&ssi=nofillers&vbn=924&num=2&w=234&h=60&&ref="+escape(document.referrer)+"&loc="+loc+"&nocache="+Math.round(Math.random()*999111)+"'>\n</sc"+"ript>");</script>
+<br></center>
+  </div>
+</div>
+<div id="topmenu">
+  <ul class="inl nomarg"><li class="mainmenu"><a class="nodecor" href="{% url my.views.index %}">{% trans 'Main' %}</a></li>
+    <li class="guestmenu"><a class="nodecor" href="{% url guestbook.views.list_subjects %}">{% trans 'Guestbook' %}</a></li>
+    <li class="photomenu"><a class="nodecor" href="{% url my.views.list_photos %}">{% trans 'Photos' %}</a></li>
+    <li class="songmenu"><a class="nodecor" href="{% url my.views.list_songs %}">{% trans 'Chords' %}</a></li></ul>
+</div>
+<div id="pageheader"><h2 class="nomarg">{% block pageheader %}{% endblock %}</h2></div>
+<div id="content">{% block content %}{% endblock %}</div>
+<div style="text-align:center;">
+<!--LiveInternet counter--><script type="text/javascript"><!--
+document.write("<a href='http://www.liveinternet.ru/click' "+
+"target=_blank><img src='//counter.yadro.ru/hit?t12.3;r"+
+escape(document.referrer)+((typeof(screen)=="undefined")?"":
+";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+";"+Math.random()+
+"' alt='' title='LiveInternet: показано число просмотров за 24"+
+" часа, посетителей за 24 часа и за сегодня' "+
+"border='0' width='88' height='31'><\/a>")
+//--></script><!--/LiveInternet-->
+</div>
+<div id="footer" class="smaller">
+  {% trans 'Write to' %} <a href="mailto:egaxegax@gmail.com?subject=About%20egaxegax.appspot.com&body=Good%20site" target="_blank">egaxegax</a>
+</div>
+<br/>
+</body>
+</html>

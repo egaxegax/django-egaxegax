@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block pageheader %}{% trans 'Server error' %}{% endblock %}
+{% block content %}
+  {% trans 'There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience.' %}
+{% endblock %}

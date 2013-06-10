@@ -1,0 +1,92 @@
+# egaxegax.appspot.com.
+# Copyright (C) 2011
+# This file is distributed under the same license as the Django package.
+# egax@bk.ru, 2012.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: models.py
+
+msgid "content"
+msgstr "Текст"
+
+msgid "subject"
+msgstr "Тема"
+
+#: templates/base.html
+
+msgid "Guestbook"
+msgstr "Гостевая книга"
+
+#: templates/subjects.html
+
+msgid "Profile"
+msgstr "Профайл"
+
+#: templates/guestbook.html
+
+msgid "notes"
+msgstr "заметки, посты"
+
+msgid "posts"
+msgstr "статьи"
+
+msgid "Notes"
+msgstr "Заметки"
+
+msgid "No posts"
+msgstr "Нет записей"
+
+msgid "An anonymous person"
+msgstr "Аноним"
+
+msgid "wrote"
+msgstr "написал"
+
+msgid "Edit"
+msgstr "Править"
+
+msgid "previous"
+msgstr "пред"
+
+msgid "Page"
+msgstr "Стр."
+
+msgid "of"
+msgstr "из"
+
+msgid "next"
+msgstr "след"
+
+msgid "Please authorize to post messages"
+msgstr "Войдите, чтобы оставлять сообщения"
+
+msgid "Support syntax"
+msgstr "Поддерживается разметка"
+
+#: templates/subjects.html
+
+msgid "Subjects"
+msgstr "Темы"
+
+msgid "No subjects"
+msgstr "Нет записей"
+
+msgid "Topics"
+msgstr "Темы"
+
+msgid "Posts"
+msgstr "Постов"
+
+msgid "Updated"
+msgstr "Обновлена"
+
+msgid "By"
+msgstr "Кем"

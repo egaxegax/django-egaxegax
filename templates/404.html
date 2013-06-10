@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block pageheader %}{% trans 'Page not found' %}{% endblock %}
+{% block content %}
+  {% trans "We're sorry, but the requested page could not be found." %}
+<p class="smaller">
+  P.S. Возможно она появиться в дальнейшем.
+</p>
+<p><img width=120px height=120px src='/media/img/xage_confuse.png' /></p>
+{% endblock %}

@@ -1,0 +1,23 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+{% load filetransfers %}
+{% block keywords %}, {% trans 'photos' %}{% endblock %}
+{% block title %}{% trans 'Add photo' %} - {% endblock %}
+{% block pagestyle %}
+#topmenu li.photomenu { background-color: #DDDDDD; }
+{% endblock %}
+{% block pageheader %}{% trans 'Add photo' %}{% endblock %}
+{% block content %}
+<p>Добавляйте свои фото и картинки.</p>
+{% if user.is_authenticated %}
+  <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
+    {% render_upload_data upload_data %}
+    <table>
+      {{ form.as_table }}
+      <tr><th/><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
+    </table>
+  </form>
+{% else %}
+  <p>{% trans "You don't have permission to edit anything." %}</p>
+{% endif %}
+{% endblock %}
