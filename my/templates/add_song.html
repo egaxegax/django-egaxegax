@@ -3,7 +3,7 @@
 {% block keywords %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}{% trans 'Add song' %} - {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
-#topmenu li.songmenu { background-color: #DDDDDD; }
+#topmenu li.songmenu { background-color: #E4E4E4; }
 #id_title { width:100%; }
 {% endblock %}
 {% block pageheader %}{% trans 'Add song' %}{% endblock %}
@@ -11,7 +11,7 @@
 <p>Добавляйте свои подборы и песни.</p>
 {% if user.is_authenticated %}
   <form action="{% url my.views.add_song %}" method="post">{% csrf_token %}
-    <table>
+    <table class="formpost">
       {{ form }}
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>

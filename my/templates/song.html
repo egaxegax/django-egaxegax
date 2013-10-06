@@ -3,7 +3,8 @@
 {% block keywords %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'songs' %} - {% endblock %}
 {% block pagestyle %}
-#topmenu li.songmenu { background-color: #DDDDDD; }
+#topmenu li.songmenu { background-color: #E4E4E4; }
+.songitem { background-color: #E4E4E4; padding: 10px; }
 {% endblock %}
 {% block pageheader %}{{ song.artist }} {{ song.title }}{% endblock %}
 {% block content %}
@@ -16,7 +17,7 @@
     </object>
   </p>
 {% endif %}
-<p>{{ song.content|safe }}</p>
+<p class="songitem">{{ song.content|safe }}</p>
 <p class="smaller">{{ song.author }} {{ song.date }}</p>
 {% if user.is_authenticated and user.id == song.author.id %}
   <p class="smaller">

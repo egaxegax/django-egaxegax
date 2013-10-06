@@ -8,7 +8,7 @@ class CreateGreetingForm(forms.ModelForm):
         model = Greeting
         exclude = ['author', 'subject', 'date']
         widgets = {
-            'content': forms.Textarea(attrs={'cols': 60, 'rows': 5}),
+            'content': forms.Textarea(attrs={'rows': 10}),
         }
 
 class CreateGreetingSubjectForm(forms.ModelForm):

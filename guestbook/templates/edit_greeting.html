@@ -4,7 +4,7 @@
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
-#topmenu li.guestmenu { background-color: #DDDDDD; }
+#topmenu li.guestmenu { background-color: #E4E4E4; }
 {% endblock %}
 {% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endblock %}
 {% block content %}
@@ -12,7 +12,7 @@
 {% if user.is_authenticated %}
   <p>
     <form action="{% url guestbook.views.edit_greeting id=form.initial.id %}" method="post">{% csrf_token %}
-    <table>
+    <table class="formpost">
       {{ form }}
        <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>

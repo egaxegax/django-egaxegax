@@ -21,7 +21,7 @@ class AddSongForm(forms.ModelForm):
         model = Song
         exclude = ['author', 'date', 'audio']
         widgets = {
-            'content': forms.Textarea(attrs={'cols': 40, 'rows': 12}),
+            'content': forms.Textarea(attrs={'rows': 10}),
         }
 
 class AddSongFileForm(forms.ModelForm):

@@ -4,7 +4,7 @@
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
-#topmenu li.guestmenu { background-color: #DDDDDD; }
+#topmenu li.guestmenu { background-color: #E4E4E4; }
 .messageheader { background-color: #D6D6D6; padding: 2px 8px; }
 .messagesubject { background-color: #E4E4E4; padding: 2px 10px; }
 .messagetext { padding: 0 10px; }
@@ -62,10 +62,14 @@
 {% if user.is_authenticated %}
   <p>
     <form action="{% url guestbook.views.create_greeting %}" method="post">{% csrf_token %}
-    <table>
+    <table class="formpost">
       {{ form_subject }}{{ form }}
-      <tr><th/><td class="smaller" align="right">{% trans 'Support syntax' %} <b>Markdown</b></td></tr>
-      <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
+      <tr><th/><td>
+        <table cellspacing="0" cellpadding="0" width="100%"><tr>
+          <td><input type="submit" value="{% trans 'Post' %}" /></td>
+          <td class="smaller" align="right">{% trans 'Support syntax' %} <b>Markdown</b></td></tr>
+        </table>
+      </td></tr>
     </table>
     </form>
   </p>
