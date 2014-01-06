@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load markup %}
+{% block description %}. {% if subject.subject %}{{ subject.subject }}{% endif %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}

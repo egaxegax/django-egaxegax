@@ -13,12 +13,5 @@ class PhotoAdmin(admin.ModelAdmin):
     ordering = ['date']
     #search_fields = ['author', 'content']
 
-class SongAdmin(admin.ModelAdmin):
-    list_display = ['id', 'artist', 'title', 'content', 'author', 'date']
-    list_per_page = 10
-    ordering = ['title']
-    #search_fields = ['title']
-
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Photo, PhotoAdmin)
-admin.site.register(Song, SongAdmin)

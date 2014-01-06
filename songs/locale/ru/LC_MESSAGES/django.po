@@ -1,0 +1,97 @@
+# egaxegax.appspot.com.
+# Copyright (C) 2011
+# This file is distributed under the same license as the Django package.
+# egaxegax@gmail.com, 2013.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: models.py
+
+msgid "album"
+msgstr "Альбом"
+
+msgid "artist"
+msgstr "Исполнитель"
+
+msgid "audio"
+msgstr "Аудио"
+
+msgid "content"
+msgstr "Текст"
+
+msgid "title"
+msgstr "Название"
+
+#: templates/base.html
+
+msgid "songs"
+msgstr "песни, тексты"
+
+msgid "music"
+msgstr "музыка"
+
+msgid "chords"
+msgstr "аккорды, подборы"
+
+msgid "Chords"
+msgstr "Аккорды"
+
+#: templates/songs.html
+
+msgid "previous"
+msgstr "пред"
+
+msgid "Page"
+msgstr "Стр."
+
+msgid "of"
+msgstr "из"
+
+msgid "next"
+msgstr "след"
+
+#: templates/song.html
+
+msgid "ago"
+msgstr "назад"
+
+msgid "No songs"
+msgstr "Нет песен"
+
+msgid "Please authorize to add songs"
+msgstr "Войдите, чтобы добавлять песни"
+
+msgid "Add song"
+msgstr "Добавить песню"
+
+msgid "Edit"
+msgstr "Править"
+
+msgid "Edit song"
+msgstr "Править песню"
+
+msgid "Added"
+msgstr "Добавил"
+
+msgid "Audio"
+msgstr "Аудио"
+
+msgid "Listen"
+msgstr "Послушать"
+
+msgid "Full list"
+msgstr "Весь список"
+
+msgid "Profile"
+msgstr "Профайл"
+
+msgid "Posts"
+msgstr "Текстов"
+

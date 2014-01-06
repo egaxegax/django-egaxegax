@@ -20,34 +20,10 @@ msgstr "Текст"
 msgid "avatar"
 msgstr "Аватар"
 
-msgid "album"
-msgstr "Альбом"
-
-msgid "artist"
-msgstr "Исполнитель"
-
 msgid "img"
 msgstr "Картинка"
 
 #: templates/base.html
-
-msgid "Portal of Gregory Nimerov. Photos, notes from author"
-msgstr "Портал Григория Нимерова. Фото, тексты, сообщения от автора"
-
-msgid "Gregory Nimerov"
-msgstr "Григорий Нимеров"
-
-msgid "photos"
-msgstr "фото"
-
-msgid "songs"
-msgstr "песни, тексты"
-
-msgid "music"
-msgstr "музыка"
-
-msgid "chords"
-msgstr "аккорды, подборы"
 
 msgid "Egax Portal"
 msgstr "Портал Egax"
@@ -61,13 +37,10 @@ msgstr "Главная"
 msgid "Photos"
 msgstr "Фото"
 
-msgid "Chords"
-msgstr "Аккорды"
-
 msgid "Write to"
 msgstr "Написать"
 
-#: templates/index.html
+#: templates/photos.html
 
 msgid "previous"
 msgstr "пред"
@@ -81,7 +54,8 @@ msgstr "из"
 msgid "next"
 msgstr "след"
 
-#: templates/photos.html
+msgid "photos"
+msgstr "фото"
 
 msgid "No photos"
 msgstr "Нет фотографий"
@@ -104,34 +78,3 @@ msgstr "Альбом"
 msgid "Close"
 msgstr "Закрыть"
 
-#: templates/songs.html
-
-msgid "ago"
-msgstr "назад"
-
-msgid "No songs"
-msgstr "Нет песен"
-
-msgid "Please authorize to add songs"
-msgstr "Войдите, чтобы добавлять песни"
-
-msgid "Add song"
-msgstr "Добавить песню"
-
-msgid "Edit"
-msgstr "Править"
-
-msgid "Edit song"
-msgstr "Править песню"
-
-msgid "Audio"
-msgstr "Аудио"
-
-msgid "audio"
-msgstr "аудио"
-
-msgid "Listen"
-msgstr "Послушать"
-
-msgid "Full list"
-msgstr "Весь список"

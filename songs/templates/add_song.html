@@ -1,0 +1,22 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+{% block keywords %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
+{% block title %}{% trans 'Add song' %} - {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
+{% block pagestyle %}
+#topmenu li.songmenu { background-color: #E4E4E4; }
+#id_title { width:100%; }
+{% endblock %}
+{% block pageheader %}{% trans 'Add song' %}{% endblock %}
+{% block content %}
+<p>Добавляйте свои подборы и песни.</p>
+{% if user.is_authenticated %}
+  <form action="{% url songs.views.add_song %}" method="post">{% csrf_token %}
+    <table class="formpost">
+      {{ form }}
+      <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
+    </table>
+  </form>
+{% else %}
+  <p>{% trans "You don't have permission to edit anything." %}</p>
+{% endif %}
+{% endblock %}

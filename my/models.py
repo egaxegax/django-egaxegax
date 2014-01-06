@@ -16,13 +16,3 @@ class Photo(models.Model):
     thumb_url = models.CharField(max_length=255, null=True, verbose_name=_('thumb_url'))
     author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
     date = models.DateTimeField(auto_now_add=True, verbose_name=_('date'))
-
-class Song(models.Model):
-    class Meta:
-        unique_together = ("artist", "title")
-    artist = models.CharField(max_length=50, db_index=True, verbose_name=_('artist'))
-    title = models.CharField(max_length=50, verbose_name=_('title'))
-    content = models.TextField(verbose_name=_('content'))
-    audio = models.FileField(upload_to='audio', null=True, blank=True, verbose_name=_('audio'))
-    author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
-    date = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_('date'))

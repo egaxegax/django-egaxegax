@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Profile' %} - {% endblock %}
+{% block pagestyle %}
+#topmenu li.mainmenu { background-color: #E4E4E4; }
+ul.profile li { padding: 1px 0 1px 0; }
+{% endblock %}
+{% block pageheader %}{% trans 'Profile' %}{% endblock %}
+{% block content %}
+<p>
+  Информация о пользователе:
+</p>
+<ul class="profile">
+  <li>{% trans 'name'|capfirst %}: {{ record.author.username }}</li>
+  <li>{% trans 'last login'|capfirst %}: {{ record.author.last_login }}</li>
+  <li>{% trans 'date joined'|capfirst %}: {{ record.author.date_joined }}</li>
+  <li>{% trans 'Posts'|capfirst %}: {{ record_count }}</li>
+</ul>
+{% endblock %}

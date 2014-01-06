@@ -15,10 +15,11 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.markup',
     'djangotoolbox',
+    'djangoappengine',
     'filetransfers',
     'upload',
-    'djangoappengine',
     'guestbook',
+    'songs',
     'my',
 )
 

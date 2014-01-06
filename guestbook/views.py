@@ -140,5 +140,5 @@ def get_user_profile(request, **kw):
         user = get_object_or_404(User, id=ZI(kw.get('id')))
         m = Greeting.objects.filter(author__id=user.id)
         return direct_to_template(request, 'get_user_profile.html',
-                                  {'greeting': m[0],
-                                   'greeting_count': m.count()})
+                                  {'record': m[0],
+                                   'record_count': m.count()})

@@ -1,0 +1,25 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+{% load filetransfers %}
+{% block keywords %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
+{% block title %}{% trans 'Edit' %} {% trans 'audio' %} - {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
+{% block pagestyle %}
+#topmenu li.songmenu { background-color: #E4E4E4; }
+#id_title { width:100%; }
+{% endblock %}
+{% block pageheader %}{% trans 'Edit' %} {% trans 'audio' %}{% endblock %}
+{% block content %}
+<p>Добавляйте свои файлы в формате mp3 к текстам песен.</p>
+{% if user.is_authenticated %}
+  <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
+    {% render_upload_data upload_data %}
+    <table>
+      {{ form }}
+      <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
+    </table>
+    <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
+  </form>
+{% else %}
+  <p>{% trans "You don't have permission to edit anything." %}</p>
+{% endif %}
+{% endblock %}
