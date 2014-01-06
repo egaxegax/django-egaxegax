@@ -10,7 +10,7 @@
 <style type="text/css">
 body { font-family: Verdana,Helvetica,sans-serif; background-color: #DDDDDD; }
 #topnav { height: 27px; background: url("/media/img/kremlin_fon_top.jpg") no-repeat scroll left top #D6D6D6; }
-#topnav img.logo { padding-left: 200px; }
+#topnav .logo { width: 415px; text-align: center; }
 #topnav ul li { padding: 5px; }
 #topban { height: 70px; background: url("/media/img/kremlin_fon_center.jpg") no-repeat scroll left top #DDDDDD; }
 #topban .ads { padding-left: 315px; }
@@ -44,7 +44,9 @@ a.nodecor { text-decoration:none; }
     <li>[<a href="{% url django.contrib.auth.views.login %}?b={{ logback }}">{% trans 'Log in' %}</a>]</li>      
   {% endif %}
   </ul>
-  <img class="logo" src="/media/img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
+  <div class="logo">
+    <img src="/media/img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
+  </div>
 </div>
 <div id="topban">
   <div class="ads">
