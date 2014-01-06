@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% block description %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block keywords %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}
 {% if song_count %}
