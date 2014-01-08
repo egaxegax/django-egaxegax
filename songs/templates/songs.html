@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block description %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
-{% block keywords %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
+{% block description %}{% if song_count %}. {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
+{% block keywords %}{% if song_count %}, {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}
 {% if song_count %}
   {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}
