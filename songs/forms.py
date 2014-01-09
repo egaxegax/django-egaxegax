@@ -15,3 +15,6 @@ class AddSongFileForm(forms.ModelForm):
     class Meta:
         model = Song
         exclude = ['artist', 'title', 'author', 'content', 'date']
+
+class SearchForm(forms.Form):
+    search = forms.CharField(max_length=100, label=_('Search by title'))

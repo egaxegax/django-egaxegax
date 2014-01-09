@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from songs.forms import *
 from songs.models import *
 from filetransfers.api import prepare_upload
@@ -49,6 +50,7 @@ def list_songs(request, **kw):
     song_art_count = 0
     art_song_count = 0
     song_last_count = 0
+    search_count = 0
     cache_by_art = False
     per_page = 1000
     if kw.get('id_art'):  # filter by art
@@ -74,6 +76,12 @@ def list_songs(request, **kw):
         else:
             song_list = Song.objects.none()
         art_song_count = len(song_list)
+    elif request.GET.get('search'): # search
+        st = request.GET.get('search')
+        song_list = Song.objects.filter(Q(title__startswith=st))
+        song_art_count = len(song_list)
+        search_count = song_art_count
+        per_page = 10
     else:  # last update
         song_list = cache.get('songs')
         if song_list is None:
@@ -97,9 +105,11 @@ def list_songs(request, **kw):
             song_art_count += art['count']
     return direct_to_template(request, 'songs.html',
                               {'art_index': art_index,
+                               'form': SearchForm(initial={'search':request.GET.get('search')}),
                                'song_count': song_art_count,
                                'art_count': art_song_count,
                                'last_count': song_last_count,
+                               'search_count': search_count,
                                'songs': PageList(request, song_list, per_page),                              
                                'logback': reverse('songs.views.list_songs')})
 

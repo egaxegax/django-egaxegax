@@ -3,24 +3,22 @@
 {% block description %}{% if song_count %}. {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block keywords %}{% if song_count %}, {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}
-{% if song_count %}
-  {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}
-{% else %}
-  {% trans 'Chords' %}
-{% endif %}
+{% if search_count %}{% trans 'Search result' %}{% endif %}
+{% if song_count and not search_count %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}
+{% if not song_count and not search_count %}{% trans 'Chords, lyrics' %}{% endif %}
  - {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
 #topmenu li.songmenu { background-color: #E4E4E4; }
-.indexlist { background-color: #D6D6D6; padding: 2px 8px; font-size: 70%; }
+.indexlist { text-align: center; background-color: #D6D6D6; padding: 2px 8px; font-size: 70%; }
 .messageitem { background-color: #E4E4E4; min-height: 1.5em; padding: 0 10px; margin: 2px; }
 .messageitem dd { color: gray; }
+#id_search { height: 12px; margin-left: 10px; }
+input.submit { height: 26px; margin-left: 5px;}
 {% endblock %}
 {% block pageheader %}
-{% if song_count %}
-  {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}
-{% else %}
-  {% trans 'Chords' %}
-{% endif %}
+{% if search_count %}{% trans 'Search result' %}{% endif %}
+{% if song_count and not search_count %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}
+{% if not song_count and not search_count %}{% trans 'Chords, lyrics' %}{% endif %}
 {% endblock %}
 {% block content %}
 <div class="indexlist">
@@ -28,8 +26,12 @@
   {% for i, v in art_index.items %}
     <a class="nodecor" href="{% url songs.views.list_songs ind_art=i %}">{{ v|capfirst }}</a>
   {% endfor %}
+  <form class="search" action="{% url songs.views.list_songs %}" method="get">{% csrf_token %}
+    {{ form }}
+    <input class="submit" type="submit" value="{% trans 'Search' %}" />
+  </form>
 </div>
-<p>Подборы гитарных аккордов к песням. Читайте, слушайте, добавляйте свои подборы, тексты песен и музыку.</p>
+<p>Подборы гитарных аккордов к песням. В базе свыше <b>11000</b> текстов. Читайте, добавляйте свои подборы и тексты. </p>
 {% if song_count %}
   <p>Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов.</p>
 {% endif %}
@@ -38,7 +40,7 @@
 {% endif %}
 {% for song in songs.object_list %}
   <dl class="messageitem"><dt>
-  {% if art_count or last_count %}
+  {% if art_count or last_count or search_count%}
     <a href="{% url songs.views.list_songs id_art=song.id %}">{{ song.artist }}</a>
   {% endif %}
   {% if song.count %}
@@ -58,7 +60,7 @@
 {% if songs.object_list %}
   <p class="smaller">
     {% if songs.has_previous %}
-      <a href="?page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
+      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
     {% endif %}
     {% if songs.paginator.num_pages > 1 %}
       <span class="current">
@@ -66,7 +68,7 @@
       </span>
     {% endif %}
     {% if songs.has_next %}
-      <a href="?page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
+      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
     {% endif %}
   </p>
 {% else %}

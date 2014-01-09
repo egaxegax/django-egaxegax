@@ -34,14 +34,14 @@ msgstr "Название"
 msgid "songs"
 msgstr "песни, тексты"
 
-msgid "music"
-msgstr "музыка"
-
 msgid "chords"
 msgstr "аккорды, подборы"
 
 msgid "Chords"
 msgstr "Аккорды"
+
+msgid "Chords, lyrics"
+msgstr "Аккорды и тексты"
 
 #: templates/songs.html
 
@@ -94,4 +94,10 @@ msgstr "Профайл"
 
 msgid "Posts"
 msgstr "Текстов"
+
+msgid "Search by title"
+msgstr "Найти по названию"
+
+msgid "Search result"
+msgstr "Найдено"
 
