@@ -8,64 +8,88 @@
 <title>{% block title %}{% endblock %}Портал Григория Еремина</title>
 <link rel='shortcut icon' href='/media/img/favicon.ico?1322400151' />
 <style type="text/css">
-body { font-family: Verdana,Helvetica,sans-serif; background-color: #DDDDDD; }
-#topnav { height: 27px; background: url("/media/img/kremlin_fon_top.jpg") no-repeat scroll left top #D6D6D6; }
-#topnav .logo { width: 415px; text-align: center; }
-#topnav ul li { padding: 5px; }
-#topban { height: 70px; background: url("/media/img/kremlin_fon_center.jpg") no-repeat scroll left top #DDDDDD; }
-#topban .ads { padding-left: 315px; }
-#topmenu { height: 27px; background: url("/media/img/kremlin_fon_bt.jpg") no-repeat scroll left top #D6D6D6; text-align: right; }
-#topmenu ul li { padding: 10px; }
-#pageheader { min-height: 27px; background: url("/media/img/kremlin_fon_bb.jpg") no-repeat scroll left top #DDDDDD; }
-#pageheader,#content { width: auto; padding: 0 10em; }
-#pageheader { margin: 0 0 1em 0; }
-#content { min-height:280px; min-width: 280px; }
+body { font-family: Verdana,Helvetica,sans-serif; 
+  background: linear-gradient(to right, #cd984c 0%, #e2bd6f 24%, #fffbf0 34%, #e8b357 57%, #a85a34 67%, #713326 100%) repeat scroll 0 0 transparent; }
+.main { width: 1020px; margin: 0 auto; }
+.wrap { margin-top: 5px; background: none repeat scroll 0 0 rgba(56,32,44,0.3); border-radius: 7px 7px 7px 7px; }
+.white { color: #E4E4E4; }
+.white a { color: #E4E4E4; }
+#header { height: 70px; }
+#logo { width: 400px; margin-top: 25px; text-align: center; }
+#topnav ul { padding: 15px; }
+#topnav ul li { margin-left: 20px; }
+#topban .ads { text-align: center; margin-top: 5px; }
+#topmenu { height: 50px; text-align: right; }
+#topmenu ul { padding: 15px; }
+#topmenu ul li { margin-left: 10px; padding: 5px; border-radius: 5px 5px 5px 5px; border: 1px solid #D6D6D6; }
+#cont { padding: 10px; }
+#pageheader { padding: 15px; background-color: white; border-bottom: 1px dotted #CCCCCC; }
+#content { padding: 15px; background-color: white; }
+#footer { height: 50px; text-align: center; }
 .formpost { width: 100%; }
 .formpost th { width: 8%; }
 .formpost textarea { width: 100%; }
-#footer { text-align: center; color: #ADADAD; }
 a.nodecor { text-decoration:none; }
-.inl li { display: inline; vertical-align:top; }
+.inl li { display: inline; vertical-align: top; }
 .nomarg { margin: 0 0 0 0; }
 .nopad { padding: 0 0 0 0; }
-.lfloat { float: left; text-align: left;}
-.rfloat { float: right; text-align: right;}
+.lfloat { float: left; text-align: left; }
+.rfloat { float: right; text-align: right; }
 .smaller { font-size: smaller; }{% block pagestyle %}{% endblock %}</style>{% block pagestylelink %}{% endblock %}
+<!--Google counter-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-25857345-1', 'blogspot.ru');
+  ga('send', 'pageview');
+</script>
+<!--/Google counter-->
 </head>
 <body class="nomarg">
-<div id="topnav">
-  <ul class="rfloat inl nomarg">
-  {% if user.is_authenticated %}
-    <li><img width="26px" height="26px" src="{% url my.views.get_avatar %}" title="{{ user.username }}"/></li>
-    <li>{% trans 'Welcome,' %} {{ user.username }}</li>
-    <li>[<a href="{% url django.contrib.auth.views.logout %}?b={{ logback }}">{% trans 'Log out' %}</a>]</li>
-  {% else %}
-    <li>{% trans 'Logged out' %}</li>
-    <li>[<a href="{% url django.contrib.auth.views.login %}?b={{ logback }}">{% trans 'Log in' %}</a>]</li>      
-  {% endif %}
-  </ul>
-  <div class="logo">
-    <img src="/media/img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
+<div id="header" class="main">
+  <div id="logo" class="lfloat">
+    <a href="/">
+      <img src="/media/img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
+    </a>
+  </div>
+  <div id="topban" class="lfloat">
+    <div class="ads">
+      <center>
+      <script language="JavaScript"> var loc = ''; </script>
+      <script language="JavaScript1.4">try{ var loc = escape(top.location.href); }catch(e){;}</script>
+      <script language="JavaScript">document.write("<sc"+"ript language='JavaScript' src='http://ad6.bannerbank.ru/bb.cgi?cmd=ad&hreftarget=_blank&pubid=173549900&pg=1&r=js&ssi=nofillers&vbn=924&num=2&w=234&h=60&&ref="+escape(document.referrer)+"&loc="+loc+"&nocache="+Math.round(Math.random()*999111)+"'>\n</sc"+"ript>");</script>
+      <br></center>
+    </div>
+  </div>
+  <div id="topnav" class="smaller white">
+    <ul class="rfloat inl">
+    {% if user.is_authenticated %}
+      <li><img width="26px" height="26px" src="{% url my.views.get_avatar %}" title="{{ user.username }}"/></li>
+      <li>{% trans 'Welcome,' %} {{ user.username }}</li>
+      <li><a class="nodecor" href="{% url django.contrib.auth.views.logout %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
+    {% else %}
+      <li>{% trans 'Logged out' %}</li>
+      <li><a class="nodecor" href="{% url django.contrib.auth.views.login %}?b={{ logback }}">{% trans 'Log in' %}</a></li>      
+    {% endif %}
+    </ul>
   </div>
 </div>
-<div id="topban">
-  <div class="ads">
-<center>
-<script language="JavaScript"> var loc = ''; </script>
-<script language="JavaScript1.4">try{ var loc = escape(top.location.href); }catch(e){;}</script>
-<script language="JavaScript">document.write("<sc"+"ript language='JavaScript' src='http://ad6.bannerbank.ru/bb.cgi?cmd=ad&hreftarget=_blank&pubid=173549900&pg=1&r=js&ssi=nofillers&vbn=924&num=2&w=234&h=60&&ref="+escape(document.referrer)+"&loc="+loc+"&nocache="+Math.round(Math.random()*999111)+"'>\n</sc"+"ript>");</script>
-<br></center>
-  </div>
-</div>
-<div id="topmenu">
-  <ul class="inl nomarg"><li class="mainmenu"><a class="nodecor" href="{% url my.views.index %}">{% trans 'Main' %}</a></li>
+<div id="topmenu" class="main wrap smaller white">
+  <ul class="inl nomarg nopad"><li class="mainmenu"><a class="nodecor" href="{% url my.views.index %}">{% trans 'Main' %}</a></li>
     <li class="guestmenu"><a class="nodecor" href="{% url guestbook.views.list_subjects %}">{% trans 'Guestbook' %}</a></li>
     <li class="photomenu"><a class="nodecor" href="{% url my.views.list_photos %}">{% trans 'Photos' %}</a></li>
     <li class="songmenu"><a class="nodecor" href="{% url songs.views.list_songs %}">{% trans 'Chords' %}</a></li></ul>
 </div>
-<div id="pageheader"><h2 class="nomarg">{% block pageheader %}{% endblock %}</h2></div>
-<div id="content">{% block content %}{% endblock %}</div>
-<div style="text-align:center;">
+<div class="main wrap">
+  <div id="cont">
+    <div id="pageheader"><h2 class="nomarg">{% block pageheader %}{% endblock %}</h2></div>
+    <div id="content">{% block content %}{% endblock %}</div>
+  </div>
+</div>
+<div id="footer" class="main wrap smaller white">
+  <table width="100%" cellpadding="0" cellspacing="10"><tr><td align="right" width="50%">
 <!--LiveInternet counter--><script type="text/javascript"><!--
 document.write("<a href='http://www.liveinternet.ru/click' "+
 "target=_blank><img src='//counter.yadro.ru/hit?t12.3;r"+
@@ -77,10 +101,10 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 " часа, посетителей за 24 часа и за сегодня' "+
 "border='0' width='88' height='31'><\/a>")
 //--></script><!--/LiveInternet-->
+  </td><td align="left">
+    <a class="nodecor" href="https://plus.google.com/102759580886505378691/about" target="_blank">egaxegax</a>
+  </td></tr>
+  </table>
 </div>
-<div id="footer" class="smaller">
-  {% trans 'Write to' %} <a href="mailto:egaxegax@gmail.com?subject=About%20egaxegax.appspot.com&body=Good%20site" target="_blank">egaxegax</a>
-</div>
-<br/>
 </body>
 </html>
