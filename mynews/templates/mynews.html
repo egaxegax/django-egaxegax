@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load markup %}
+{% block description %}. {% trans 'News' %}{% endblock %}
+{% block keywords %}, {% trans 'news' %}{% endblock %}
+{% block title %}{% trans 'News' %} - {% endblock %}
+{% block pagestyle %}
+#topmenu li.newsmenu { background-color: #cd984c; }
+.msgfooter { font-size: 70%; padding: 2px 8px; text-align: right; }
+.msgtext { padding: 0 10px; }
+.msgbox { border: 1px solid #CCCCCC; margin-bottom: 5px; }
+{% endblock %}
+{% block pagestylelink %}
+<link rel="stylesheet" href="/media/css/syntax.css" />
+{% endblock %}
+{% block pageheader %}{% trans 'News' %}{% endblock %}
+{% block content %}
+<p>Что нового? Новости, изменения, обновления на сайте, сообщения от пользователей.</p>
+{% for msg in news.object_list %}
+  <div class="msgbox">
+    <div class="msgtext">{{ msg.content|markdown:"codehilite" }}</div>
+    <div class="msgfooter">
+      <a class="nodecor" href="{% url mynews.views.get_user_profile id=msg.author.id %}">{{ msg.author.username }}</a></b> {% trans 'added' %}
+      {{ msg.date|timesince }} {% trans 'ago' %} 
+      {% if user.is_authenticated and user.id == msg.author.id %}
+        <a class="nodecor" href="{% url mynews.views.edit_msg id=msg.id %}">{% trans 'Edit' %}</a>
+        <a class="nodecor" href="{% url mynews.views.delete_msg id=msg.id %}">{% trans 'Delete' %}</a>
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}
+{% if news.object_list %}
+{% if list_all %}
+  <p class="smaller">
+  {% if news.has_previous %}
+    <a href="?page={{ news.previous_page_number }}">‹ {% trans 'previous' %}</a>
+  {% endif %}
+  {% if news.paginator.num_pages > 1 %}
+    <span class="current">
+      {% trans 'Page' %} {{ news.number }} {% trans 'of' %} {{ news.paginator.num_pages }}
+    </span>
+  {% endif %}
+  {% if news.has_next %}
+    <a href="?page={{ news.next_page_number }}">{% trans 'next' %} ›</a>
+  {% endif %}
+  </p>
+{% else %}
+  <p class="smaller"><a href="{% url mynews.views.list_msg all='all' %}">{% trans 'All news' %}</a></p>
+{% endif %}
+{% else %}
+  <p>{% trans 'No posts' %}.</p>
+{% endif %}
+{% if user.is_authenticated %}
+  <p>
+    <form action="{% url mynews.views.add_msg %}" method="post">{% csrf_token %}
+    <table class="formpost">
+      {{ form }}
+      <tr><th></th><td>
+        <table cellspacing="0" cellpadding="0" width="100%"><tr>
+          <td><input type="submit" value="{% trans 'Post' %}" /></td>
+          <td class="smaller" align="right">{% trans 'Support syntax' %} <b>Markdown</b></td></tr>
+        </table>
+      </td></tr>
+    </table>
+    </form>
+  </p>
+{% else %}
+  <p class="smaller">{% trans 'Please authorize to post messages' %}.</p>
+{% endif %}
+{% endblock %}

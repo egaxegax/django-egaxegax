@@ -8,20 +8,23 @@
 <title>{% block title %}{% endblock %}Портал Григория Еремина</title>
 <link rel='shortcut icon' href='/media/img/favicon.ico?1322400151' />
 <style type="text/css">
+body { background-color: #ce994d; }
 body { font-family: Verdana,Helvetica,sans-serif; 
   background: linear-gradient(to right, #cd984c 0%, #e2bd6f 24%, #fffbf0 34%, #e8b357 57%, #a85a34 67%, #713326 100%) repeat scroll 0 0 transparent; }
 .main { width: 1020px; margin: 0 auto; }
-.wrap { margin-top: 5px; background: none repeat scroll 0 0 rgba(56,32,44,0.3); border-radius: 7px 7px 7px 7px; }
-.white { color: #E4E4E4; }
-.white a { color: #E4E4E4; }
+.bg { background-color: #ce994d; }
+.wrap { margin-top: 5px; background: none repeat scroll 0 0 rgba(56,32,44,0.3); 
+ border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px;}
+.white { color: #F4F4F4; }
+.white a { color: #F4F4F4; }
 #header { height: 70px; }
 #logo { width: 400px; margin-top: 25px; text-align: center; }
-#topnav ul { padding: 15px; }
-#topnav ul li { margin-left: 20px; }
+#topnav ul li { margin-left: 20px; text-shadow: 1px 1px #713326; }
 #topban .ads { text-align: center; margin-top: 5px; }
 #topmenu { height: 50px; text-align: right; }
 #topmenu ul { padding: 15px; }
-#topmenu ul li { margin-left: 10px; padding: 5px; border-radius: 5px 5px 5px 5px; border: 1px solid #D6D6D6; }
+#topmenu ul li { margin-left: 10px; padding: 5px; border: 1px solid #D6D6D6;
+  border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px; }
 #cont { padding: 10px; }
 #pageheader { padding: 15px; background-color: white; border-bottom: 1px dotted #CCCCCC; }
 #content { padding: 15px; background-color: white; }
@@ -30,6 +33,7 @@ body { font-family: Verdana,Helvetica,sans-serif;
 .formpost th { width: 8%; }
 .formpost textarea { width: 100%; }
 a.nodecor { text-decoration:none; }
+a.nodecor img { border: 0 none; }
 .inl li { display: inline; vertical-align: top; }
 .nomarg { margin: 0 0 0 0; }
 .nopad { padding: 0 0 0 0; }
@@ -50,7 +54,7 @@ a.nodecor { text-decoration:none; }
 <body class="nomarg">
 <div id="header" class="main">
   <div id="logo" class="lfloat">
-    <a href="/">
+    <a class="nodecor" href="/">
       <img src="/media/img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
     </a>
   </div>
@@ -63,10 +67,9 @@ a.nodecor { text-decoration:none; }
       <br></center>
     </div>
   </div>
-  <div id="topnav" class="smaller white">
-    <ul class="rfloat inl">
+  <div id="topnav" class="rfloat smaller white">
+    <ul class="inl">
     {% if user.is_authenticated %}
-      <li><img width="26px" height="26px" src="{% url my.views.get_avatar %}" title="{{ user.username }}"/></li>
       <li>{% trans 'Welcome,' %} {{ user.username }}</li>
       <li><a class="nodecor" href="{% url django.contrib.auth.views.logout %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
     {% else %}
@@ -74,10 +77,16 @@ a.nodecor { text-decoration:none; }
       <li><a class="nodecor" href="{% url django.contrib.auth.views.login %}?b={{ logback }}">{% trans 'Log in' %}</a></li>      
     {% endif %}
     </ul>
+    <ul class="inl">
+    {% if not user.is_authenticated %}
+      <li><a class="nodecor" href="{% url my.views.create_new_user %}?b={{ logback }}">{% trans 'Register' %}</a></li>      
+    {% endif %}
+    </ul>
   </div>
 </div>
 <div id="topmenu" class="main wrap smaller white">
   <ul class="inl nomarg nopad"><li class="mainmenu"><a class="nodecor" href="{% url my.views.index %}">{% trans 'Main' %}</a></li>
+    <li class="newsmenu"><a class="nodecor" href="{% url mynews.views.list_msg %}">{% trans 'News' %}</a></li>
     <li class="guestmenu"><a class="nodecor" href="{% url guestbook.views.list_subjects %}">{% trans 'Guestbook' %}</a></li>
     <li class="photomenu"><a class="nodecor" href="{% url my.views.list_photos %}">{% trans 'Photos' %}</a></li>
     <li class="songmenu"><a class="nodecor" href="{% url songs.views.list_songs %}">{% trans 'Chords' %}</a></li></ul>
@@ -102,7 +111,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 "border='0' width='88' height='31'><\/a>")
 //--></script><!--/LiveInternet-->
   </td><td align="left">
-    <a class="nodecor" href="https://plus.google.com/102759580886505378691/about" target="_blank">egaxegax</a>
+   <i>{% trans 'Write to' %}</i> <a href="mailto:egaxegax@gmail.com?subject=About%20egaxegax.appspot.com&body=Good%20site" target="_blank">egaxegax</a>
   </td></tr>
   </table>
 </div>

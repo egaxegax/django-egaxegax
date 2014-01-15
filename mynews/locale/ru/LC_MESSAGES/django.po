@@ -1,0 +1,60 @@
+# egaxegax.appspot.com.
+# Copyright (C) 2011
+# This file is distributed under the same license as the Django package.
+# egaxegax@gmail.com, 2013.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: models.py
+
+msgid "content"
+msgstr "Текст"
+
+#: templates/base.html
+
+msgid "News"
+msgstr "Новости"
+
+#: templates/mynews.html
+
+msgid "news"
+msgstr "новости, сообщения"
+
+msgid "All news"
+msgstr "Все новости"
+
+msgid "No posts"
+msgstr "Нет записей"
+
+msgid "added"
+msgstr "добавил"
+
+msgid "Edit"
+msgstr "Править"
+
+msgid "previous"
+msgstr "пред"
+
+msgid "Page"
+msgstr "Стр."
+
+msgid "of"
+msgstr "из"
+
+msgid "next"
+msgstr "след"
+
+msgid "Please authorize to post messages"
+msgstr "Войдите, чтобы оставлять сообщения"
+
+msgid "Support syntax"
+msgstr "Поддерживается разметка"
+
+

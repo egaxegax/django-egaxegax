@@ -78,9 +78,8 @@ def create_new_user(request):
                                'upload_url': upload_url,
                                'upload_data': upload_data}) 
 
-def get_avatar(request):
-    user_id = ZI(request.session.get('_auth_user_id'))
-    profile = get_object_or_404(Profile, user__exact=user_id)
+def get_avatar(request, **kw):
+    profile = get_object_or_404(Profile, user__exact=ZI(kw.get('id')))
     if profile.avatar:
 #        blob_key = str(greeting.avatar.file.blobstore_info._BlobInfo__key)
         return serve_file(request, profile.avatar)

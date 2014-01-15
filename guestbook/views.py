@@ -141,4 +141,5 @@ def get_user_profile(request, **kw):
         m = Greeting.objects.filter(author__id=user.id)
         return direct_to_template(request, 'get_user_profile.html',
                                   {'record': m[0],
-                                   'record_count': m.count()})
+                                   'record_count': m.count(),
+                                   'logback': reverse('guestbook.views.list_greetings')})

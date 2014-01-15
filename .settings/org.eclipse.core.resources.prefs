@@ -1,3 +1,6 @@
 eclipse.preferences.version=1
 encoding//guestbook/views.py=utf-8
 encoding//my/views.py=utf-8
+encoding//mynews/views.py=utf-8
+encoding//songs/views.py=utf-8
+encoding/<project>=UTF-8

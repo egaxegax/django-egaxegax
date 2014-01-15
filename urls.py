@@ -9,10 +9,12 @@ admin.autodiscover()
 handler500 = 'djangotoolbox.errorviews.server_error'
 
 urlpatterns = patterns('',
+    (r'^$', include('mynews.urls')),
+    (r'^about/', 'my.views.index'),
+    (r'^av/(?P<id>[0-9]*)/?$', 'my.views.get_avatar'),
+    (r'^news/', include('mynews.urls')),
     (r'^guestbook$', 'django.views.generic.simple.redirect_to', {'url': '/guestbook/', }),
     (r'^guestbook/', include('guestbook.urls')),
-    (r'^$', 'my.views.index'),
-    (r'^av/', 'my.views.get_avatar'),
     (r'^photos/', include(my.urls.photos)),
     (r'^songs/', include('songs.urls')),
     (r'^upload/', include('upload.urls')),

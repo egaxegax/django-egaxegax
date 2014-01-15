@@ -18,9 +18,10 @@ INSTALLED_APPS = (
     'djangoappengine',
     'filetransfers',
     'upload',
+    'my',
+    'mynews',
     'guestbook',
     'songs',
-    'my',
 )
 
 MIDDLEWARE_CLASSES = (

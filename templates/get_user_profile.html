@@ -11,6 +11,7 @@ ul.profile li { padding: 1px 0 1px 0; }
   Информация о пользователе:
 </p>
 <ul class="profile">
+  <li>{% trans 'avatar'|capfirst %}: <img width="26px" height="26px" src="{% url my.views.get_avatar id=record.author.id %}" title="{{ record.author.username }}"/></li>
   <li>{% trans 'name'|capfirst %}: {{ record.author.username }}</li>
   <li>{% trans 'last login'|capfirst %}: {{ record.author.last_login }}</li>
   <li>{% trans 'date joined'|capfirst %}: {{ record.author.date_joined }}</li>

@@ -92,9 +92,6 @@ msgstr "Весь список"
 msgid "Profile"
 msgstr "Профайл"
 
-msgid "Posts"
-msgstr "Текстов"
-
 msgid "Search by title"
 msgstr "Найти по названию"
 

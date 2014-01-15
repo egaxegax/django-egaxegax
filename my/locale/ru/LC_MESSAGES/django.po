@@ -31,8 +31,11 @@ msgstr "Портал Egax"
 msgid "Add user"
 msgstr "Добавить пользователя"
 
+msgid "Register"
+msgstr "Регистрация"
+
 msgid "Main"
-msgstr "Главная"
+msgstr "О сайте"
 
 msgid "Photos"
 msgstr "Фото"
