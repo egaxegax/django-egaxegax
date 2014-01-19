@@ -15,4 +15,14 @@ class AddPhotoForm(forms.ModelForm):
     class Meta:
         model = Photo
         exclude = ['author', 'date', 'width', 'height', 'thumb_url']
+        widgets = {
+            'title': forms.TextInput(attrs={'onkeyup': 'document.getElementById(this.id+1).value=toTranslit(this.value);'}),
+            'album': forms.TextInput(attrs={'onkeyup': 'document.getElementById(this.id+1).value=toTranslit(this.value);'}),
+        }
+    title1 = forms.CharField(widget=forms.HiddenInput, required=False)
+    album1 = forms.CharField(widget=forms.HiddenInput, required=False)
 
+class EditPhotoForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        exclude = ['author', 'date', 'width', 'height', 'thumb_url', 'img']

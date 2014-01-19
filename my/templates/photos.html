@@ -6,14 +6,13 @@
 {% block pagestyle %}
 #topmenu li.photomenu { background-color: #cd984c; }
 #viewcont { position: fixed; left:0; top:0; height: 100%; width: 100%; }
-#viewphoto { max-width:805px; background-color: #a07443; }
+#viewphoto { max-width:805px; background-color: #a07443; border: 1px solid #999999; }
 #viewheader { height: 1.5em; }
 #closebtn { background-color: #cd984c; }
-#removebtn { color: #f2866b; }
 #viewfooter { text-align:left; }
 .info { font-size: 80%; color: #888888; width: 120px; text-align: center; }
 .inbar { margin: 1px 5px; padding: 1px 8px; }
-.outbar { padding: 8px; }
+.edit b { color: #f2866b; }
 li.img img { margin: 16px 0 16px 0; }
 li.nav { padding: 0 4px 0 4px; }
 li.nav i { padding-left: 24px; }
@@ -62,8 +61,9 @@ li.nav i { padding-left: 24px; }
         <div class="smaller inbar lfloat">
           <a class="nodecor" href="" title="{% trans 'Title' %}">{{ photo.title }}</a> | 
           {% if photo.album %}<a class="nodecor" href="" title="{% trans 'Album' %}">{{ photo.album }}</a>{% endif %}
-          {% if user.is_authenticated and user.id == photo.author.id %} |   
-            <a id="removebtn" class="nodecor smaller" href="{% url my.views.delete_photo id=photo.id %}" title="{% trans 'Delete' %}"><b>x</b></a>
+          {% if user.is_authenticated and user.id == photo.author.id %}&nbsp;
+            <a class="nodecor smaller edit" href="{% url my.views.edit_photo id=photo.id %}" title="{% trans 'Edit' %}"><b>{% trans 'Edit' %}</b></a>   
+            <a class="nodecor smaller edit" href="{% url my.views.delete_photo id=photo.id %}" title="{% trans 'Delete' %}"><b>{% trans 'Delete' %}</b></a>
           {% endif %}
         </div>
       </div>

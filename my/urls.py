@@ -5,6 +5,7 @@ photos = patterns('my.views',
     (r'^(?P<id>[0-9]*)/?$', 'list_photos'),
     (r'^orig/(?P<id>[0-9]*)/?$', 'get_photo'),
     (r'^add/?$', 'add_photo'),
+    (r'^edit/(?P<id>[0-9]*)/?$', 'edit_photo'),
     (r'^del/(?P<id>[0-9]*)/?$', 'delete_photo'),
 )
 

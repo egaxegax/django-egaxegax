@@ -8,7 +8,9 @@ class Profile(models.Model):
     avatar = models.FileField(upload_to='img', null=True, blank=True, verbose_name=_('avatar'))
 
 class Photo(models.Model):
-    title = models.CharField(max_length=50, unique=True, verbose_name=_('title'))
+    class Meta:
+        unique_together = ('title', 'album')
+    title = models.CharField(max_length=50, verbose_name=_('title'))
     album = models.CharField(max_length=50, null=True, verbose_name=_('album'))
     img = models.FileField(upload_to='img', verbose_name=_('img'))
     width = models.IntegerField(null=True, verbose_name=_('width'))

@@ -69,6 +69,9 @@ msgstr "Войдите, чтобы добавлять фотографии"
 msgid "Add photo"
 msgstr "Добавить фото"
 
+msgid "Edit photo"
+msgstr "Править фото"
+
 msgid "Click to view full size"
 msgstr "Нажмите, чтобы открыть исходный размер"
 

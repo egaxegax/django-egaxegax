@@ -14,7 +14,7 @@ from my.forms import *
 from my.models import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
-import time, os.path
+import time, os.path, re
 
 def ZI(s):
     try:
@@ -34,8 +34,16 @@ def PageList(request, qst, per_page=5):
     try:    # last page
         return paginator.page(page)
     except (EmptyPage, InvalidPage):
-        return paginator.page(paginator.num_pages) 
-    
+        return paginator.page(paginator.num_pages)
+
+def FromTranslit(s):
+    r = {'YO':u'Ё', 'A':u'А', 'B':u'Б', 'V':u'В', 'G':u'Г', 'D':u'Д', 'E':u'Е', 'ZH':u'Ж', 'Z':u'З', 'I':u'И', 'J':u'Й', 'K':u'К', 'L':u'Л', 'M':u'М', 'N':u'Н', 'O':u'О', 'P':u'П',
+         'R':u'Р', 'S':u'С', 'T':u'Т', 'U':u'У', 'F':u'Ф', 'H':u'Х', 'C':u'Ц', 'CH':u'Ч', 'SH':u'Ш', 'SHCH':u'Щ', '\'\'':u'Ъ', 'Y\'':u'Ы', '\'':u'Ь', 'E\'':u'Э', 'YU':u'Ю', 'YA':u'Я',          
+         'yo':u'ё', 'a':u'а', 'b':u'б', 'v':u'в', 'g':u'г', 'd':u'д', 'e':u'е', 'zh':u'ж', 'z':u'з', 'i':u'и', 'j':u'й', 'k':u'к', 'l':u'л', 'm':u'м', 'n':u'н', 'o':u'о', 'p':u'п',
+         'r':u'р', 's':u'с', 't':u'т', 'u':u'у', 'f':u'ф', 'h':u'х', 'c':u'ц', 'ch':u'ч', 'sh':u'ш', 'shch':u'щ', '\'\'':u'ъ', 'y\'':u'ы', '\'':u'ь', 'e\'':u'э', 'yu':u'ю', 'ya':u'я'};
+    pattern = '|'.join(map(re.escape, sorted(r, key=len, reverse=True)))
+    return re.sub(pattern, lambda m: r[m.group()], s)
+
 # Controllers
 
 def index(request):
@@ -95,6 +103,8 @@ def add_photo(request):
             data = blobstore.BlobReader(blob_key).read()
             try:
                 img = images.Image(image_data=data)
+                photo.title = FromTranslit(form.data['title1'])
+                photo.album = FromTranslit(form.data['album1'])
                 photo.width = img.width
                 photo.height = img.height
                 photo.thumb_url = images.get_serving_url(blob_key)
@@ -111,6 +121,24 @@ def add_photo(request):
                               {'form': form, 
                                'upload_url': upload_url,
                                'upload_data': upload_data})
+
+def edit_photo(request, **kw):
+    id_photo = ZI(kw.get('id'))
+    photo = get_object_or_404(Photo, id=id_photo)
+    if request.method == 'POST':
+        form = EditPhotoForm(request.POST, instance=photo)
+        if form.is_valid():
+            photo = form.save(commit=False)
+            photo.save(force_update=True)
+            return HttpResponseRedirect(reverse('my.views.list_photos', kwargs={'id': id_photo}))
+    else:
+        form = EditPhotoForm(initial={
+                           'id': photo.id,
+                           'title': photo.title,
+                           'album': photo.album})
+    return direct_to_template(request, 'edit_photo.html',
+                              {'form': form,
+                               'photo': photo})
 
 def delete_photo(request, **kw):
     if request.user.is_authenticated():
