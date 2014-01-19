@@ -9,32 +9,40 @@
 #viewphoto { max-width:805px; background-color: #a07443; }
 #viewheader { height: 1.5em; }
 #closebtn { background-color: #cd984c; }
-#removebtn { margin-left: -20px; margin-top: 1.5em; background-color: #a07443; color: #f2866b; }
+#removebtn { color: #f2866b; }
 #viewfooter { text-align:left; }
+.info { font-size: 80%; color: #888888; width: 120px; text-align: center; }
 .inbar { margin: 1px 5px; padding: 1px 8px; }
 .outbar { padding: 8px; }
-table.plist td { vertical-align: center; }
-td.nav { width: 18px; }
+li.img img { margin: 16px 0 16px 0; }
+li.nav { padding: 0 4px 0 4px; }
+li.nav i { padding-left: 24px; }
 {% endblock %}
 {% block pageheader %}{% trans 'Photos' %}{% endblock %}
 {% block content %}
-<p>Подборка разных фотографий о природе, местах, людях. Смотрите, добавляйте свои работы.</p>
+<p>Подборка фотографий, снятых на телефон, о природе, местах, людях. Смотрите, добавляйте свои работы.</p>
 {% if photos.object_list %}
-  <table class="plist smaller"><tr>
-  <td class="nav">
+  <ul class="inl nomarg nopad smaller">
+    <li class="nav">
   {% if photos.has_previous %}
-    <a class="nodecor" href="{% url my.views.list_photos %}?page={{ photos.previous_page_number }}"><img src='/media/img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}"></span></a>
+      <a class="nodecor" href="{% url my.views.list_photos %}?page={{ photos.previous_page_number }}">
+        <img src='/media/img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
+  {% else %}<i></i>
   {% endif %}
-  </td>
+    </li>
   {% for photo in photos.object_list %}
-    <td><a class="nodecor" href="{% url my.views.list_photos id=photo.id %}?page={{ photos.number }}"><img src="{{ photo.thumb_url }}=s128" title="{{ photo.title }}" alt="{{ photo.title }}"/></a></td>
+    <li class="img">
+      <a class="img nodecor" href="{% url my.views.list_photos id=photo.id %}?page={{ photos.number }}">
+        <img src="{{ photo.thumb_url }}=s128" title="{{ photo.title }}" alt="{{ photo.title }}"/></a>
+    </li>
   {% endfor %}
-  <td class="nav">
+    <li class="nav">
   {% if photos.has_next %}
-    <a class="nodecor" href="{% url my.views.list_photos %}?page={{ photos.next_page_number }}"><img src='/media/img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}"></span></a>
+    <a class="nodecor" href="{% url my.views.list_photos %}?page={{ photos.next_page_number }}"><img src='/media/img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
+  {% else %}<i></i>
   {% endif %}
-  </td>
-  </tr></table>
+    </li>
+  </ul>
 {% else %}
   <p>{% trans 'No photos' %}.</p>
 {% endif %}
@@ -51,14 +59,12 @@ td.nav { width: 18px; }
         <a class="nodecor" href="#" onclick="document.getElementById('viewcont').style.display='none';" title="{% trans 'Close' %}">
           <div id="closebtn" class="smaller inbar rfloat"><b>x</b></div>
         </a>
-        {% if user.is_authenticated and user.id == photo.author.id %}
-         <a href="{% url my.views.delete_photo id=photo.id %}" title="{% trans 'Delete' %}">
-           <div id="removebtn" class="wrap smaller outbar lfloat"><b>x</b></div>
-         </a>
-        {% endif %}
         <div class="smaller inbar lfloat">
           <a class="nodecor" href="" title="{% trans 'Title' %}">{{ photo.title }}</a> | 
           {% if photo.album %}<a class="nodecor" href="" title="{% trans 'Album' %}">{{ photo.album }}</a>{% endif %}
+          {% if user.is_authenticated and user.id == photo.author.id %} |   
+            <a id="removebtn" class="nodecor smaller" href="{% url my.views.delete_photo id=photo.id %}" title="{% trans 'Delete' %}"><b>x</b></a>
+          {% endif %}
         </div>
       </div>
       <div id="viewcontent">

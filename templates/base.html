@@ -11,24 +11,24 @@
 body { background-color: #ce994d; }
 body { font-family: Verdana,Helvetica,sans-serif; 
   background: linear-gradient(to right, #cd984c 0%, #e2bd6f 24%, #fffbf0 34%, #e8b357 57%, #a85a34 67%, #713326 100%) repeat scroll 0 0 transparent; }
-.main { width: 1020px; margin: 0 auto; }
-.bg { background-color: #ce994d; }
-.wrap { margin-top: 5px; background: none repeat scroll 0 0 rgba(56,32,44,0.3); 
- border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px;}
-.white { color: #F4F4F4; }
-.white a { color: #F4F4F4; }
 #header { height: 70px; }
 #logo { width: 400px; margin-top: 25px; text-align: center; }
 #topnav ul li { margin-left: 20px; text-shadow: 1px 1px #713326; }
 #topban .ads { text-align: center; margin-top: 5px; }
 #topmenu { height: 50px; text-align: right; }
 #topmenu ul { padding: 15px; }
-#topmenu ul li { margin-left: 10px; padding: 5px; border: 1px solid #D6D6D6;
+#topmenu ul li { margin-left: 10px; padding: 5px; border: 1px solid #d6d6d6;
   border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px; }
 #cont { padding: 10px; }
-#pageheader { padding: 15px; background-color: white; border-bottom: 1px dotted #CCCCCC; }
+#pageheader { padding: 15px; background-color: white; border-bottom: 1px dotted #cccccc; }
 #content { padding: 15px; background-color: white; }
 #footer { height: 50px; text-align: center; }
+.main { width: 966px; margin: 0 auto; }
+.bg { background-color: #ce994d; }
+.wrap { margin-top: 5px; background: none repeat scroll 0 0 rgba(56,32,44,0.3); 
+ border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px;}
+.white { color: #f4f4f4; }
+.white a { color: #f4f4f4; }
 .formpost { width: 100%; }
 .formpost th { width: 8%; }
 .formpost textarea { width: 100%; }
@@ -71,14 +71,15 @@ a.nodecor img { border: 0 none; }
     <ul class="inl">
     {% if user.is_authenticated %}
       <li>{% trans 'Welcome,' %} {{ user.username }}</li>
-      <li><a class="nodecor" href="{% url django.contrib.auth.views.logout %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
     {% else %}
       <li>{% trans 'Logged out' %}</li>
       <li><a class="nodecor" href="{% url django.contrib.auth.views.login %}?b={{ logback }}">{% trans 'Log in' %}</a></li>      
     {% endif %}
     </ul>
     <ul class="inl">
-    {% if not user.is_authenticated %}
+    {% if user.is_authenticated %}
+      <li><a class="nodecor" href="{% url django.contrib.auth.views.logout %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
+    {% else %}
       <li><a class="nodecor" href="{% url my.views.create_new_user %}?b={{ logback }}">{% trans 'Register' %}</a></li>      
     {% endif %}
     </ul>

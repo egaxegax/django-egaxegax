@@ -48,7 +48,7 @@ def list_photos(request, **kw):
     if kw.get('id'): 
         view = Photo.objects.filter(id=ZI(kw.get('id')))
     return direct_to_template(request, 'photos.html',
-                              {'photos': PageList(request, photos_list, 7),
+                              {'photos': PageList(request, photos_list, 6),
                                'view':  view,
                                'logback': reverse('my.views.list_photos')})
 

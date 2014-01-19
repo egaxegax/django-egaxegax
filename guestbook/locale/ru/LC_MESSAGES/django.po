@@ -23,7 +23,7 @@ msgstr "Тема"
 #: templates/base.html
 
 msgid "Guestbook"
-msgstr "Гостевая книга"
+msgstr "Статьи"
 
 #: templates/subjects.html
 

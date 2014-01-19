@@ -10,7 +10,7 @@
 {% block content %}
 <p>Добавляйте свои фото и картинки.</p>
 {% if user.is_authenticated %}
-  <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
+  <form action="{{ upload_url }}" enctype="multipart/form-data" method="post" accept-charset="utf-8">
     {% render_upload_data upload_data %}
     <table>
       {{ form.as_table }}
