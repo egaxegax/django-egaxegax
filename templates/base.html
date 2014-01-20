@@ -70,7 +70,7 @@ a.nodecor img { border: 0 none; }
   <div id="topnav" class="rfloat smaller white">
     <ul class="inl">
     {% if user.is_authenticated %}
-      <li>{% trans 'Welcome,' %} {{ user.username }}</li>
+      <li>{% trans 'Welcome,' %} <b>{{ user.username }}</b></li>
     {% else %}
       <li>{% trans 'Logged out' %}</li>
       <li><a class="nodecor" href="{% url django.contrib.auth.views.login %}?b={{ logback }}">{% trans 'Log in' %}</a></li>      

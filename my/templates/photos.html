@@ -32,7 +32,7 @@ li.nav i { padding-left: 24px; }
   {% for photo in photos.object_list %}
     <li class="img">
       <a class="img nodecor" href="{% url my.views.list_photos id=photo.id %}?page={{ photos.number }}">
-        <img src="{{ photo.thumb_url }}=s128" title="{{ photo.title }}" alt="{{ photo.title }}"/></a>
+        <img src="{{ photo.thumb_url }}=s128" title="{{ photo.title }} | {{ photo.album }}" alt="{{ photo.title }}"/></a>
     </li>
   {% endfor %}
     <li class="nav">
@@ -59,8 +59,7 @@ li.nav i { padding-left: 24px; }
           <div id="closebtn" class="smaller inbar rfloat"><b>x</b></div>
         </a>
         <div class="smaller inbar lfloat">
-          <a class="nodecor" href="" title="{% trans 'Title' %}">{{ photo.title }}</a> | 
-          {% if photo.album %}<a class="nodecor" href="" title="{% trans 'Album' %}">{{ photo.album }}</a>{% endif %}
+          {{ photo.title }} | {{ photo.album }}
           {% if user.is_authenticated and user.id == photo.author.id %}&nbsp;
             <a class="nodecor smaller edit" href="{% url my.views.edit_photo id=photo.id %}" title="{% trans 'Edit' %}"><b>{% trans 'Edit' %}</b></a>   
             <a class="nodecor smaller edit" href="{% url my.views.delete_photo id=photo.id %}" title="{% trans 'Delete' %}"><b>{% trans 'Delete' %}</b></a>
