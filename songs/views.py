@@ -40,47 +40,100 @@ def PageList(request, qst, per_page=5):
         return paginator.page(paginator.num_pages) 
     
 def ClearSongCache():
-    cache.delete_many(['songs', 'songs_art'])
+    cache.delete_many(['songs', 'art'])
     for i in art_index.keys():
-        cache.delete_many(['songs_art_i_%s' % (i,)])
+        cache.delete_many(['art_i_%s' % (i,)])
+
+# increment art song count
+def IncArtCount(**kw):
+    if kw.get('artist'):
+        try:
+            form_art = AddArtForm(instance=Art.objects.get(artist=kw['artist']))
+            art = form_art.save(commit=False)
+            art.count += kw.get('count', 1)
+            art.save(force_update=True)
+            if art.count < 1:
+                art.delete()
+        except:
+            form_art = AddArtForm()
+            art = form_art.save(commit=False)
+            art.artist = kw['artist']
+            art.count = kw.get('count', 1)
+            art.ref_id = kw['id']
+            art.save()
 
 # Controllers
 
+def copy_art(request):
+    a = []
+    art_list = []
+    song_list = Song.objects.order_by('artist')
+    for song in song_list:
+        if song.artist not in a:
+            a.append(song.artist)
+            art_list.append({'id': song.id, 'artist': song.artist, 'count': 1})
+        else:
+            art_list[len(art_list)-1]['count'] += 1
+    Art.objects.all().delete()
+    for art in art_list:
+        IncArtCount(**art)
+    return direct_to_template(request, 'copy_art.html',
+                              {'songs': Art.objects.all(),
+                               'art_count': len(art_list),
+                               'song_count': len(song_list)})
+
+def list_art(request, **kw):
+    art_count = 0
+    song_count = 0
+    per_page = 1000
+    cache_by_art = False
+    art_list = []
+    if kw.get('ind_art'):  # by index
+        i = ZI(kw.get('ind_art'))
+        lt = art_index.get(i)
+        if lt:
+            art_list = cache.get('art_i_%s' % (i,))
+            if art_list is None:
+                art_list = Art.objects.filter(artist__startswith=lt.capitalize()).order_by('artist')
+                cache_by_art = 'art_i_%s' % (i,)
+        else:
+            art_list = Art.objects.none()
+        art_count = len(art_list)
+        for art in art_list:  # sum song by art
+            song_count += art.count
+    else:  # full list
+        art_list = cache.get('art')
+        if art_list is None:
+            art_list = Art.objects.order_by('artist')
+            cache_by_art = 'art'
+        art_count = len(art_list)
+    if cache_by_art:
+        cache.add(cache_by_art, art_list)
+    return direct_to_template(request, 'songs.html',
+                              {'art_index': art_index,
+                               'form': SearchForm(initial={'search':request.GET.get('search')}),
+                               'song_count': song_count,
+                               'art_count': art_count,
+                               'songs': PageList(request, art_list, per_page),
+                               'logback': reverse('songs.views.list_art')})
+
 def list_songs(request, **kw):
-    song_art_count = 0
-    art_song_count = 0
+    song_count = 0
     song_last_count = 0
     search_count = 0
-    cache_by_art = False
     per_page = 1000
+    song_list = []
     if kw.get('id_art'):  # filter by art
         song_list = Song.objects.filter(id=ZI(kw.get('id_art')))
         if song_list.count(): # count songs
             song_list = Song.objects.filter(artist=song_list[0].artist)
-            song_art_count = len(song_list)
+            song_count = len(song_list)
             per_page = 10
-    elif 'id_art' in kw:  # full list
-        song_list = cache.get('songs_art')
-        if song_list is None:
-            song_list = Song.objects.order_by('artist')
-            cache_by_art = 'songs_art'
-        art_song_count = len(song_list)
-    elif kw.get('ind_art'):  # by index
-        i = ZI(kw.get('ind_art'))
-        lt = art_index.get(i)
-        if lt:
-            song_list = cache.get('songs_art_i_%s' % (i,))
-            if song_list is None:
-                song_list = Song.objects.filter(artist__startswith=lt.capitalize()).order_by('artist')
-                cache_by_art = 'songs_art_i_%s' % (i,)
-        else:
-            song_list = Song.objects.none()
-        art_song_count = len(song_list)
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
         song_list = Song.objects.filter(Q(title__startswith=st))
-        song_art_count = len(song_list)
-        search_count = song_art_count
+        song_count = len(song_list)
+        search_count = song_count
         per_page = 10
     else:  # last update
         song_list = cache.get('songs')
@@ -88,26 +141,10 @@ def list_songs(request, **kw):
             song_list = Song.objects.order_by('-date')[:7]
             cache.add('songs', song_list)
         song_last_count = len(song_list)
-    if art_song_count:
-        if cache_by_art:  # regroup by art    
-            a = []
-            art_song_list = []
-            for song in song_list:
-                if song.artist not in a:
-                    a.append(song.artist)
-                    art_song_list.append({'id': song.id, 'artist': song.artist, 'count': 1})
-                else:
-                    art_song_list[len(art_song_list)-1]['count'] += 1
-            art_song_count = len(art_song_list)
-            song_list = art_song_list        
-            cache.add(cache_by_art, song_list)
-        for art in song_list:  # sum song by art
-            song_art_count += art['count']
     return direct_to_template(request, 'songs.html',
                               {'art_index': art_index,
                                'form': SearchForm(initial={'search':request.GET.get('search')}),
-                               'song_count': song_art_count,
-                               'art_count': art_song_count,
+                               'song_count': song_count,
                                'last_count': song_last_count,
                                'search_count': search_count,
                                'songs': PageList(request, song_list, per_page),                              
@@ -124,6 +161,7 @@ def add_song(request):
             song.content = song.content.strip('\r\n')
             song.author = request.user
             song.save()
+            IncArtCount(artist=song.artist, id=song.id)
             ClearSongCache()
             return HttpResponseRedirect(reverse('songs.views.list_songs'))
     else:
@@ -136,6 +174,7 @@ def delete_song(request, **kw):
         song = get_object_or_404(Song, id=ZI(kw.get('id')))         
         if not song.author or request.user.username == song.author.username:
             song.delete()
+            IncArtCount(artist=song.artist, id=song.id, count=-1)
             ClearSongCache()
     return HttpResponseRedirect(reverse('songs.views.list_songs'))
 
@@ -187,7 +226,7 @@ def get_song(request, **kw):
         t = t.replace('\n','<br/>')
         t = t.replace('\t', '  ')
         t = t.replace(' ', '&nbsp;')
-        song.content = t        
+        song.content = t
         return direct_to_template(request, 'song.html',
                                   {'song': song,
                                    'autoplay': request.GET.get('a', 0)})

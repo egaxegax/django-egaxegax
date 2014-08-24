@@ -422,3 +422,21 @@ transformers:
 
     - property: artist
       external_name: artist
+
+
+- kind: my_art
+  connector: csv
+  connector_options:
+    encoding: windows-1251
+  property_map:
+    - property: __key__
+      external_name: key
+      export_transform: transform.key_id_or_name_as_string
+      import_transform: transform.none_if_empty(int)
+
+    - property: artist
+      external_name: artist
+
+    - property: count
+      external_name: count
+

@@ -22,9 +22,9 @@ input.submit { height: 26px; margin-left: 5px;}
 {% endblock %}
 {% block content %}
 <div class="indexlist">
-  <a href="{% url songs.views.list_songs id_art=None %}">{% trans 'Full list' %}</a>
+  <a href="{% url songs.views.list_art %}">{% trans 'Full list' %}</a>
   {% for i, v in art_index.items %}
-    <a class="nodecor" href="{% url songs.views.list_songs ind_art=i %}">{{ v|capfirst }}</a>
+    <a class="nodecor" href="{% url songs.views.list_art ind_art=i %}">{{ v|capfirst }}</a>
   {% endfor %}
   <form class="search" action="{% url songs.views.list_songs %}" method="get">{% csrf_token %}
     {{ form }}
@@ -40,7 +40,10 @@ input.submit { height: 26px; margin-left: 5px;}
 {% endif %}
 {% for song in songs.object_list %}
   <dl class="messageitem"><dt>
-  {% if art_count or last_count or search_count%}
+  {% if art_count %}
+    <a href="{% url songs.views.list_songs id_art=song.ref_id %}">{{ song.artist }}</a>
+  {% endif %}
+  {% if last_count or search_count%}
     <a href="{% url songs.views.list_songs id_art=song.id %}">{{ song.artist }}</a>
   {% endif %}
   {% if song.count %}

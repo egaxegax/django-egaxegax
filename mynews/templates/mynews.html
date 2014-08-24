@@ -8,7 +8,7 @@
 #topmenu li.newsmenu { background-color: #cd984c; }
 .msgfooter { font-size: 70%; padding: 2px 8px; text-align: right; }
 .msgtext { padding: 0 10px; }
-.msgbox { border: 1px solid #cccccc; margin-bottom: 5px; }
+.msgbox { border: 1px solid #cccccc; border-radius: 4px; margin-bottom: 5px; }
 {% endblock %}
 {% block pagestylelink %}
 <link rel="stylesheet" href="/media/css/syntax.css" />
@@ -20,7 +20,7 @@
   <div class="msgbox">
     <div class="msgtext">{{ msg.content|markdown:"codehilite" }}</div>
     <div class="msgfooter">
-      <a class="nodecor" href="{% url mynews.views.get_user_profile id=msg.author.id %}">{{ msg.author.username }}</a></b> {% trans 'added' %}
+      <b><a class="nodecor" href="{% url mynews.views.get_user_profile id=msg.author.id %}">{{ msg.author.username }}</a></b> {% trans 'added' %}
       {{ msg.date|timesince }} {% trans 'ago' %} 
       {% if user.is_authenticated and user.id == msg.author.id %}
         <a class="nodecor" href="{% url mynews.views.edit_msg id=msg.id %}">{% trans 'Edit' %}</a>

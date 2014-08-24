@@ -5,33 +5,24 @@
 {% block title %}{% trans 'Guestbook' %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
 #topmenu li.guestmenu { background-color: #cd984c; }
-.messageheader { background-color: #d6d6d6; height: 1.5em; padding: 0 8px; }
-.messagesubject { background-color: #E4E4E4; height: 1.5em; padding: 0 10px; }
-.subjlist td { border-bottom: 1px solid #cccccc; border-right: 1px solid #cccccc; }
+.messageitem { background-color: #e4e4e4; min-height: 1.5em; padding: 0 10px; margin: 2px; }
+.messageitem dd { color: gray; }
 {% endblock %}
-{% block pageheader %}{% trans 'Subjects' %}{% endblock %}
+{% block pageheader %}{% trans 'Guestbook' %}{% endblock %}
 {% block content %}
-<p>Читайте, пишите статьи и заметки, оставляйте комментарии.</p>
-{% if subjects.object_list %}
-  <table class="subjlist" width=100% border=0 cellpadding=0 cellspacing=0>
-    <tr><td class="messageheader">{% trans 'Topics' %}</td>
-      <td class="messageheader">{% trans 'Posts' %}</td>
-      <td class="messageheader">{% trans 'Updated' %}</td>
-      <td class="messageheader">{% trans 'By' %}</td></tr>
-{% endif %}
+<p>Читайте, пишите статьи и заметки, оставляйте комментарии на темы:</p>
 {% for subject in subjects.object_list %}
   {% if subject.subject %}
-    <tr><td class="messagesubject">
-        <a href="{% url guestbook.views.list_greetings id_subj=subject.id %}">{{ subject.subject|escape }}</a>
-      </td>
-    <td class="messagesubject">{{ subject.greeting_count }}</td>
-    <td class="messagesubject">{{ subject.updated|date:"d.m.Y H:i" }}</td>
-    <td class="messagesubject"><a class="nodecor" href="{% url guestbook.views.get_user_profile id=subject.author.id %}">{{ subject.author }}</a></td></tr>
+    <dl class="messageitem">
+      <dt><a href="{% url guestbook.views.list_greetings id_subj=subject.id %}">{{ subject.subject|escape }}</a>
+      <span class="smaller">[{{ subject.greeting_count }}]</span></dt>
+      <dd class="smaller">
+        <acronym title="{{ subject.updated|date:"Y-m-d H:i" }}">{{ subject.updated|timesince }}</acronym> {% trans 'ago' %} {% trans 'ago' %}
+      </dd>
+    </dl>
   {% endif %}
 {% endfor %}
-{% if subjects.object_list %}
-  </table>
-{% endif %}
+<p class="smaller"><a href="{% url guestbook.views.list_greetings %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
 {% if subjects.object_list %}
   <p class="smaller">
     {% if subjects.has_previous %}
@@ -66,5 +57,4 @@
 {% else %}
   <p class="smaller">{% trans 'Please authorize to post messages' %}.</p>
 {% endif %}
-  <p class="smaller"><a href="{% url guestbook.views.list_greetings %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
 {% endblock %}

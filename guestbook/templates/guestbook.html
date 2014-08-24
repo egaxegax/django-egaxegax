@@ -6,10 +6,10 @@
 {% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
 #topmenu li.guestmenu { background-color: #cd984c; }
-.messageheader { background-color: #d6d6d6; padding: 2px 8px; }
-.messagesubject { background-color: #e4e4e4; padding: 2px 10px; }
 .messagetext { padding: 0 10px; }
-.messagebox { border: 1px solid #cccccc; margin-bottom: 5px; }
+.messagebox { border: 1px solid #cccccc; border-radius: 4px; margin-bottom: 5px; }
+.messageblock { font-size: 70%; padding: 2px 8px; text-align: right; }
+.messagecred { color: gray; }
 {% endblock %}
 {% block pagestylelink %}
 <link rel="stylesheet" href="/media/css/syntax.css" />
@@ -20,27 +20,25 @@
 {% for greeting in greetings.object_list %}
   <div class="messagebox">
     <a id="id{{ greeting.id }}" name="id{{ greeting.id }}"></a>
-    <div class="messageheader">
-      <div class="rfloat">
-        <a class="nodecor" href="{% url guestbook.views.list_greetings id=greeting.id %}">#{{ greeting.id }}</a>
-      {% if user.is_authenticated and user.id == greeting.author.id %}
-        <a href="{% url guestbook.views.edit_greeting id=greeting.id %}">{% trans 'Edit' %}</a>
-        <a href="{% url guestbook.views.delete_greeting id=greeting.id %}{% if greeting.subject.id %}?id_subj={{ greeting.subject.id }}{% endif %}">{% trans 'Delete' %}</a>
-      {% endif %}
-      </div>
-    {% if greeting.author %}
-      <span><b><a class="nodecor" href="{% url guestbook.views.get_user_profile id=greeting.author.id %}">{{ greeting.author.username }}</a></b> {% trans 'wrote' %}</span>
-    {% else %}
-      {% trans 'An anonymous person' %} {% trans 'wrote' %}
-    {% endif %}
-      <span>{{ greeting.date|date:"d.m.y - H:i" }}:</span>
-    </div>
-  {% if greeting.subject %}
-    <div class="messagesubject">
-      <a href="{% url guestbook.views.list_greetings id_subj=greeting.subject.id %}">{{ greeting.subject.subject|escape }}</a>
-    </div>
-  {% endif %}
+    <div class="messageblock"><a class="nodecor" href="{% url guestbook.views.list_greetings id=greeting.id %}"># {{ greeting.id }}</a></div>
     <div class="messagetext">{{ greeting.content|markdown:"codehilite" }}</div>
+    <div class="messageblock">
+      {% if greeting.subject %}
+        <div><a class="nodecor" href="{% url guestbook.views.list_greetings id_subj=greeting.subject.id %}">{{ greeting.subject.subject|escape }}</a></div>
+      {% endif %}
+      <div class="messagecred">
+        {% if greeting.author %}
+          <b><a class="nodecor" href="{% url guestbook.views.get_user_profile id=greeting.author.id %}">{{ greeting.author.username }}</a></b> {% trans 'wrote' %}
+        {% else %}
+          {% trans 'An anonymous person' %} {% trans 'wrote' %}
+        {% endif %}
+        <acronym title="{{ greeting.date|date:"Y-m-d H:i" }}">{{ greeting.date|timesince }}</acronym> {% trans 'ago' %}
+        {% if user.is_authenticated and user.id == greeting.author.id %}
+          <a class="nodecor" href="{% url guestbook.views.edit_greeting id=greeting.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor" href="{% url guestbook.views.delete_greeting id=greeting.id %}{% if greeting.subject.id %}?id_subj={{ greeting.subject.id }}{% endif %}">{% trans 'Delete' %}</a>
+        {% endif %}
+      </div>
+    </div>
   </div>
 {% endfor %}
 {% if greetings.object_list %}
