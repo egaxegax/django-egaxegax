@@ -1,30 +1,29 @@
 import os
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.template import Template, Context, TemplateSyntaxError
 from django.test import TestCase
+from django.test.utils import override_settings
 
+
+@override_settings(
+    MIDDLEWARE_CLASSES=(
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    ),
+    TEMPLATE_DIRS=(
+        os.path.join(os.path.dirname(__file__), 'templates'),
+    ),
+    SITE_ID=1,
+)
 class FlatpageTemplateTagTests(TestCase):
     fixtures = ['sample_flatpages']
     urls = 'django.contrib.flatpages.tests.urls'
-
-    def setUp(self):
-        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
-        flatpage_middleware_class = 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
-        if flatpage_middleware_class not in settings.MIDDLEWARE_CLASSES:
-            settings.MIDDLEWARE_CLASSES += (flatpage_middleware_class,)
-        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (
-            os.path.join(
-                os.path.dirname(__file__),
-                'templates'
-            ),
-        )
-        self.me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
-
-    def tearDown(self):
-        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
-        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
 
     def test_get_flatpages_tag(self):
         "The flatpage template tag retrives unregistered prefixed flatpages by default"
@@ -35,7 +34,7 @@ class FlatpageTemplateTagTests(TestCase):
                 "{{ page.title }},"
                 "{% endfor %}"
             ).render(Context())
-        self.assertEquals(out, "A Flatpage,A Nested Flatpage,")
+        self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
     def test_get_flatpages_tag_for_anon_user(self):
         "The flatpage template tag retrives unregistered flatpages for an anonymous user"
@@ -48,10 +47,12 @@ class FlatpageTemplateTagTests(TestCase):
             ).render(Context({
                 'anonuser': AnonymousUser()
             }))
-        self.assertEquals(out, "A Flatpage,A Nested Flatpage,")
+        self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
+    @skipIfCustomUser
     def test_get_flatpages_tag_for_user(self):
         "The flatpage template tag retrives all flatpages for an authenticated user"
+        me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
         out = Template(
                 "{% load flatpages %}"
                 "{% get_flatpages for me as flatpages %}"
@@ -59,9 +60,9 @@ class FlatpageTemplateTagTests(TestCase):
                 "{{ page.title }},"
                 "{% endfor %}"
             ).render(Context({
-                'me': self.me
+                'me': me
             }))
-        self.assertEquals(out, "A Flatpage,A Nested Flatpage,Sekrit Nested Flatpage,Sekrit Flatpage,")
+        self.assertEqual(out, "A Flatpage,A Nested Flatpage,Sekrit Nested Flatpage,Sekrit Flatpage,")
 
     def test_get_flatpages_with_prefix(self):
         "The flatpage template tag retrives unregistered prefixed flatpages by default"
@@ -72,7 +73,7 @@ class FlatpageTemplateTagTests(TestCase):
                 "{{ page.title }},"
                 "{% endfor %}"
             ).render(Context())
-        self.assertEquals(out, "A Nested Flatpage,")
+        self.assertEqual(out, "A Nested Flatpage,")
 
     def test_get_flatpages_with_prefix_for_anon_user(self):
         "The flatpage template tag retrives unregistered prefixed flatpages for an anonymous user"
@@ -85,10 +86,12 @@ class FlatpageTemplateTagTests(TestCase):
             ).render(Context({
                 'anonuser': AnonymousUser()
             }))
-        self.assertEquals(out, "A Nested Flatpage,")
+        self.assertEqual(out, "A Nested Flatpage,")
 
+    @skipIfCustomUser
     def test_get_flatpages_with_prefix_for_user(self):
         "The flatpage template tag retrive prefixed flatpages for an authenticated user"
+        me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
         out = Template(
                 "{% load flatpages %}"
                 "{% get_flatpages '/location/' for me as location_flatpages %}"
@@ -96,9 +99,9 @@ class FlatpageTemplateTagTests(TestCase):
                 "{{ page.title }},"
                 "{% endfor %}"
             ).render(Context({
-                'me': self.me
+                'me': me
             }))
-        self.assertEquals(out, "A Nested Flatpage,Sekrit Nested Flatpage,")
+        self.assertEqual(out, "A Nested Flatpage,Sekrit Nested Flatpage,")
 
     def test_get_flatpages_with_variable_prefix(self):
         "The prefix for the flatpage template tag can be a template variable"
@@ -111,7 +114,7 @@ class FlatpageTemplateTagTests(TestCase):
             ).render(Context({
                 'location_prefix': '/location/'
             }))
-        self.assertEquals(out, "A Nested Flatpage,")
+        self.assertEqual(out, "A Nested Flatpage,")
 
     def test_parsing_errors(self):
         "There are various ways that the flatpages template tag won't parse"

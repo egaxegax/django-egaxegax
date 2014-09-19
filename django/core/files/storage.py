@@ -1,6 +1,9 @@
 import os
 import errno
-import urlparse
+try:
+    from urllib.parse import urljoin
+except ImportError:     # Python 2
+    from urlparse import urljoin
 import itertools
 from datetime import datetime
 
@@ -8,11 +11,12 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 from django.utils.text import get_valid_filename
-from django.utils._os import safe_join
+from django.utils._os import safe_join, abspathu
+
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 
@@ -25,16 +29,11 @@ class Storage(object):
     # The following methods represent a public interface to private methods.
     # These shouldn't be overridden by subclasses unless absolutely necessary.
 
-    def open(self, name, mode='rb', mixin=None):
+    def open(self, name, mode='rb'):
         """
-        Retrieves the specified file from storage, using the optional mixin
-        class to customize what features are available on the File returned.
+        Retrieves the specified file from storage.
         """
-        file = self._open(name, mode)
-        if mixin:
-            # Add the mixin as a parent class of the File returned from storage.
-            file.__class__ = type(mixin.__name__, (mixin, file.__class__), {})
-        return file
+        return self._open(name, mode)
 
     def save(self, name, content):
         """
@@ -49,7 +48,7 @@ class Storage(object):
         name = self._save(name, content)
 
         # Store filenames with forward slashes, even on Windows
-        return force_unicode(name.replace('\\', '/'))
+        return force_text(name.replace('\\', '/'))
 
     # These methods are part of the public API, with default implementations.
 
@@ -73,7 +72,7 @@ class Storage(object):
         count = itertools.count(1)
         while self.exists(name):
             # file_ext includes the dot.
-            name = os.path.join(dir_name, "%s_%s%s" % (file_root, count.next(), file_ext))
+            name = os.path.join(dir_name, "%s_%s%s" % (file_root, next(count), file_ext))
 
         return name
 
@@ -150,9 +149,10 @@ class FileSystemStorage(Storage):
     def __init__(self, location=None, base_url=None):
         if location is None:
             location = settings.MEDIA_ROOT
+        self.base_location = location
+        self.location = abspathu(self.base_location)
         if base_url is None:
             base_url = settings.MEDIA_URL
-        self.location = os.path.abspath(location)
         self.base_url = base_url
 
     def _open(self, name, mode='rb'):
@@ -161,10 +161,18 @@ class FileSystemStorage(Storage):
     def _save(self, name, content):
         full_path = self.path(name)
 
+        # Create any intermediate directories that do not exist.
+        # Note that there is a race between os.path.exists and os.makedirs:
+        # if os.makedirs fails with EEXIST, the directory was created
+        # concurrently, and we can continue normally. Refs #16082.
         directory = os.path.dirname(full_path)
         if not os.path.exists(directory):
-            os.makedirs(directory)
-        elif not os.path.isdir(directory):
+            try:
+                os.makedirs(directory)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise
+        if not os.path.isdir(directory):
             raise IOError("%s exists and is not a directory." % directory)
 
         # There's a potential race condition between get_available_name and
@@ -184,15 +192,25 @@ class FileSystemStorage(Storage):
                 else:
                     # This fun binary flag incantation makes os.open throw an
                     # OSError if the file already exists before we open it.
-                    fd = os.open(full_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_BINARY', 0))
+                    flags = (os.O_WRONLY | os.O_CREAT | os.O_EXCL |
+                             getattr(os, 'O_BINARY', 0))
+                    # The current umask value is masked out by os.open!
+                    fd = os.open(full_path, flags, 0o666)
                     try:
                         locks.lock(fd, locks.LOCK_EX)
+                        _file = None
                         for chunk in content.chunks():
-                            os.write(fd, chunk)
+                            if _file is None:
+                                mode = 'wb' if isinstance(chunk, bytes) else 'wt'
+                                _file = os.fdopen(fd, mode)
+                            _file.write(chunk)
                     finally:
                         locks.unlock(fd)
-                        os.close(fd)
-            except OSError, e:
+                        if _file is not None:
+                            _file.close()
+                        else:
+                            os.close(fd)
+            except OSError as e:
                 if e.errno == errno.EEXIST:
                     # Ooops, the file exists. We need a new file name.
                     name = self.get_available_name(name)
@@ -211,8 +229,15 @@ class FileSystemStorage(Storage):
     def delete(self, name):
         name = self.path(name)
         # If the file exists, delete it from the filesystem.
+        # Note that there is a race between os.path.exists and os.remove:
+        # if os.remove fails with ENOENT, the file was removed
+        # concurrently, and we can continue normally.
         if os.path.exists(name):
-            os.remove(name)
+            try:
+                os.remove(name)
+            except OSError as e:
+                if e.errno != errno.ENOENT:
+                    raise
 
     def exists(self, name):
         return os.path.exists(self.path(name))
@@ -240,7 +265,7 @@ class FileSystemStorage(Storage):
     def url(self, name):
         if self.base_url is None:
             raise ValueError("This file is not accessible via a URL.")
-        return urlparse.urljoin(self.base_url, name).replace('\\', '/')
+        return urljoin(self.base_url, filepath_to_uri(name))
 
     def accessed_time(self, name):
         return datetime.fromtimestamp(os.path.getatime(self.path(name)))
@@ -261,7 +286,7 @@ def get_storage_class(import_path=None):
     module, classname = import_path[:dot], import_path[dot+1:]
     try:
         mod = import_module(module)
-    except ImportError, e:
+    except ImportError as e:
         raise ImproperlyConfigured('Error importing storage module %s: "%s"' % (module, e))
     try:
         return getattr(mod, classname)

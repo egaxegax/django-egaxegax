@@ -2,12 +2,16 @@
 Iceland specific form helpers.
 """
 
+from __future__ import absolute_import, unicode_literals
+
+from django.contrib.localflavor.is_.is_postalcodes import IS_POSTALCODES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import RegexField
 from django.forms.widgets import Select
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
+
 
 class ISIdNumberField(RegexField):
     """
@@ -16,18 +20,18 @@ class ISIdNumberField(RegexField):
     """
     default_error_messages = {
         'invalid': _('Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.'),
-        'checksum': _(u'The Icelandic identification number is not valid.'),
+        'checksum': _('The Icelandic identification number is not valid.'),
     }
 
-    def __init__(self, *args, **kwargs):
-        kwargs['min_length'],kwargs['max_length'] = 10,11
-        super(ISIdNumberField, self).__init__(r'^\d{6}(-| )?\d{4}$', *args, **kwargs)
+    def __init__(self, max_length=11, min_length=10, *args, **kwargs):
+        super(ISIdNumberField, self).__init__(r'^\d{6}(-| )?\d{4}$',
+            max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         value = super(ISIdNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = self._canonify(value)
         if self._validate(value):
@@ -54,22 +58,22 @@ class ISIdNumberField(RegexField):
         Takes in the value in canonical form and returns it in the common
         display format.
         """
-        return smart_unicode(value[:6]+'-'+value[6:])
+        return smart_text(value[:6]+'-'+value[6:])
 
 class ISPhoneNumberField(RegexField):
     """
     Icelandic phone number. Seven digits with an optional hyphen or space after
     the first three digits.
     """
-    def __init__(self, *args, **kwargs):
-        kwargs['min_length'], kwargs['max_length'] = 7,8
-        super(ISPhoneNumberField, self).__init__(r'^\d{3}(-| )?\d{4}$', *args, **kwargs)
+    def __init__(self, max_length=8, min_length=7, *args, **kwargs):
+        super(ISPhoneNumberField, self).__init__(r'^\d{3}(-| )?\d{4}$',
+            max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         value = super(ISPhoneNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         return value.replace('-', '').replace(' ', '')
 
@@ -78,6 +82,5 @@ class ISPostalCodeSelect(Select):
     A Select widget that uses a list of Icelandic postal codes as its choices.
     """
     def __init__(self, attrs=None):
-        from is_postalcodes import IS_POSTALCODES
         super(ISPostalCodeSelect, self).__init__(attrs, choices=IS_POSTALCODES)
 

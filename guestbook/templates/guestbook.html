@@ -20,22 +20,22 @@
 {% for greeting in greetings.object_list %}
   <div class="messagebox">
     <a id="id{{ greeting.id }}" name="id{{ greeting.id }}"></a>
-    <div class="messageblock"><a class="nodecor" href="{% url guestbook.views.list_greetings id=greeting.id %}"># {{ greeting.id }}</a></div>
+    <div class="messageblock"><a class="nodecor" href="{% url 'guestbook.views.list_greetings' id=greeting.id %}"># {{ greeting.id }}</a></div>
     <div class="messagetext">{{ greeting.content|markdown:"codehilite" }}</div>
     <div class="messageblock">
       {% if greeting.subject %}
-        <div><a class="nodecor" href="{% url guestbook.views.list_greetings id_subj=greeting.subject.id %}">{{ greeting.subject.subject|escape }}</a></div>
+        <div><a class="nodecor" href="{% url 'guestbook.views.list_greetings' id_subj=greeting.subject.id %}">{{ greeting.subject.subject|escape }}</a></div>
       {% endif %}
       <div class="messagecred">
         {% if greeting.author %}
-          <b><a class="nodecor" href="{% url guestbook.views.get_user_profile id=greeting.author.id %}">{{ greeting.author.username }}</a></b> {% trans 'wrote' %}
+          <b><a class="nodecor" href="{% url 'guestbook.views.get_user_profile' id=greeting.author.id %}">{{ greeting.author.username }}</a></b> {% trans 'wrote' %}
         {% else %}
           {% trans 'An anonymous person' %} {% trans 'wrote' %}
         {% endif %}
         <acronym title="{{ greeting.date|date:"Y-m-d H:i" }}">{{ greeting.date|timesince }}</acronym> {% trans 'ago' %}
-        {% if user.is_authenticated and user.id == greeting.author.id %}
-          <a class="nodecor" href="{% url guestbook.views.edit_greeting id=greeting.id %}">{% trans 'Edit' %}</a>
-          <a class="nodecor" href="{% url guestbook.views.delete_greeting id=greeting.id %}{% if greeting.subject.id %}?id_subj={{ greeting.subject.id }}{% endif %}">{% trans 'Delete' %}</a>
+        {% if request.user.is_authenticated and request.user.id == greeting.author.id %}
+          <a class="nodecor" href="{% url 'guestbook.views.edit_greeting' id=greeting.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor" href="{% url 'guestbook.views.delete_greeting' id=greeting.id %}{% if greeting.subject.id %}?id_subj={{ greeting.subject.id }}{% endif %}">{% trans 'Delete' %}</a>
         {% endif %}
       </div>
     </div>
@@ -58,9 +58,9 @@
 {% else %}
   <p>{% trans 'No posts' %}.</p>
 {% endif %}
-{% if user.is_authenticated %}
+{% if request.user.is_authenticated %}
   <p>
-    <form action="{% url guestbook.views.create_greeting %}" method="post">{% csrf_token %}
+    <form action="{% url 'guestbook.views.create_greeting' %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form_subject }}{{ form }}
       <tr><th></th><td>

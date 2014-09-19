@@ -1,9 +1,11 @@
 """
 Israeli-specific form helpers
 """
+from __future__ import unicode_literals
 import re
 
 from django.core.exceptions import ValidationError
+from django.core.validators import EMPTY_VALUES
 from django.forms.fields import RegexField, Field, EMPTY_VALUES
 from django.utils.checksums import luhn
 from django.utils.translation import ugettext_lazy as _
@@ -27,14 +29,14 @@ class ILPostalCodeField(RegexField):
     """
 
     default_error_messages = {
-        'invalid': _(u'Enter a postal code in the format XXXXX'),
+        'invalid': _('Enter a postal code in the format XXXXX'),
     }
 
     def __init__(self, *args, **kwargs):
         super(ILPostalCodeField, self).__init__(r'^\d{5}$', *args, **kwargs)
 
     def clean(self, value):
-        if value is not None:
+        if value not in EMPTY_VALUES:
             value = value.replace(" ", "")
         return super(ILPostalCodeField, self).clean(value)
 
@@ -46,14 +48,14 @@ class ILIDNumberField(Field):
     """
 
     default_error_messages = {
-        'invalid': _(u'Enter a valid ID number.'),
+        'invalid': _('Enter a valid ID number.'),
     }
 
     def clean(self, value):
         value = super(ILIDNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         match = id_number_re.match(value)
         if not match:

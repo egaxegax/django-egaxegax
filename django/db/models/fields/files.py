@@ -1,20 +1,15 @@
 import datetime
 import os
 
-import django.utils.copycompat as copy
-
-from django.conf import settings
-from django.db.models.fields import Field
-from django.core.files.base import File, ContentFile
-from django.core.files.storage import default_storage
-from django.core.files.images import ImageFile, get_image_dimensions
-from django.core.files.uploadedfile import UploadedFile
-from django.utils.functional import curry
-from django.db.models import signals
-from django.utils.encoding import force_unicode, smart_str
-from django.utils.translation import ugettext_lazy, ugettext as _
 from django import forms
-from django.db.models.loading import cache
+from django.db.models.fields import Field
+from django.core.files.base import File
+from django.core.files.storage import default_storage
+from django.core.files.images import ImageFile
+from django.db.models import signals
+from django.utils.encoding import force_str, force_text
+from django.utils import six
+from django.utils.translation import ugettext_lazy as _
 
 class FieldFile(File):
     def __init__(self, instance, field, name):
@@ -35,7 +30,6 @@ class FieldFile(File):
         return not self.__eq__(other)
 
     def __hash__(self):
-        # Required because we defined a custom __eq__.
         return hash(self.name)
 
     # The standard File contains most of the necessary properties, but
@@ -73,7 +67,7 @@ class FieldFile(File):
     def _get_size(self):
         self._require_file()
         if not self._committed:
-            return len(self.file)
+            return self.file.size
         return self.storage.size(self.name)
     size = property(_get_size)
 
@@ -93,7 +87,7 @@ class FieldFile(File):
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
-        self._size = len(content)
+        self._size = content.size
         self._committed = True
 
         # Save the object because it has changed, unless save is False
@@ -181,7 +175,7 @@ class FileDescriptor(object):
         # subclasses might also want to subclass the attribute class]. This
         # object understands how to convert a path to a file, and also how to
         # handle None.
-        if isinstance(file, basestring) or file is None:
+        if isinstance(file, six.string_types) or file is None:
             attr = self.field.attr_class(instance, self.field, file)
             instance.__dict__[self.field.name] = attr
 
@@ -210,6 +204,7 @@ class FileDescriptor(object):
         instance.__dict__[self.field.name] = value
 
 class FileField(Field):
+
     # The class to wrap instance attributes in. Accessing the file object off
     # the instance will always return an instance of attr_class.
     attr_class = FieldFile
@@ -217,7 +212,7 @@ class FileField(Field):
     # The descriptor to use for accessing the attribute off of the class.
     descriptor_class = FileDescriptor
 
-    description = ugettext_lazy("File path")
+    description = _("File")
 
     def __init__(self, verbose_name=None, name=None, upload_to='', storage=None, **kwargs):
         for arg in ('primary_key', 'unique'):
@@ -245,7 +240,7 @@ class FileField(Field):
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
 
     def pre_save(self, model_instance, add):
         "Returns field's value just before saving."
@@ -258,22 +253,9 @@ class FileField(Field):
     def contribute_to_class(self, cls, name):
         super(FileField, self).contribute_to_class(cls, name)
         setattr(cls, self.name, self.descriptor_class(self))
-        signals.post_delete.connect(self.delete_file, sender=cls)
-
-    def delete_file(self, instance, sender, **kwargs):
-        file = getattr(instance, self.attname)
-        # If no other object of this type references the file,
-        # and it's not the default value for future objects,
-        # delete it from the backend.
-        if file and file.name != self.default and \
-            not sender._default_manager.filter(**{self.name: file.name}):
-                file.delete(save=False)
-        elif file:
-            # Otherwise, just close the file, so it doesn't tie up resources.
-            file.close()
 
     def get_directory_name(self):
-        return os.path.normpath(force_unicode(datetime.datetime.now().strftime(smart_str(self.upload_to))))
+        return os.path.normpath(force_text(datetime.datetime.now().strftime(force_str(self.upload_to))))
 
     def get_filename(self, filename):
         return os.path.normpath(self.storage.get_valid_name(os.path.basename(filename)))
@@ -327,6 +309,7 @@ class ImageFileDescriptor(FileDescriptor):
             self.field.update_dimension_fields(instance, force=True)
 
 class ImageFieldFile(ImageFile, FieldFile):
+
     def delete(self, save=True):
         # Clear the image dimensions cache
         if hasattr(self, '_dimensions_cache'):
@@ -336,11 +319,12 @@ class ImageFieldFile(ImageFile, FieldFile):
 class ImageField(FileField):
     attr_class = ImageFieldFile
     descriptor_class = ImageFileDescriptor
-    description = ugettext_lazy("File path")
+    description = _("Image")
 
-    def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
+    def __init__(self, verbose_name=None, name=None, width_field=None,
+            height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
-        FileField.__init__(self, verbose_name, name, **kwargs)
+        super(ImageField, self).__init__(verbose_name, name, **kwargs)
 
     def contribute_to_class(self, cls, name):
         super(ImageField, self).contribute_to_class(cls, name)

@@ -1,7 +1,6 @@
 from django import forms
-import django.contrib.auth.forms as auth_forms
-from guestbook.models import *
 from django.utils.translation import ugettext as _
+from guestbook.models import *
 
 class CreateGreetingForm(forms.ModelForm):
     class Meta:

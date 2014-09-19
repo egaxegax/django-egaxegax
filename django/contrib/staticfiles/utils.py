@@ -1,45 +1,57 @@
+import os
 import fnmatch
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-def get_files(storage, ignore_patterns=[], location=''):
+def matches_patterns(path, patterns=None):
     """
-    Recursively walk the storage directories gathering a complete list of files
-    that should be copied, returning this list.
-    
+    Return True or False depending on whether the ``path`` should be
+    ignored (if it matches any pattern in ``ignore_patterns``).
     """
-    def is_ignored(path):
-        """
-        Return True or False depending on whether the ``path`` should be
-        ignored (if it matches any pattern in ``ignore_patterns``).
-        
-        """
-        for pattern in ignore_patterns:
-            if fnmatch.fnmatchcase(path, pattern):
-                return True
-        return False
+    if patterns is None:
+        patterns = []
+    for pattern in patterns:
+        if fnmatch.fnmatchcase(path, pattern):
+            return True
+    return False
 
+def get_files(storage, ignore_patterns=None, location=''):
+    """
+    Recursively walk the storage directories yielding the paths
+    of all files that should be copied.
+    """
+    if ignore_patterns is None:
+        ignore_patterns = []
     directories, files = storage.listdir(location)
-    static_files = [location and '/'.join([location, fn]) or fn
-                    for fn in files
-                    if not is_ignored(fn)]
-    for dir in directories:
-        if is_ignored(dir):
+    for fn in files:
+        if matches_patterns(fn, ignore_patterns):
             continue
         if location:
-            dir = '/'.join([location, dir])
-        static_files.extend(get_files(storage, ignore_patterns, dir))
-    return static_files
+            fn = os.path.join(location, fn)
+        yield fn
+    for dir in directories:
+        if matches_patterns(dir, ignore_patterns):
+            continue
+        if location:
+            dir = os.path.join(location, dir)
+        for fn in get_files(storage, ignore_patterns, dir):
+            yield fn
 
-def check_settings():
+def check_settings(base_url=None):
     """
-    Checks if the MEDIA_(ROOT|URL) and STATICFILES_(ROOT|URL)
-    settings have the same value.
+    Checks if the staticfiles settings have sane values.
+
     """
-    if settings.MEDIA_URL == settings.STATICFILES_URL:
-        raise ImproperlyConfigured("The MEDIA_URL and STATICFILES_URL "
-                                   "settings must have individual values")
-    if ((settings.MEDIA_ROOT and settings.STATICFILES_ROOT) and
-            (settings.MEDIA_ROOT == settings.STATICFILES_ROOT)):
-        raise ImproperlyConfigured("The MEDIA_ROOT and STATICFILES_ROOT "
-                                   "settings must have individual values")
+    if base_url is None:
+        base_url = settings.STATIC_URL
+    if not base_url:
+        raise ImproperlyConfigured(
+            "You're using the staticfiles app "
+            "without having set the required STATIC_URL setting.")
+    if settings.MEDIA_URL == base_url:
+        raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
+                                   "settings must have different values")
+    if ((settings.MEDIA_ROOT and settings.STATIC_ROOT) and
+            (settings.MEDIA_ROOT == settings.STATIC_ROOT)):
+        raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
+                                   "settings must have different values")

@@ -1,18 +1,28 @@
-import copy
+from __future__ import unicode_literals
+
+import logging
+from functools import update_wrapper
+
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.template import RequestContext, loader
-from django.utils.translation import ugettext_lazy as _
-from django.utils.functional import update_wrapper
-from django.utils.log import getLogger
+from django.template.response import TemplateResponse
+from django.utils.decorators import classonlymethod
+from django.utils import six
 
-logger = getLogger('django.request')
+logger = logging.getLogger('django.request')
 
-class classonlymethod(classmethod):
-    def __get__(self, instance, owner):
-        if instance is not None:
-            raise AttributeError("This method is available only on the view class.")
-        return super(classonlymethod, self).__get__(instance, owner)
+
+class ContextMixin(object):
+    """
+    A default context mixin that passes the keyword arguments received by
+    get_context_data as the template context.
+    """
+
+    def get_context_data(self, **kwargs):
+        if 'view' not in kwargs:
+            kwargs['view'] = self
+        return kwargs
+
 
 class View(object):
     """
@@ -29,7 +39,7 @@ class View(object):
         """
         # Go through keyword arguments, and either save their values to our
         # instance, or raise an error.
-        for key, value in kwargs.iteritems():
+        for key, value in six.iteritems(kwargs):
             setattr(self, key, value)
 
     @classonlymethod
@@ -40,15 +50,21 @@ class View(object):
         # sanitize keyword arguments
         for key in initkwargs:
             if key in cls.http_method_names:
-                raise TypeError(u"You tried to pass in the %s method name as a "
-                                u"keyword argument to %s(). Don't do that."
+                raise TypeError("You tried to pass in the %s method name as a "
+                                "keyword argument to %s(). Don't do that."
                                 % (key, cls.__name__))
             if not hasattr(cls, key):
-                raise TypeError(u"%s() received an invalid keyword %r" % (
-                    cls.__name__, key))
+                raise TypeError("%s() received an invalid keyword %r. as_view "
+                                "only accepts arguments that are already "
+                                "attributes of the class." % (cls.__name__, key))
 
         def view(request, *args, **kwargs):
             self = cls(**initkwargs)
+            if hasattr(self, 'get') and not hasattr(self, 'head'):
+                self.head = self.get
+            self.request = request
+            self.args = args
+            self.kwargs = kwargs
             return self.dispatch(request, *args, **kwargs)
 
         # take name and docstring from class
@@ -67,20 +83,28 @@ class View(object):
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
             handler = self.http_method_not_allowed
-        self.request = request
-        self.args = args
-        self.kwargs = kwargs
         return handler(request, *args, **kwargs)
 
     def http_method_not_allowed(self, request, *args, **kwargs):
-        allowed_methods = [m for m in self.http_method_names if hasattr(self, m)]
-        logger.warning('Method Not Allowed (%s): %s' % (request.method, request.path),
+        logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
             extra={
                 'status_code': 405,
                 'request': self.request
             }
         )
-        return http.HttpResponseNotAllowed(allowed_methods)
+        return http.HttpResponseNotAllowed(self._allowed_methods())
+
+    def options(self, request, *args, **kwargs):
+        """
+        Handles responding to requests for the OPTIONS HTTP verb.
+        """
+        response = http.HttpResponse()
+        response['Allow'] = ', '.join(self._allowed_methods())
+        response['Content-Length'] = '0'
+        return response
+
+    def _allowed_methods(self):
+        return [m.upper() for m in self.http_method_names if hasattr(self, m)]
 
 
 class TemplateResponseMixin(object):
@@ -88,69 +112,43 @@ class TemplateResponseMixin(object):
     A mixin that can be used to render a template.
     """
     template_name = None
+    response_class = TemplateResponse
+    content_type = None
 
-    def render_to_response(self, context):
+    def render_to_response(self, context, **response_kwargs):
         """
-        Returns a response with a template rendered with the given context.
-        """
-        return self.get_response(self.render_template(context))
+        Returns a response, using the `response_class` for this
+        view, with a template rendered with the given context.
 
-    def get_response(self, content, **httpresponse_kwargs):
+        If any keyword arguments are provided, they will be
+        passed to the constructor of the response class.
         """
-        Construct an `HttpResponse` object.
-        """
-        return http.HttpResponse(content, **httpresponse_kwargs)
-
-    def render_template(self, context):
-        """
-        Render the template with a given context.
-        """
-        context_instance = self.get_context_instance(context)
-        return self.get_template().render(context_instance)
-
-    def get_context_instance(self, context):
-        """
-        Get the template context instance. Must return a Context (or subclass)
-        instance.
-        """
-        return RequestContext(self.request, context)
-
-    def get_template(self):
-        """
-        Get a ``Template`` object for the given request.
-        """
-        names = self.get_template_names()
-        if not names:
-            raise ImproperlyConfigured(u"'%s' must provide template_name."
-                                       % self.__class__.__name__)
-        return self.load_template(names)
+        response_kwargs.setdefault('content_type', self.content_type)
+        return self.response_class(
+            request = self.request,
+            template = self.get_template_names(),
+            context = context,
+            **response_kwargs
+        )
 
     def get_template_names(self):
         """
-        Return a list of template names to be used for the request. Must return
-        a list. May not be called if get_template is overridden.
+        Returns a list of template names to be used for the request. Must return
+        a list. May not be called if render_to_response is overridden.
         """
         if self.template_name is None:
-            return []
+            raise ImproperlyConfigured(
+                "TemplateResponseMixin requires either a definition of "
+                "'template_name' or an implementation of 'get_template_names()'")
         else:
             return [self.template_name]
 
-    def load_template(self, names):
-        """
-        Load a list of templates using the default template loader.
-        """
-        return loader.select_template(names)
 
-
-class TemplateView(TemplateResponseMixin, View):
+class TemplateView(TemplateResponseMixin, ContextMixin, View):
     """
-    A view that renders a template.
+    A view that renders a template.  This view will also pass into the context
+    any keyword arguments passed by the url conf.
     """
-    def get_context_data(self, **kwargs):
-        return {
-            'params': kwargs
-        }
-
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
@@ -171,12 +169,11 @@ class RedirectView(View):
         are provided as kwargs to this method.
         """
         if self.url:
-            args = self.request.META["QUERY_STRING"]
+            url = self.url % kwargs
+            args = self.request.META.get('QUERY_STRING', '')
             if args and self.query_string:
-                url = "%s?%s" % (self.url, args)
-            else:
-                url = self.url
-            return url % kwargs
+                url = "%s?%s" % (url, args)
+            return url
         else:
             return None
 
@@ -188,9 +185,24 @@ class RedirectView(View):
             else:
                 return http.HttpResponseRedirect(url)
         else:
-            logger.warning('Gone: %s' % self.request.path,
+            logger.warning('Gone: %s', self.request.path,
                         extra={
                             'status_code': 410,
                             'request': self.request
                         })
             return http.HttpResponseGone()
+
+    def head(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def options(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)

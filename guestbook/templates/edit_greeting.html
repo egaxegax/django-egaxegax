@@ -9,9 +9,9 @@
 {% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endblock %}
 {% block content %}
 <p>Читайте, пишите заметки, оставляйте комментарии.<p>
-{% if user.is_authenticated %}
+{% if request.user.is_authenticated %}
   <p>
-    <form action="{% url guestbook.views.edit_greeting id=form.initial.id %}" method="post">{% csrf_token %}
+    <form action="{% url 'guestbook.views.edit_greeting' id=form.initial.id %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form }}
        <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />

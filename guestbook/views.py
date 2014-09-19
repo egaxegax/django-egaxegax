@@ -4,9 +4,8 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import *
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render_to_response
 from guestbook.forms import *
 from guestbook.models import *
 import time
@@ -50,8 +49,9 @@ def list_greetings(request, **kw):
                 if subject.count():
                     initial['subject'] = subject[0].subject
     greetings_list = greetings_list.order_by('-date')
-    return direct_to_template(request, 'guestbook.html',
-                              {'greetings': PageList(request, greetings_list),
+    return render_to_response('guestbook.html',
+                              {'request': request,
+                               'greetings': PageList(request, greetings_list),
                                'subject': initial,
                                'form': CreateGreetingForm(),
                                'form_subject': CreateGreetingSubjectForm(initial=initial),
@@ -68,8 +68,9 @@ def list_subjects(request):
             m = m.order_by('-date')
             subjects.object_list[i].updated = m[0].date
             subjects.object_list[i].author = m[0].author
-    return direct_to_template(request, 'subjects.html',
-                              {'subjects': subjects,
+    return render_to_response('subjects.html',
+                              {'request': request,
+                               'subjects': subjects,
                                'form': CreateGreetingForm(),
                                'form_subject': CreateGreetingSubjectForm(),
                                'logback': reverse('guestbook.views.list_subjects')})
@@ -114,8 +115,9 @@ def edit_greeting(request, **kw):
                                   'id': greeting.id,
                                   'subject': greeting.subject,
                                   'content': greeting.content}) 
-    return direct_to_template(request, 'edit_greeting.html',
-                              {'subject': greeting.subject,
+    return render_to_response('edit_greeting.html',
+                              {'request': request,
+                               'subject': greeting.subject,
                                'form': form})    
 
 def delete_greeting(request, **kw):
@@ -139,7 +141,8 @@ def get_user_profile(request, **kw):
     if request.method == 'GET':
         user = get_object_or_404(User, id=ZI(kw.get('id')))
         m = Greeting.objects.filter(author__id=user.id)
-        return direct_to_template(request, 'get_user_profile.html',
-                                  {'record': m[0],
+        return render_to_response('get_user_profile.html',
+                                  {'request': request,
+                                   'record': m[0],
                                    'record_count': m.count(),
                                    'logback': reverse('guestbook.views.list_greetings')})

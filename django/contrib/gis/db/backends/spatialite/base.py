@@ -2,15 +2,16 @@ from ctypes.util import find_library
 from django.conf import settings
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.sqlite3.base import *
-from django.db.backends.sqlite3.base import DatabaseWrapper as SqliteDatabaseWrapper, \
-    _sqlite_extract, _sqlite_date_trunc, _sqlite_regexp
+from django.db.backends.sqlite3.base import (
+    _sqlite_extract, _sqlite_date_trunc, _sqlite_regexp, _sqlite_format_dtdelta,
+    connection_created, Database, DatabaseWrapper as SQLiteDatabaseWrapper,
+    SQLiteCursorWrapper)
 from django.contrib.gis.db.backends.spatialite.client import SpatiaLiteClient
 from django.contrib.gis.db.backends.spatialite.creation import SpatiaLiteCreation
 from django.contrib.gis.db.backends.spatialite.introspection import SpatiaLiteIntrospection
 from django.contrib.gis.db.backends.spatialite.operations import SpatiaLiteOperations
 
-class DatabaseWrapper(SqliteDatabaseWrapper):
+class DatabaseWrapper(SQLiteDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         # Before we get too far, make sure pysqlite 2.5+ is installed.
         if Database.version_info < (2, 5, 0):
@@ -37,21 +38,7 @@ class DatabaseWrapper(SqliteDatabaseWrapper):
 
     def _cursor(self):
         if self.connection is None:
-            ## The following is the same as in django.db.backends.sqlite3.base ##
-            settings_dict = self.settings_dict
-            if not settings_dict['NAME']:
-                raise ImproperlyConfigured("Please fill out the database NAME in the settings module before using the database.")
-            kwargs = {
-                'database': settings_dict['NAME'],
-                'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
-            }
-            kwargs.update(settings_dict['OPTIONS'])
-            self.connection = Database.connect(**kwargs)
-            # Register extract, date_trunc, and regexp functions.
-            self.connection.create_function("django_extract", 2, _sqlite_extract)
-            self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
-            self.connection.create_function("regexp", 2, _sqlite_regexp)
-            connection_created.send(sender=self.__class__, connection=self)
+            self._sqlite_create_connection()
 
             ## From here on, customized for GeoDjango ##
 
@@ -69,7 +56,7 @@ class DatabaseWrapper(SqliteDatabaseWrapper):
             cur = self.connection.cursor(factory=SQLiteCursorWrapper)
             try:
                 cur.execute("SELECT load_extension(%s)", (self.spatialite_lib,))
-            except Exception, msg:
+            except Exception as msg:
                 raise ImproperlyConfigured('Unable to load the SpatiaLite library extension '
                                            '"%s" because: %s' % (self.spatialite_lib, msg))
             return cur

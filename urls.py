@@ -1,7 +1,8 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib import admin
+from django.views.generic import RedirectView
 import my.urls
 
 admin.autodiscover()
@@ -13,7 +14,7 @@ urlpatterns = patterns('',
     (r'^about/', 'my.views.index'),
     (r'^av/(?P<id>[0-9]*)/?$', 'my.views.get_avatar'),
     (r'^news/', include('mynews.urls')),
-    (r'^guestbook$', 'django.views.generic.simple.redirect_to', {'url': '/guestbook/', }),
+    (r'^guestbook$', RedirectView.as_view(url='/guestbook/')),
     (r'^guestbook/', include('guestbook.urls')),
     (r'^photos/', include(my.urls.photos)),
     (r'^songs/', include('songs.urls')),

@@ -1,27 +1,29 @@
 """
 AT-specific Form helpers
 """
-
+from __future__ import unicode_literals
 import re
 
-from django.utils.translation import ugettext_lazy as _
-from django.forms.fields import Field, RegexField, Select
+from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
+from django.forms.fields import Field, RegexField, Select
+from django.utils.translation import ugettext_lazy as _
 
 re_ssn = re.compile(r'^\d{4} \d{6}')
+
 
 class ATZipCodeField(RegexField):
     """
     A form field that validates its input is an Austrian postcode.
 
-    Accepts 4 digits.
+    Accepts 4 digits (first digit must be greater than 0).
     """
     default_error_messages = {
         'invalid': _('Enter a zip code in the format XXXX.'),
     }
-    def __init__(self, *args, **kwargs):
-        super(ATZipCodeField, self).__init__(r'^\d{4}$',
-                max_length=None, min_length=None, *args, **kwargs)
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
+        super(ATZipCodeField, self).__init__(r'^[1-9]{1}\d{3}$',
+                max_length, min_length, *args, **kwargs)
 
 class ATStateSelect(Select):
     """
@@ -45,10 +47,13 @@ class ATSocialSecurityNumberField(Field):
     """
 
     default_error_messages = {
-        'invalid': _(u'Enter a valid Austrian Social Security Number in XXXX XXXXXX format.'),
+        'invalid': _('Enter a valid Austrian Social Security Number in XXXX XXXXXX format.'),
     }
 
     def clean(self, value):
+        value = super(ATSocialSecurityNumberField, self).clean(value)
+        if value in EMPTY_VALUES:
+            return ""
         if not re_ssn.search(value):
             raise ValidationError(self.error_messages['invalid'])
         sqnr, date = value.split(" ")
@@ -61,5 +66,4 @@ class ATSocialSecurityNumberField(Field):
         res = res % 11
         if res != int(check):
            raise ValidationError(self.error_messages['invalid'])
-        return u'%s%s %s'%(sqnr, check, date,)
-
+        return '%s%s %s'%(sqnr, check, date,)

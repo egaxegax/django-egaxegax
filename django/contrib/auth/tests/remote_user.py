@@ -1,11 +1,15 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.contrib.auth.backends import RemoteUserBackend
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase
+from django.utils import timezone
 
 
+@skipIfCustomUser
 class RemoteUserTest(TestCase):
 
     urls = 'django.contrib.auth.tests.urls'
@@ -20,7 +24,7 @@ class RemoteUserTest(TestCase):
         self.curr_middleware = settings.MIDDLEWARE_CLASSES
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
         settings.MIDDLEWARE_CLASSES += (self.middleware,)
-        settings.AUTHENTICATION_BACKENDS = (self.backend,)
+        settings.AUTHENTICATION_BACKENDS += (self.backend,)
 
     def test_no_remote_user(self):
         """
@@ -30,15 +34,15 @@ class RemoteUserTest(TestCase):
         num_users = User.objects.count()
 
         response = self.client.get('/remote_user/')
-        self.assert_(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
         response = self.client.get('/remote_user/', REMOTE_USER=None)
-        self.assert_(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
         response = self.client.get('/remote_user/', REMOTE_USER='')
-        self.assert_(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
     def test_unknown_user(self):
@@ -80,6 +84,8 @@ class RemoteUserTest(TestCase):
         user = User.objects.create(username='knownuser')
         # Set last_login to something so we can determine if it changes.
         default_login = datetime(2000, 1, 1)
+        if settings.USE_TZ:
+            default_login = default_login.replace(tzinfo=timezone.utc)
         user.last_login = default_login
         user.save()
 
@@ -92,6 +98,26 @@ class RemoteUserTest(TestCase):
         response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
         self.assertEqual(default_login, response.context['user'].last_login)
 
+    def test_header_disappears(self):
+        """
+        Tests that a logged in user is logged out automatically when
+        the REMOTE_USER header disappears during the same browser session.
+        """
+        User.objects.create(username='knownuser')
+        # Known user authenticates
+        response = self.client.get('/remote_user/', REMOTE_USER=self.known_user)
+        self.assertEqual(response.context['user'].username, 'knownuser')
+        # During the session, the REMOTE_USER header disappears. Should trigger logout.
+        response = self.client.get('/remote_user/')
+        self.assertEqual(response.context['user'].is_anonymous(), True)
+        # verify the remoteuser middleware will not remove a user
+        # authenticated via another backend
+        User.objects.create_user(username='modeluser', password='foo')
+        self.client.login(username='modeluser', password='foo')
+        authenticate(username='modeluser', password='foo')
+        response = self.client.get('/remote_user/')
+        self.assertEqual(response.context['user'].username, 'modeluser')
+
     def tearDown(self):
         """Restores settings to avoid breaking other tests."""
         settings.MIDDLEWARE_CLASSES = self.curr_middleware
@@ -103,6 +129,7 @@ class RemoteUserNoCreateBackend(RemoteUserBackend):
     create_unknown_user = False
 
 
+@skipIfCustomUser
 class RemoteUserNoCreateTest(RemoteUserTest):
     """
     Contains the same tests as RemoteUserTest, but using a custom auth backend
@@ -115,7 +142,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
     def test_unknown_user(self):
         num_users = User.objects.count()
         response = self.client.get('/remote_user/', REMOTE_USER='newuser')
-        self.assert_(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
 
@@ -139,6 +166,7 @@ class CustomRemoteUserBackend(RemoteUserBackend):
         return user
 
 
+@skipIfCustomUser
 class RemoteUserCustomTest(RemoteUserTest):
     """
     Tests a custom RemoteUserBackend subclass that overrides the clean_username
@@ -147,7 +175,7 @@ class RemoteUserCustomTest(RemoteUserTest):
 
     backend =\
         'django.contrib.auth.tests.remote_user.CustomRemoteUserBackend'
-    # REMOTE_USER strings with e-mail addresses for the custom backend to
+    # REMOTE_USER strings with email addresses for the custom backend to
     # clean.
     known_user = 'knownuser@example.com'
     known_user2 = 'knownuser2@example.com'

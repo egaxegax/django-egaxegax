@@ -7,17 +7,19 @@
    http://geodjango.org/docs/layermapping.html
 """
 import sys
-from datetime import date, datetime
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import connections, router
 from django.contrib.gis.db.models import GeometryField
-from django.contrib.gis.gdal import CoordTransform, DataSource, \
-    OGRException, OGRGeometry, OGRGeomType, SpatialReference
-from django.contrib.gis.gdal.field import \
-    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
+from django.contrib.gis.gdal import (CoordTransform, DataSource,
+    OGRException, OGRGeometry, OGRGeomType, SpatialReference)
+from django.contrib.gis.gdal.field import (
+    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
 from django.db import models, transaction
 from django.contrib.localflavor.us.models import USStateField
+from django.utils import six
+from django.utils.encoding import force_text
+
 
 # LayerMapping exceptions.
 class LayerMapError(Exception): pass
@@ -54,7 +56,7 @@ class LayerMapping(object):
         models.TextField : OFTString,
         models.URLField : OFTString,
         USStateField : OFTString,
-        models.XMLField : OFTString,
+        models.BigIntegerField : (OFTInteger, OFTReal, OFTString),
         models.SmallIntegerField : (OFTInteger, OFTReal, OFTString),
         models.PositiveSmallIntegerField : (OFTInteger, OFTReal, OFTString),
         }
@@ -65,9 +67,9 @@ class LayerMapping(object):
                          }
 
     def __init__(self, model, data, mapping, layer=0,
-                 source_srs=None, encoding=None,
+                 source_srs=None, encoding='utf-8',
                  transaction_mode='commit_on_success',
-                 transform=True, unique=None, using=DEFAULT_DB_ALIAS):
+                 transform=True, unique=None, using=None):
         """
         A LayerMapping object is initialized using the given Model (not an instance),
         a DataSource (or string path to an OGR-supported data file), and a mapping
@@ -75,14 +77,14 @@ class LayerMapping(object):
         argument usage.
         """
         # Getting the DataSource and the associated Layer.
-        if isinstance(data, basestring):
-            self.ds = DataSource(data)
+        if isinstance(data, six.string_types):
+            self.ds = DataSource(data, encoding=encoding)
         else:
             self.ds = data
         self.layer = self.ds[layer]
 
-        self.using = using
-        self.spatial_backend = connections[using].ops
+        self.using = using if using is not None else router.db_for_write(model)
+        self.spatial_backend = connections[self.using].ops
 
         # Setting the mapping & model attributes.
         self.mapping = mapping
@@ -132,9 +134,6 @@ class LayerMapping(object):
             self.transaction_mode = transaction_mode
         else:
             raise LayerMapError('Unrecognized transaction mode: %s' % transaction_mode)
-
-        if using is None:
-            pass
 
     #### Checking routines used during initialization ####
     def check_fid_range(self, fid_range):
@@ -253,7 +252,7 @@ class LayerMapping(object):
             sr = source_srs
         elif isinstance(source_srs, self.spatial_backend.spatial_ref_sys()):
             sr = source_srs.srs
-        elif isinstance(source_srs, (int, basestring)):
+        elif isinstance(source_srs, (int, six.string_types)):
             sr = SpatialReference(source_srs)
         else:
             # Otherwise just pulling the SpatialReference from the layer
@@ -270,7 +269,7 @@ class LayerMapping(object):
             # List of fields to determine uniqueness with
             for attr in unique:
                 if not attr in self.mapping: raise ValueError
-        elif isinstance(unique, basestring):
+        elif isinstance(unique, six.string_types):
             # Only a single field passed in.
             if unique not in self.mapping: raise ValueError
         else:
@@ -292,7 +291,10 @@ class LayerMapping(object):
 
             if isinstance(model_field, GeometryField):
                 # Verify OGR geometry.
-                val = self.verify_geom(feat.geom, model_field)
+                try:
+                    val = self.verify_geom(feat.geom, model_field)
+                except OGRException:
+                    raise LayerMapError('Could not retrieve geometry from feature.')
             elif isinstance(model_field, models.base.ModelBase):
                 # The related _model_, not a field was passed in -- indicating
                 # another mapping for the related Model.
@@ -313,7 +315,7 @@ class LayerMapping(object):
         will construct and return the uniqueness keyword arguments -- a subset
         of the feature kwargs.
         """
-        if isinstance(self.unique, basestring):
+        if isinstance(self.unique, six.string_types):
             return {self.unique : kwargs[self.unique]}
         else:
             return dict((fld, kwargs[fld]) for fld in self.unique)
@@ -330,10 +332,10 @@ class LayerMapping(object):
             if self.encoding:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
-                val = unicode(ogr_field.value, self.encoding)
+                val = force_text(ogr_field.value, self.encoding)
             else:
                 val = ogr_field.value
-                if len(val) > model_field.max_length:
+                if model_field.max_length and len(val) > model_field.max_length:
                     raise InvalidString('%s model field maximum string length is %s, given %s characters.' %
                                         (model_field.name, model_field.max_length, len(val)))
         elif isinstance(ogr_field, OFTReal) and isinstance(model_field, models.DecimalField):
@@ -391,7 +393,7 @@ class LayerMapping(object):
 
         # Attempting to retrieve and return the related model.
         try:
-            return rel_model.objects.get(**fk_kwargs)
+            return rel_model.objects.using(self.using).get(**fk_kwargs)
         except ObjectDoesNotExist:
             raise MissingForeignKey('No ForeignKey %s model found with keyword arguments: %s' % (rel_model.__name__, fk_kwargs))
 
@@ -427,11 +429,11 @@ class LayerMapping(object):
         SpatialRefSys = self.spatial_backend.spatial_ref_sys()
         try:
             # Getting the target spatial reference system
-            target_srs = SpatialRefSys.objects.get(srid=self.geo_field.srid).srs
+            target_srs = SpatialRefSys.objects.using(self.using).get(srid=self.geo_field.srid).srs
 
             # Creating the CoordTransform object
             return CoordTransform(self.source_srs, target_srs)
-        except Exception, msg:
+        except Exception as msg:
             raise LayerMapError('Could not translate between the data source and model geometry: %s' % msg)
 
     def geometry_field(self):
@@ -515,7 +517,7 @@ class LayerMapping(object):
                 # Getting the keyword arguments
                 try:
                     kwargs = self.feature_kwargs(feat)
-                except LayerMapError, msg:
+                except LayerMapError as msg:
                     # Something borked the validation
                     if strict: raise
                     elif not silent:
@@ -554,7 +556,7 @@ class LayerMapping(object):
                         if verbose: stream.write('%s: %s\n' % (is_update and 'Updated' or 'Saved', m))
                     except SystemExit:
                         raise
-                    except Exception, msg:
+                    except Exception as msg:
                         if self.transaction_mode == 'autocommit':
                             # Rolling back the transaction so that other model saves
                             # will work.

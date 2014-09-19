@@ -1,21 +1,25 @@
 """Translation helper functions."""
+from __future__ import unicode_literals
 
 import locale
 import os
 import re
 import sys
-import warnings
 import gettext as gettext_module
-from cStringIO import StringIO
+from threading import local
 
 from django.utils.importlib import import_module
+from django.utils.encoding import force_str, force_text
+from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
-from django.utils.thread_support import currentThread
+from django.utils import six
+from django.utils.six import StringIO
+
 
 # Translations are cached in a dictionary for every language+app tuple.
 # The active translations are stored by threadid to make them thread local.
 _translations = {}
-_active = {}
+_active = local()
 
 # The default translation is based on the settings file.
 _default = None
@@ -25,14 +29,17 @@ _default = None
 _accepted = {}
 
 # magic gettext number to separate context from message
-CONTEXT_SEPARATOR = u"\x04"
+CONTEXT_SEPARATOR = "\x04"
 
-# Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9.
+# Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9
+# and RFC 3066, section 2.1
 accept_language_re = re.compile(r'''
-        ([A-Za-z]{1,8}(?:-[A-Za-z]{1,8})*|\*)   # "en", "en-au", "x-y-z", "*"
-        (?:;q=(0(?:\.\d{,3})?|1(?:.0{,3})?))?   # Optional "q=1.00", "q=0.8"
-        (?:\s*,\s*|$)                            # Multiple accepts per header.
+        ([A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)      # "en", "en-au", "x-y-z", "es-419", "*"
+        (?:\s*;\s*q=(0(?:\.\d{,3})?|1(?:.0{,3})?))?   # Optional "q=1.00", "q=0.8"
+        (?:\s*,\s*|$)                                 # Multiple accepts per header.
         ''', re.VERBOSE)
+
+language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
 def to_locale(language, to_lower=False):
     """
@@ -62,19 +69,11 @@ def to_language(locale):
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
     This class sets up the GNUTranslations context with regard to output
-    charset. Django uses a defined DEFAULT_CHARSET as the output charset on
-    Python 2.4.
+    charset.
     """
     def __init__(self, *args, **kw):
-        from django.conf import settings
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
-        # Starting with Python 2.4, there's a function to define
-        # the output charset. Before 2.4, the output charset is
-        # identical with the translation file charset.
-        try:
-            self.set_output_charset('utf-8')
-        except AttributeError:
-            pass
+        self.set_output_charset('utf-8')
         self.django_output_charset = 'utf-8'
         self.__language = '??'
 
@@ -111,31 +110,24 @@ def translation(language):
 
     from django.conf import settings
 
-    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
-
-    if settings.SETTINGS_MODULE is not None:
-        parts = settings.SETTINGS_MODULE.split('.')
-        project = import_module(parts[0])
-        projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
-    else:
-        projectpath = None
+    globalpath = os.path.join(os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
 
     def _fetch(lang, fallback=None):
 
         global _translations
 
-        loc = to_locale(lang)
-
         res = _translations.get(lang, None)
         if res is not None:
             return res
+
+        loc = to_locale(lang)
 
         def _translation(path):
             try:
                 t = gettext_module.translation('django', path, [loc], DjangoTranslation)
                 t.set_language(lang)
                 return t
-            except IOError, e:
+            except IOError:
                 return None
 
         res = _translation(globalpath)
@@ -158,19 +150,16 @@ def translation(language):
                     res.merge(t)
             return res
 
-        for localepath in settings.LOCALE_PATHS:
-            if os.path.isdir(localepath):
-                res = _merge(localepath)
-
-        for appname in settings.INSTALLED_APPS:
+        for appname in reversed(settings.INSTALLED_APPS):
             app = import_module(appname)
-            apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
+            apppath = os.path.join(os.path.dirname(upath(app.__file__)), 'locale')
 
             if os.path.isdir(apppath):
                 res = _merge(apppath)
 
-        if projectpath and os.path.isdir(projectpath):
-            res = _merge(projectpath)
+        for localepath in reversed(settings.LOCALE_PATHS):
+            if os.path.isdir(localepath):
+                res = _merge(localepath)
 
         if res is None:
             if fallback is not None:
@@ -191,22 +180,15 @@ def activate(language):
     language and installs it as the current translation object for the current
     thread.
     """
-    if isinstance(language, basestring) and language == 'no':
-        warnings.warn(
-            "The use of the language code 'no' is deprecated. "
-            "Please use the 'nb' translation instead.",
-            DeprecationWarning
-        )
-    _active[currentThread()] = translation(language)
+    _active.value = translation(language)
 
 def deactivate():
     """
     Deinstalls the currently active translation object so that further _ calls
     will resolve against the default translation object, again.
     """
-    global _active
-    if currentThread() in _active:
-        del _active[currentThread()]
+    if hasattr(_active, "value"):
+        del _active.value
 
 def deactivate_all():
     """
@@ -214,11 +196,11 @@ def deactivate_all():
     useful when we want delayed translations to appear as the original string
     for some reason.
     """
-    _active[currentThread()] = gettext_module.NullTranslations()
+    _active.value = gettext_module.NullTranslations()
 
 def get_language():
     """Returns the currently selected language."""
-    t = _active.get(currentThread(), None)
+    t = getattr(_active, "value", None)
     if t is not None:
         try:
             return t.to_language()
@@ -246,8 +228,9 @@ def catalog():
     This can be used if you need to modify the catalog or want to access the
     whole message catalog instead of just translating one string.
     """
-    global _default, _active
-    t = _active.get(currentThread(), None)
+    global _default
+
+    t = getattr(_active, "value", None)
     if t is not None:
         return t
     if _default is None:
@@ -262,9 +245,11 @@ def do_translate(message, translation_function):
     translation object to use. If no current translation is activated, the
     message will be run through the default translation object.
     """
-    eol_message = message.replace('\r\n', '\n').replace('\r', '\n')
-    global _default, _active
-    t = _active.get(currentThread(), None)
+    global _default
+
+    # str() is allowing a bytestring message to remain bytestring on Python 2
+    eol_message = message.replace(str('\r\n'), str('\n')).replace(str('\r'), str('\n'))
+    t = getattr(_active, "value", None)
     if t is not None:
         result = getattr(t, translation_function)(eol_message)
     else:
@@ -277,14 +262,22 @@ def do_translate(message, translation_function):
     return result
 
 def gettext(message):
+    """
+    Returns a string of the translation of the message.
+
+    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
+    """
     return do_translate(message, 'gettext')
 
-def ugettext(message):
-    return do_translate(message, 'ugettext')
+if six.PY3:
+    ugettext = gettext
+else:
+    def ugettext(message):
+        return do_translate(message, 'ugettext')
 
 def pgettext(context, message):
-    result = do_translate(
-        u"%s%s%s" % (context, CONTEXT_SEPARATOR, message), 'ugettext')
+    msg_with_ctxt = "%s%s%s" % (context, CONTEXT_SEPARATOR, message)
+    result = ugettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = message
@@ -300,9 +293,9 @@ def gettext_noop(message):
     return message
 
 def do_ntranslate(singular, plural, number, translation_function):
-    global _default, _active
+    global _default
 
-    t = _active.get(currentThread(), None)
+    t = getattr(_active, "value", None)
     if t is not None:
         return getattr(t, translation_function)(singular, plural, number)
     if _default is None:
@@ -312,52 +305,86 @@ def do_ntranslate(singular, plural, number, translation_function):
 
 def ngettext(singular, plural, number):
     """
-    Returns a UTF-8 bytestring of the translation of either the singular or
-    plural, based on the number.
+    Returns a string of the translation of either the singular or plural,
+    based on the number.
+
+    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
 
-def ungettext(singular, plural, number):
-    """
-    Returns a unicode strings of the translation of either the singular or
-    plural, based on the number.
-    """
-    return do_ntranslate(singular, plural, number, 'ungettext')
+if six.PY3:
+    ungettext = ngettext
+else:
+    def ungettext(singular, plural, number):
+        """
+        Returns a unicode strings of the translation of either the singular or
+        plural, based on the number.
+        """
+        return do_ntranslate(singular, plural, number, 'ungettext')
 
 def npgettext(context, singular, plural, number):
-    result = do_ntranslate(u"%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
-                           u"%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
-                           number, 'ungettext')
+    msgs_with_ctxt = ("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
+                      "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
+                      number)
+    result = ungettext(*msgs_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        result = do_ntranslate(singular, plural, number, 'ungettext')
+        result = ungettext(singular, plural, number)
     return result
+
+def all_locale_paths():
+    """
+    Returns a list of paths to user-provides languages files.
+    """
+    from django.conf import settings
+    globalpath = os.path.join(
+        os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
+    return [globalpath] + list(settings.LOCALE_PATHS)
 
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
     code. This is used to decide whether a user-provided language is
-    available. This is only used for language codes from either the cookies or
-    session.
+    available. This is only used for language codes from either the cookies
+    or session and during format localization.
     """
-    from django.conf import settings
-    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
-    if gettext_module.find('django', globalpath, [to_locale(lang_code)]) is not None:
-        return True
-    else:
-        return False
+    for path in all_locale_paths():
+        if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
+            return True
+    return False
 
-def get_language_from_request(request):
+def get_language_from_path(path, supported=None):
+    """
+    Returns the language-code if there is a valid language-code
+    found in the `path`.
+    """
+    if supported is None:
+        from django.conf import settings
+        supported = dict(settings.LANGUAGES)
+    regex_match = language_code_prefix_re.match(path)
+    if regex_match:
+        lang_code = regex_match.group(1)
+        if lang_code in supported and check_for_language(lang_code):
+            return lang_code
+
+def get_language_from_request(request, check_path=False):
     """
     Analyzes the request to find what language the user wants the system to
     show. Only languages listed in settings.LANGUAGES are taken into account.
     If the user requests a sublanguage where we have a main language, we send
     out the main language.
+
+    If check_path is True, the URL path prefix will be checked for a language
+    code, otherwise this is skipped for backwards compatibility.
     """
     global _accepted
     from django.conf import settings
-    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     supported = dict(settings.LANGUAGES)
+
+    if check_path:
+        lang_code = get_language_from_path(request.path_info, supported)
+        if lang_code is not None:
+            return lang_code
 
     if hasattr(request, 'session'):
         lang_code = request.session.get('django_language', None)
@@ -399,11 +426,10 @@ def get_language_from_request(request):
                 (accept_lang.split('-')[0], normalized.split('_')[0])):
             if lang.lower() not in supported:
                 continue
-            langfile = os.path.join(globalpath, dirname, 'LC_MESSAGES',
-                    'django.mo')
-            if os.path.exists(langfile):
-                _accepted[normalized] = lang
-                return lang
+            for path in all_locale_paths():
+                if os.path.exists(os.path.join(path, dirname, 'LC_MESSAGES', 'django.mo')):
+                    _accepted[normalized] = lang
+                    return lang
 
     return settings.LANGUAGE_CODE
 
@@ -415,40 +441,72 @@ def blankout(src, char):
     """
     return dot_re.sub(char, src)
 
-inline_re = re.compile(r"""^\s*trans\s+((?:".*?")|(?:'.*?'))\s*""")
-block_re = re.compile(r"""^\s*blocktrans(?:\s+|$)""")
+context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
+inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*""")
+block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
+one_percent_re = re.compile(r"""(?<!%)%(?!%)""")
 
-def templatize(src):
+
+def templatize(src, origin=None):
     """
     Turns a Django template into something that is understood by xgettext. It
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    from django.template import Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
+    from django.conf import settings
+    from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
+            TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
+    src = force_text(src, settings.FILE_CHARSET)
     out = StringIO()
+    message_context = None
     intrans = False
     inplural = False
     singular = []
     plural = []
-    for t in Lexer(src, None).tokenize():
-        if intrans:
+    incomment = False
+    comment = []
+    for t in Lexer(src, origin).tokenize():
+        if incomment:
+            if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
+                content = ''.join(comment)
+                translators_comment_start = None
+                for lineno, line in enumerate(content.splitlines(True)):
+                    if line.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
+                        translators_comment_start = lineno
+                for lineno, line in enumerate(content.splitlines(True)):
+                    if translators_comment_start is not None and lineno >= translators_comment_start:
+                        out.write(' # %s' % line)
+                    else:
+                        out.write(' #\n')
+                incomment = False
+                comment = []
+            else:
+                comment.append(t.contents)
+        elif intrans:
             if t.token_type == TOKEN_BLOCK:
                 endbmatch = endblock_re.match(t.contents)
                 pluralmatch = plural_re.match(t.contents)
                 if endbmatch:
                     if inplural:
-                        out.write(' ngettext(%r,%r,count) ' % (''.join(singular), ''.join(plural)))
+                        if message_context:
+                            out.write(' npgettext(%r, %r, %r,count) ' % (message_context, ''.join(singular), ''.join(plural)))
+                        else:
+                            out.write(' ngettext(%r, %r, count) ' % (''.join(singular), ''.join(plural)))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                         for part in plural:
                             out.write(blankout(part, 'P'))
                     else:
-                        out.write(' gettext(%r) ' % ''.join(singular))
+                        if message_context:
+                            out.write(' pgettext(%r, %r) ' % (message_context, ''.join(singular)))
+                        else:
+                            out.write(' gettext(%r) ' % ''.join(singular))
                         for part in singular:
                             out.write(blankout(part, 'S'))
+                    message_context = None
                     intrans = False
                     inplural = False
                     singular = []
@@ -456,14 +514,17 @@ def templatize(src):
                 elif pluralmatch:
                     inplural = True
                 else:
-                    raise SyntaxError("Translation blocks must not include other block tags: %s" % t.contents)
+                    filemsg = ''
+                    if origin:
+                        filemsg = 'file %s, ' % origin
+                    raise SyntaxError("Translation blocks must not include other block tags: %s (%sline %d)" % (t.contents, filemsg, t.lineno))
             elif t.token_type == TOKEN_VAR:
                 if inplural:
                     plural.append('%%(%s)s' % t.contents)
                 else:
                     singular.append('%%(%s)s' % t.contents)
             elif t.token_type == TOKEN_TEXT:
-                contents = t.contents.replace('%', '%%')
+                contents = one_percent_re.sub('%%', t.contents)
                 if inplural:
                     plural.append(contents)
                 else:
@@ -475,12 +536,34 @@ def templatize(src):
                 cmatches = constant_re.findall(t.contents)
                 if imatch:
                     g = imatch.group(1)
-                    if g[0] == '"': g = g.strip('"')
-                    elif g[0] == "'": g = g.strip("'")
-                    out.write(' gettext(%r) ' % g)
+                    if g[0] == '"':
+                        g = g.strip('"')
+                    elif g[0] == "'":
+                        g = g.strip("'")
+                    g = one_percent_re.sub('%%', g)
+                    if imatch.group(2):
+                        # A context is provided
+                        context_match = context_re.match(imatch.group(2))
+                        message_context = context_match.group(1)
+                        if message_context[0] == '"':
+                            message_context = message_context.strip('"')
+                        elif message_context[0] == "'":
+                            message_context = message_context.strip("'")
+                        out.write(' pgettext(%r, %r) ' % (message_context, g))
+                        message_context = None
+                    else:
+                        out.write(' gettext(%r) ' % g)
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)
+                    if bmatch.group(1):
+                        # A context is provided
+                        context_match = context_re.match(bmatch.group(1))
+                        message_context = context_match.group(1)
+                        if message_context[0] == '"':
+                            message_context = message_context.strip('"')
+                        elif message_context[0] == "'":
+                            message_context = message_context.strip("'")
                     intrans = True
                     inplural = False
                     singular = []
@@ -488,6 +571,8 @@ def templatize(src):
                 elif cmatches:
                     for cmatch in cmatches:
                         out.write(' _(%s) ' % cmatch)
+                elif t.contents == 'comment':
+                    incomment = True
                 else:
                     out.write(blankout(t.contents, 'B'))
             elif t.token_type == TOKEN_VAR:
@@ -500,9 +585,11 @@ def templatize(src):
                         out.write(' %s ' % p.split(':',1)[1])
                     else:
                         out.write(blankout(p, 'F'))
+            elif t.token_type == TOKEN_COMMENT:
+                out.write(' # %s' % t.contents)
             else:
                 out.write(blankout(t.contents, 'X'))
-    return out.getvalue()
+    return force_str(out.getvalue())
 
 def parse_accept_lang_header(lang_string):
     """
@@ -523,52 +610,3 @@ def parse_accept_lang_header(lang_string):
         result.append((lang, priority))
     result.sort(key=lambda k: k[1], reverse=True)
     return result
-
-# get_date_formats and get_partial_date_formats aren't used anymore by Django
-# and are kept for backward compatibility.
-# Note, it's also important to keep format names marked for translation.
-# For compatibility we still want to have formats on translation catalogs.
-# That makes template code like {{ my_date|date:_('DATE_FORMAT') }} still work
-def get_date_formats():
-    """
-    Checks whether translation files provide a translation for some technical
-    message ID to store date and time formats. If it doesn't contain one, the
-    formats provided in the settings will be used.
-    """
-    warnings.warn(
-        "'django.utils.translation.get_date_formats' is deprecated. "
-        "Please update your code to use the new i18n aware formatting.",
-        DeprecationWarning
-    )
-    from django.conf import settings
-    date_format = ugettext('DATE_FORMAT')
-    datetime_format = ugettext('DATETIME_FORMAT')
-    time_format = ugettext('TIME_FORMAT')
-    if date_format == 'DATE_FORMAT':
-        date_format = settings.DATE_FORMAT
-    if datetime_format == 'DATETIME_FORMAT':
-        datetime_format = settings.DATETIME_FORMAT
-    if time_format == 'TIME_FORMAT':
-        time_format = settings.TIME_FORMAT
-    return date_format, datetime_format, time_format
-
-def get_partial_date_formats():
-    """
-    Checks whether translation files provide a translation for some technical
-    message ID to store partial date formats. If it doesn't contain one, the
-    formats provided in the settings will be used.
-    """
-    warnings.warn(
-        "'django.utils.translation.get_partial_date_formats' is deprecated. "
-        "Please update your code to use the new i18n aware formatting.",
-        DeprecationWarning
-    )
-    from django.conf import settings
-    year_month_format = ugettext('YEAR_MONTH_FORMAT')
-    month_day_format = ugettext('MONTH_DAY_FORMAT')
-    if year_month_format == 'YEAR_MONTH_FORMAT':
-        year_month_format = settings.YEAR_MONTH_FORMAT
-    if month_day_format == 'MONTH_DAY_FORMAT':
-        month_day_format = settings.MONTH_DAY_FORMAT
-    return year_month_format, month_day_format
-

@@ -26,9 +26,10 @@
 # installed, because pkg_resources is necessary to read eggs.
 
 from django.core.exceptions import ImproperlyConfigured
-from django.template import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
+from django.template.base import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
 from django.utils.importlib import import_module
 from django.conf import settings
+from django.utils import six
 
 template_source_loaders = None
 
@@ -89,15 +90,15 @@ def find_template_loader(loader):
         loader, args = loader[0], loader[1:]
     else:
         args = []
-    if isinstance(loader, basestring):
+    if isinstance(loader, six.string_types):
         module, attr = loader.rsplit('.', 1)
         try:
             mod = import_module(module)
-        except ImportError, e:
+        except ImportError as e:
             raise ImproperlyConfigured('Error importing template source loader %s: "%s"' % (loader, e))
         try:
             TemplateLoader = getattr(mod, attr)
-        except AttributeError, e:
+        except AttributeError as e:
             raise ImproperlyConfigured('Error importing template source loader %s: "%s"' % (loader, e))
 
         if hasattr(TemplateLoader, 'load_template_source'):
@@ -137,18 +138,6 @@ def find_template(name, dirs=None):
             pass
     raise TemplateDoesNotExist(name)
 
-def find_template_source(name, dirs=None):
-    # For backward compatibility
-    import warnings
-    warnings.warn(
-        "`django.template.loaders.find_template_source` is deprecated; use `django.template.loaders.find_template` instead.",
-        DeprecationWarning
-    )
-    template, origin = find_template(name, dirs)
-    if hasattr(template, 'render'):
-        raise Exception("Found a compiled template that is incompatible with the deprecated `django.template.loaders.find_template_source` function.")
-    return template, origin
-
 def get_template(template_name):
     """
     Returns a compiled Template object for the given template name,
@@ -179,20 +168,29 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
         t = select_template(template_name)
     else:
         t = get_template(template_name)
-    if context_instance:
-        context_instance.update(dictionary)
-    else:
-        context_instance = Context(dictionary)
-    return t.render(context_instance)
+    if not context_instance:
+        return t.render(Context(dictionary))
+    # Add the dictionary to the context stack, ensuring it gets removed again
+    # to keep the context_instance in the same state it started in.
+    context_instance.update(dictionary)
+    try:
+        return t.render(context_instance)
+    finally:
+        context_instance.pop()
 
 def select_template(template_name_list):
     "Given a list of template names, returns the first that can be loaded."
+    if not template_name_list:
+        raise TemplateDoesNotExist("No template names provided")
+    not_found = []
     for template_name in template_name_list:
         try:
             return get_template(template_name)
-        except TemplateDoesNotExist:
+        except TemplateDoesNotExist as e:
+            if e.args[0] not in not_found:
+                not_found.append(e.args[0])
             continue
     # If we get here, none of the templates could be loaded
-    raise TemplateDoesNotExist(', '.join(template_name_list))
+    raise TemplateDoesNotExist(', '.join(not_found))
 
 add_to_builtins('django.template.loader_tags')

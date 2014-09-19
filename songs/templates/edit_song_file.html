@@ -10,11 +10,12 @@
 {% block pageheader %}{% trans 'Edit' %} {% trans 'audio' %}{% endblock %}
 {% block content %}
 <p>Добавляйте свои файлы в формате mp3 к текстам песен.</p>
-{% if user.is_authenticated %}
+{% if request.user.is_authenticated %}
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
     {% render_upload_data upload_data %}
     <table>
       {{ form }}
+      <tr><th/><td><span class="smaller">{{ file_name }}</span></td></tr>
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
     <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />

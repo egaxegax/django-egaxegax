@@ -1,17 +1,25 @@
 """
 Internationalization support.
 """
-from django.utils.encoding import force_unicode
-from django.utils.functional import lazy, curry
+from __future__ import unicode_literals
+
+from django.utils.encoding import force_text
+from django.utils.functional import lazy
+from django.utils import six
 
 
-__all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
-        'ngettext_lazy', 'string_concat', 'activate', 'deactivate',
-        'get_language', 'get_language_bidi', 'get_date_formats',
-        'get_partial_date_formats', 'check_for_language', 'to_locale',
-        'get_language_from_request', 'templatize', 'ugettext', 'ugettext_lazy',
-        'ungettext', 'ungettext_lazy', 'pgettext', 'pgettext_lazy',
-        'npgettext', 'npgettext_lazy', 'deactivate_all']
+__all__ = [
+    'activate', 'deactivate', 'override', 'deactivate_all',
+    'get_language',  'get_language_from_request',
+    'get_language_info', 'get_language_bidi',
+    'check_for_language', 'to_locale', 'templatize', 'string_concat',
+    'gettext', 'gettext_lazy', 'gettext_noop',
+    'ugettext', 'ugettext_lazy', 'ugettext_noop',
+    'ngettext', 'ngettext_lazy',
+    'ungettext', 'ungettext_lazy',
+    'pgettext', 'pgettext_lazy',
+    'npgettext', 'npgettext_lazy',
+]
 
 # Here be dragons, so a short explanation of the logic won't hurt:
 # We are trying to solve two problems: (1) access settings, in particular
@@ -33,6 +41,7 @@ class Trans(object):
     performance effect, as access to the function goes the normal path,
     instead of using __getattr__.
     """
+
     def __getattr__(self, real_name):
         from django.conf import settings
         if settings.USE_I18N:
@@ -70,12 +79,12 @@ def pgettext(context, message):
 def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
-ngettext_lazy = lazy(ngettext, str)
 gettext_lazy = lazy(gettext, str)
-ungettext_lazy = lazy(ungettext, unicode)
-ugettext_lazy = lazy(ugettext, unicode)
-pgettext_lazy = lazy(pgettext, unicode)
-npgettext_lazy = lazy(npgettext, unicode)
+ngettext_lazy = lazy(ngettext, str)
+ugettext_lazy = lazy(ugettext, six.text_type)
+ungettext_lazy = lazy(ungettext, six.text_type)
+pgettext_lazy = lazy(pgettext, six.text_type)
+npgettext_lazy = lazy(npgettext, six.text_type)
 
 def activate(language):
     return _trans.activate(language)
@@ -83,17 +92,29 @@ def activate(language):
 def deactivate():
     return _trans.deactivate()
 
+class override(object):
+    def __init__(self, language, deactivate=False):
+        self.language = language
+        self.deactivate = deactivate
+        self.old_language = get_language()
+
+    def __enter__(self):
+        if self.language is not None:
+            activate(self.language)
+        else:
+            deactivate_all()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self.deactivate:
+            deactivate()
+        else:
+            activate(self.old_language)
+
 def get_language():
     return _trans.get_language()
 
 def get_language_bidi():
     return _trans.get_language_bidi()
-
-def get_date_formats():
-    return _trans.get_date_formats()
-
-def get_partial_date_formats():
-    return _trans.get_partial_date_formats()
 
 def check_for_language(lang_code):
     return _trans.check_for_language(lang_code)
@@ -101,11 +122,14 @@ def check_for_language(lang_code):
 def to_locale(language):
     return _trans.to_locale(language)
 
-def get_language_from_request(request):
-    return _trans.get_language_from_request(request)
+def get_language_from_request(request, check_path=False):
+    return _trans.get_language_from_request(request, check_path)
 
-def templatize(src):
-    return _trans.templatize(src)
+def get_language_from_path(path):
+    return _trans.get_language_from_path(path)
+
+def templatize(src, origin=None):
+    return _trans.templatize(src, origin)
 
 def deactivate_all():
     return _trans.deactivate_all()
@@ -115,5 +139,12 @@ def _string_concat(*strings):
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.
     """
-    return u''.join([force_unicode(s) for s in strings])
-string_concat = lazy(_string_concat, unicode)
+    return ''.join([force_text(s) for s in strings])
+string_concat = lazy(_string_concat, six.text_type)
+
+def get_language_info(lang_code):
+    from django.conf.locale import LANG_INFO
+    try:
+        return LANG_INFO[lang_code]
+    except KeyError:
+        raise KeyError("Unknown language code %r." % lang_code)

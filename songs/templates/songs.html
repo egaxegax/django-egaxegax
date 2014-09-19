@@ -22,11 +22,11 @@ input.submit { height: 26px; margin-left: 5px;}
 {% endblock %}
 {% block content %}
 <div class="indexlist">
-  <a href="{% url songs.views.list_art %}">{% trans 'Full list' %}</a>
+  <a href="{% url 'songs.views.list_art' %}">{% trans 'Full list' %}</a>
   {% for i, v in art_index.items %}
-    <a class="nodecor" href="{% url songs.views.list_art ind_art=i %}">{{ v|capfirst }}</a>
+    <a class="nodecor" href="{% url 'songs.views.list_art' ind_art=i %}">{{ v|capfirst }}</a>
   {% endfor %}
-  <form class="search" action="{% url songs.views.list_songs %}" method="get">{% csrf_token %}
+  <form class="search" action="{% url 'songs.views.list_songs' %}" method="get">{% csrf_token %}
     {{ form }}
     <input class="submit" type="submit" value="{% trans 'Search' %}" />
   </form>
@@ -41,22 +41,22 @@ input.submit { height: 26px; margin-left: 5px;}
 {% for song in songs.object_list %}
   <dl class="messageitem"><dt>
   {% if art_count %}
-    <a href="{% url songs.views.list_songs id_art=song.ref_id %}">{{ song.artist }}</a>
+    <a href="{% url 'songs.views.list_songs' id_art=song.ref_id %}">{{ song.artist }}</a>
   {% endif %}
   {% if last_count or search_count%}
-    <a href="{% url songs.views.list_songs id_art=song.id %}">{{ song.artist }}</a>
+    <a href="{% url 'songs.views.list_songs' id_art=song.id %}">{{ song.artist }}</a>
   {% endif %}
   {% if song.count %}
     <span class="smaller">[{{ song.count }}]</span>
   {% else %}
-    <a class="nodecor" href="{% url songs.views.get_song id=song.id %}">{{ song.title|escape }}</a>
+    <a class="nodecor" href="{% url 'songs.views.get_song' id=song.id %}">{{ song.title|escape }}</a>
   {% endif %}
   {% if not art_count and song.audio %}
-    <a class="nodecor" title="{% trans 'Listen' %}" href="{% url songs.views.get_song id=song.id %}?a=1"><sup> mp3</sup></a>
+    <span class="smaller">[<a class="nodecor" title="{% trans 'Listen' %}" href="{% url 'songs.views.get_song' id=song.id %}?a=1">{% trans 'Listen' %}</a>]</span>
   {% endif %}
   </dt>
   {% if last_count %}
-    <dd class="smaller">{{ song.date|timesince }} {% trans 'ago' %}</dd>
+    <dd class="smaller">{{ song.date }}</dd>
   {% endif %}
   </dl>
 {% endfor %}
@@ -77,8 +77,8 @@ input.submit { height: 26px; margin-left: 5px;}
 {% else %}
   <p>{% trans 'No songs' %}.</p>
 {% endif %}
-{% if user.is_authenticated %}
-  <p class="smaller"><a href="{% url songs.views.add_song %}">{% trans 'Add song' %}</a></p>
+{% if request.user.is_authenticated %}
+  <p class="smaller"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
 {% else %}
   <p class="smaller">{% trans 'Please authorize to add songs' %}.</p>
 {% endif %}

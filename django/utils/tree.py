@@ -3,7 +3,7 @@ A class for storing a tree graph. Primarily used for filter constructs in the
 ORM.
 """
 
-from django.utils.copycompat import deepcopy
+import copy
 
 class Node(object):
     """
@@ -58,8 +58,8 @@ class Node(object):
         """
         obj = Node(connector=self.connector, negated=self.negated)
         obj.__class__ = self.__class__
-        obj.children = deepcopy(self.children, memodict)
-        obj.subtree_parents = deepcopy(self.subtree_parents, memodict)
+        obj.children = copy.deepcopy(self.children, memodict)
+        obj.subtree_parents = copy.deepcopy(self.subtree_parents, memodict)
         return obj
 
     def __len__(self):
@@ -68,11 +68,14 @@ class Node(object):
         """
         return len(self.children)
 
-    def __nonzero__(self):
+    def __bool__(self):
         """
         For truth value testing.
         """
         return bool(self.children)
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
     def __contains__(self, other):
         """

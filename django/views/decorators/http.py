@@ -2,24 +2,18 @@
 Decorators for views based on HTTP headers.
 """
 
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps  # Python 2.4 fallback.
-
+import logging
 from calendar import timegm
-from datetime import timedelta
-from email.Utils import formatdate
+from functools import wraps
 
 from django.utils.decorators import decorator_from_middleware, available_attrs
-from django.utils.http import parse_etags, quote_etag
-from django.utils.log import getLogger
+from django.utils.http import http_date, parse_http_date_safe, parse_etags, quote_etag
 from django.middleware.http import ConditionalGetMiddleware
 from django.http import HttpResponseNotAllowed, HttpResponseNotModified, HttpResponse
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
 
-logger = getLogger('django.request')
+logger = logging.getLogger('django.request')
 
 
 def require_http_methods(request_method_list):
@@ -34,9 +28,10 @@ def require_http_methods(request_method_list):
     Note that request methods should be in uppercase.
     """
     def decorator(func):
+        @wraps(func, assigned=available_attrs(func))
         def inner(request, *args, **kwargs):
             if request.method not in request_method_list:
-                logger.warning('Method Not Allowed (%s): %s' % (request.method, request.path),
+                logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
                     extra={
                         'status_code': 405,
                         'request': request
@@ -44,7 +39,7 @@ def require_http_methods(request_method_list):
                 )
                 return HttpResponseNotAllowed(request_method_list)
             return func(request, *args, **kwargs)
-        return wraps(func, assigned=available_attrs(func))(inner)
+        return inner
     return decorator
 
 require_GET = require_http_methods(["GET"])
@@ -52,6 +47,9 @@ require_GET.__doc__ = "Decorator to require that a view only accept the GET meth
 
 require_POST = require_http_methods(["POST"])
 require_POST.__doc__ = "Decorator to require that a view only accept the POST method."
+
+require_safe = require_http_methods(["GET", "HEAD"])
+require_safe.__doc__ = "Decorator to require that a view only accept safe methods: GET and HEAD."
 
 def condition(etag_func=None, last_modified_func=None):
     """
@@ -76,9 +74,12 @@ def condition(etag_func=None, last_modified_func=None):
     called.
     """
     def decorator(func):
+        @wraps(func, assigned=available_attrs(func))
         def inner(request, *args, **kwargs):
             # Get HTTP request headers
             if_modified_since = request.META.get("HTTP_IF_MODIFIED_SINCE")
+            if if_modified_since:
+                if_modified_since = parse_http_date_safe(if_modified_since)
             if_none_match = request.META.get("HTTP_IF_NONE_MATCH")
             if_match = request.META.get("HTTP_IF_MATCH")
             if if_none_match or if_match:
@@ -102,7 +103,7 @@ def condition(etag_func=None, last_modified_func=None):
             if last_modified_func:
                 dt = last_modified_func(request, *args, **kwargs)
                 if dt:
-                    res_last_modified = formatdate(timegm(dt.utctimetuple()))[:26] + 'GMT'
+                    res_last_modified = timegm(dt.utctimetuple())
                 else:
                     res_last_modified = None
             else:
@@ -116,11 +117,12 @@ def condition(etag_func=None, last_modified_func=None):
                 if ((if_none_match and (res_etag in etags or
                         "*" in etags and res_etag)) and
                         (not if_modified_since or
-                            res_last_modified == if_modified_since)):
+                            (res_last_modified and if_modified_since and
+                            res_last_modified <= if_modified_since))):
                     if request.method in ("GET", "HEAD"):
                         response = HttpResponseNotModified()
                     else:
-                        logger.warning('Precondition Failed: %s' % request.path,
+                        logger.warning('Precondition Failed: %s', request.path,
                             extra={
                                 'status_code': 412,
                                 'request': request
@@ -129,16 +131,16 @@ def condition(etag_func=None, last_modified_func=None):
                         response = HttpResponse(status=412)
                 elif if_match and ((not res_etag and "*" in etags) or
                         (res_etag and res_etag not in etags)):
-                    logger.warning('Precondition Failed: %s' % request.path,
+                    logger.warning('Precondition Failed: %s', request.path,
                         extra={
                             'status_code': 412,
                             'request': request
                         }
                     )
                     response = HttpResponse(status=412)
-                elif (not if_none_match and if_modified_since and
-                        request.method == "GET" and
-                        res_last_modified == if_modified_since):
+                elif (not if_none_match and request.method == "GET" and
+                        res_last_modified and if_modified_since and
+                        res_last_modified <= if_modified_since):
                     response = HttpResponseNotModified()
 
             if response is None:
@@ -146,7 +148,7 @@ def condition(etag_func=None, last_modified_func=None):
 
             # Set relevant headers on the response if they don't already exist.
             if res_last_modified and not response.has_header('Last-Modified'):
-                response['Last-Modified'] = res_last_modified
+                response['Last-Modified'] = http_date(res_last_modified)
             if res_etag and not response.has_header('ETag'):
                 response['ETag'] = quote_etag(res_etag)
 

@@ -1,11 +1,17 @@
 """
 Tests for geography support in PostGIS 1.5+
 """
+from __future__ import absolute_import
+
 import os
+
 from django.contrib.gis import gdal
 from django.contrib.gis.measure import D
 from django.test import TestCase
-from models import City, County, Zipcode
+from django.utils._os import upath
+
+from .models import City, County, Zipcode
+
 
 class GeographyTest(TestCase):
 
@@ -56,7 +62,7 @@ class GeographyTest(TestCase):
         from django.contrib.gis.utils import LayerMapping
 
         # Getting the shapefile and mapping dictionary.
-        shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
+        shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
         co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
         co_mapping = {'name' : 'Name',
                       'state' : 'State',
@@ -79,7 +85,6 @@ class GeographyTest(TestCase):
 
     def test06_geography_area(self):
         "Testing that Area calculations work on geography columns."
-        from django.contrib.gis.measure import A
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
         ref_area = 5439084.70637573
         tol = 5

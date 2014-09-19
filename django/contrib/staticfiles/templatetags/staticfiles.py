@@ -1,43 +1,37 @@
 from django import template
-from django.utils.encoding import iri_to_uri
+from django.templatetags.static import StaticNode
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 register = template.Library()
 
-class StaticFilesPrefixNode(template.Node):
 
-    def __init__(self, varname=None):
-        self.varname = varname
+class StaticFilesNode(StaticNode):
 
-    def render(self, context):
-        try:
-            from django.conf import settings
-        except ImportError:
-            prefix = ''
-        else:
-            prefix = iri_to_uri(settings.STATICFILES_URL)
-        if self.varname is None:
-            return prefix
-        context[self.varname] = prefix
-        return ''
+    def url(self, context):
+        path = self.path.resolve(context)
+        return staticfiles_storage.url(path)
 
-@register.tag
-def get_staticfiles_prefix(parser, token):
+
+@register.tag('static')
+def do_static(parser, token):
     """
-    Populates a template variable with the prefix (settings.STATICFILES_URL).
+    A template tag that returns the URL to a file
+    using staticfiles' storage backend
 
     Usage::
 
-        {% get_staticfiles_prefix [as varname] %}
+        {% static path [as varname] %}
 
     Examples::
 
-        {% get_staticfiles_prefix %}
-        {% get_staticfiles_prefix as staticfiles_prefix %}
+        {% static "myapp/css/base.css" %}
+        {% static variable_with_path %}
+        {% static "myapp/css/base.css" as admin_base_css %}
+        {% static variable_with_path as varname %}
 
     """
-    tokens = token.contents.split()
-    if len(tokens) > 1 and tokens[1] != 'as':
-        raise template.TemplateSyntaxError(
-            "First argument in '%s' must be 'as'" % tokens[0])
-    return StaticFilesPrefixNode(varname=(len(tokens) > 1 and tokens[2] or None))
+    return StaticFilesNode.handle_token(parser, token)
 
+
+def static(path):
+    return staticfiles_storage.url(path)

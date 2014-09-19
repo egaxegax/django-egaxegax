@@ -1,13 +1,13 @@
 #-*- coding: utf-8 -*-
 
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import *
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
-from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render_to_response
 from google.appengine.api import images
 from google.appengine.ext import blobstore
 from my.forms import *
@@ -44,20 +44,70 @@ def FromTranslit(s):
     pattern = '|'.join(map(re.escape, sorted(r, key=len, reverse=True)))
     return re.sub(pattern, lambda m: r[m.group()], s)
 
+def AddPhotoCache(photo):
+    cache_photo = {
+        'id': photo.id,
+        'title': photo.title,
+        'album': photo.album,
+        'thumb_url': photo.thumb_url,
+        'date': photo.date.strftime('%Y-%m-%d %H:%M:%S')
+    }
+    cache.add('photo:' + str(photo.id), str(cache_photo))
+
+def AddPhotosListCache(album, photos_list):
+    cache_list = []
+    for photo in photos_list:
+        cache_list.append({
+           'id': photo.id,
+           'title': photo.title,
+           'album': photo.album,
+           'width': photo.width,
+           'height': photo.height,
+           'thumb_url': photo.thumb_url,
+           'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
+           'date': photo.date.strftime('%Y-%m-%d %H:%M:%S') })
+    cache.add('photos:' + album, str(cache_list))
+
+def ClearPhotoCache(photo):
+    cache.delete_many(['photo:' + str(photo.id)])
+
+def ClearPhotosListCache(album):
+    cache.delete_many(['photos:.full_list', 'photos:' + album])
+
 # Controllers
 
 def index(request):
-    return direct_to_template(request, 'index.html',
-                              {'logback': reverse('my.views.index')})
+    return render_to_response('index.html',
+                              {'request': request,
+                               'logback': reverse('my.views.index')})
 
 def list_photos(request, **kw):
-    photos_list = Photo.objects.all().order_by('-date')
-    view = []
-    if kw.get('id'): 
-        view = Photo.objects.filter(id=ZI(kw.get('id')))
-    return direct_to_template(request, 'photos.html',
-                              {'photos': PageList(request, photos_list, 6),
-                               'view':  view,
+    photos_list = []
+    album =''
+    if kw.get('id_album'): # filter by album
+        cache_photo_id = 'photo:' + kw.get('id_album', '')
+        if not cache.has_key(cache_photo_id):
+            mlist = Photo.objects.filter(id=ZI(kw.get('id_album')))
+            if mlist.count():
+                AddPhotoCache(mlist[0])
+        if cache.has_key(cache_photo_id):
+            photo = eval(cache.get(cache_photo_id))
+            album = photo['album']
+            if not cache.has_key('photos:' + album):
+                photos_list = Photo.objects.filter(album=album).order_by('-date')
+                AddPhotosListCache(album, photos_list)
+            photos_list = eval(cache.get('photos:' + album))
+    else: # full list
+        allkey = '.full_list'
+        if not cache.has_key('photos:' + allkey):
+            photos_list = Photo.objects.order_by('-date')
+            AddPhotosListCache(allkey, photos_list)
+        photos_list = eval(cache.get('photos:' + allkey))
+    return render_to_response('photos.html',
+                              {'request': request,
+                               'photos': PageList(request, photos_list, 6),
+                               'photos_count': len(photos_list),
+                               'album': album,
                                'logback': reverse('my.views.list_photos')})
 
 # Form actions
@@ -80,8 +130,9 @@ def create_new_user(request):
         form_profile = CreateProfileForm()
     view_url = reverse('my.views.create_new_user')
     upload_url, upload_data = prepare_upload(request, view_url)
-    return direct_to_template(request, 'user_create_form.html',
-                              {'form': form, 
+    return render_to_response('user_create_form.html',
+                              {'request': request,
+                               'form': form, 
                                'form_profile': form_profile,
                                'upload_url': upload_url,
                                'upload_data': upload_data}) 
@@ -89,7 +140,6 @@ def create_new_user(request):
 def get_avatar(request, **kw):
     profile = get_object_or_404(Profile, user__exact=ZI(kw.get('id')))
     if profile.avatar:
-#        blob_key = str(greeting.avatar.file.blobstore_info._BlobInfo__key)
         return serve_file(request, profile.avatar)
     else:
         return HttpResponseRedirect('/media/img/anon.png')
@@ -109,7 +159,8 @@ def add_photo(request):
                 photo.height = img.height
                 photo.thumb_url = images.get_serving_url(blob_key)
                 photo.author = request.user
-                photo = form.save()            
+                photo = form.save()
+                ClearPhotosListCache(photo.album)
                 return HttpResponseRedirect(reverse('my.views.list_photos'))
             except:
                 pass
@@ -117,33 +168,40 @@ def add_photo(request):
         form = AddPhotoForm()
     view_url = reverse('my.views.add_photo')
     upload_url, upload_data = prepare_upload(request, view_url)
-    return direct_to_template(request, 'add_photo.html',
-                              {'form': form, 
+    return render_to_response('add_photo.html',
+                              {'request': request,
+                               'form': form, 
                                'upload_url': upload_url,
                                'upload_data': upload_data})
 
 def edit_photo(request, **kw):
     id_photo = ZI(kw.get('id'))
-    photo = get_object_or_404(Photo, id=id_photo)
+    photo_old = get_object_or_404(Photo, id=id_photo)
     if request.method == 'POST':
-        form = EditPhotoForm(request.POST, instance=photo)
+        form = EditPhotoForm(request.POST, instance=photo_old)
         if form.is_valid():
             photo = form.save(commit=False)
             photo.save(force_update=True)
+            ClearPhotoCache(photo)
+            ClearPhotosListCache(photo_old.album)
+            ClearPhotosListCache(photo.album)
             return HttpResponseRedirect(reverse('my.views.list_photos', kwargs={'id': id_photo}))
     else:
         form = EditPhotoForm(initial={
-                           'id': photo.id,
-                           'title': photo.title,
-                           'album': photo.album})
-    return direct_to_template(request, 'edit_photo.html',
-                              {'form': form,
-                               'photo': photo})
+                             'id': photo_old.id,
+                             'title': photo_old.title,
+                             'album': photo_old.album,
+                             'thumb_url': photo_old.thumb_url})
+    return render_to_response('edit_photo.html',
+                              {'request': request,
+                               'form': form})
 
 def delete_photo(request, **kw):
     if request.user.is_authenticated():
-        photo = get_object_or_404(Photo, id=ZI(kw.get('id')))         
-        if not photo.author or request.user.username == photo.author.username:
+        photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
+        if request.user.is_superuser or hasattr(photo, 'author') and request.user.username == photo.author.username:
+            ClearPhotoCache(photo)
+            ClearPhotosListCache(photo.album)
             photo.delete()
     return HttpResponseRedirect(reverse('my.views.list_photos'))
 
@@ -152,3 +210,13 @@ def get_photo(request, **kw):
         photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
         return serve_file(request, photo.img)
 
+def view_photo(request, **kw):
+    if request.method == 'GET':
+        cache_photo_id = 'photo:' + kw.get('id', '')
+        if not cache.has_key(cache_photo_id):
+            photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
+            AddPhotoCache(photo)
+        photo = eval(cache.get(cache_photo_id))
+        return render_to_response('view_photo.html',
+                                  {'request': request,
+                                   'photo': photo})

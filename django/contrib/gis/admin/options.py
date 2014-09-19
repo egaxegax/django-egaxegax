@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.admin import ModelAdmin
 from django.contrib.gis.admin.widgets import OpenLayersWidget
 from django.contrib.gis.gdal import OGRGeomType
@@ -32,21 +31,22 @@ class GeoModelAdmin(ModelAdmin):
     map_height = 400
     map_srid = 4326
     map_template = 'gis/admin/openlayers.html'
-    openlayers_url = 'http://openlayers.org/api/2.10/OpenLayers.js'
+    openlayers_url = 'http://openlayers.org/api/2.11/OpenLayers.js'
     point_zoom = num_zoom - 6
-    wms_url = 'http://labs.metacarta.com/wms/vmap0'
+    wms_url = 'http://vmap0.tiles.osgeo.org/wms/vmap0'
     wms_layer = 'basic'
     wms_name = 'OpenLayers WMS'
+    wms_options = {'format': 'image/jpeg'}
     debug = False
     widget = OpenLayersWidget
 
-    def _media(self):
+    @property
+    def media(self):
         "Injects OpenLayers JavaScript into the admin."
-        media = super(GeoModelAdmin, self)._media()
+        media = super(GeoModelAdmin, self).media
         media.add_js([self.openlayers_url])
         media.add_js(self.extra_js)
         return media
-    media = property(_media)
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
@@ -77,6 +77,12 @@ class GeoModelAdmin(ModelAdmin):
         class OLMap(self.widget):
             template = self.map_template
             geom_type = db_field.geom_type
+
+            wms_options = ''
+            if self.wms_options:
+                wms_options = ["%s: '%s'" % pair for pair in self.wms_options.items()]
+                wms_options = ', %s' % ', '.join(wms_options)
+
             params = {'default_lon' : self.default_lon,
                       'default_lat' : self.default_lat,
                       'default_zoom' : self.default_zoom,
@@ -107,17 +113,24 @@ class GeoModelAdmin(ModelAdmin):
                       'wms_url' : self.wms_url,
                       'wms_layer' : self.wms_layer,
                       'wms_name' : self.wms_name,
+                      'wms_options' : wms_options,
                       'debug' : self.debug,
                       }
         return OLMap
 
 from django.contrib.gis import gdal
 if gdal.HAS_GDAL:
+    # Use the official spherical mercator projection SRID on versions
+    # of GDAL that support it; otherwise, fallback to 900913.
+    if gdal.GDAL_VERSION >= (1, 7):
+        spherical_mercator_srid = 3857
+    else:
+        spherical_mercator_srid = 900913
+
     class OSMGeoAdmin(GeoModelAdmin):
         map_template = 'gis/admin/osm.html'
-        extra_js = ['http://www.openstreetmap.org/openlayers/OpenStreetMap.js']
         num_zoom = 20
-        map_srid = 900913
+        map_srid = spherical_mercator_srid
         max_extent = '-20037508,-20037508,20037508,20037508'
         max_resolution = '156543.0339'
         point_zoom = num_zoom - 6

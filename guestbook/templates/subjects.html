@@ -14,7 +14,7 @@
 {% for subject in subjects.object_list %}
   {% if subject.subject %}
     <dl class="messageitem">
-      <dt><a href="{% url guestbook.views.list_greetings id_subj=subject.id %}">{{ subject.subject|escape }}</a>
+      <dt><a href="{% url 'guestbook.views.list_greetings' id_subj=subject.id %}">{{ subject.subject|escape }}</a>
       <span class="smaller">[{{ subject.greeting_count }}]</span></dt>
       <dd class="smaller">
         <acronym title="{{ subject.updated|date:"Y-m-d H:i" }}">{{ subject.updated|timesince }}</acronym> {% trans 'ago' %} {% trans 'ago' %}
@@ -22,7 +22,7 @@
     </dl>
   {% endif %}
 {% endfor %}
-<p class="smaller"><a href="{% url guestbook.views.list_greetings %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
+<p class="smaller"><a href="{% url 'guestbook.views.list_greetings' %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
 {% if subjects.object_list %}
   <p class="smaller">
     {% if subjects.has_previous %}
@@ -40,9 +40,9 @@
 {% else %}
   <p>{% trans 'No subjects' %}.</p>
 {% endif %}
-{% if user.is_authenticated %}
+{% if request.user.is_authenticated %}
   <p>
-    <form action="{% url guestbook.views.create_greeting %}" method="post">{% csrf_token %}
+    <form action="{% url 'guestbook.views.create_greeting' %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form_subject }}{{ form }}     
       <tr><th></th><td>

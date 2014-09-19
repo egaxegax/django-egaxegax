@@ -1,12 +1,14 @@
 """
 Kuwait-specific Form helpers
 """
+from __future__ import unicode_literals
+
 import re
 from datetime import date
 
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.forms.fields import Field, RegexField
+from django.forms.fields import Field
 from django.utils.translation import gettext as _
 
 id_re = re.compile(r'^(?P<initial>\d{1})(?P<yy>\d\d)(?P<mm>\d\d)(?P<dd>\d\d)(?P<mid>\d{4})(?P<checksum>\d{1})')
@@ -40,7 +42,7 @@ class KWCivilIDNumberField(Field):
     def clean(self, value):
         super(KWCivilIDNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         if not re.match(r'^\d{12}$', value):
             raise ValidationError(self.error_messages['invalid'])

@@ -2,11 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
-class Profile(models.Model):
-    user = models.ForeignKey(User, null=True, unique=True, verbose_name=_('user'))
-    about = models.TextField(null=True, blank=True, verbose_name=_('comment'))
-    avatar = models.FileField(upload_to='img', null=True, blank=True, verbose_name=_('avatar'))
-
 class Photo(models.Model):
     class Meta:
         unique_together = ('title', 'album')
@@ -18,3 +13,8 @@ class Photo(models.Model):
     thumb_url = models.CharField(max_length=255, null=True, verbose_name=_('thumb_url'))
     author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
     date = models.DateTimeField(auto_now_add=True, verbose_name=_('date'))
+
+class Profile(models.Model):
+    user = models.ForeignKey(User, null=True, unique=True, verbose_name=_('user'))
+    about = models.TextField(null=True, blank=True, verbose_name=_('comment'))
+    avatar = models.FileField(upload_to='img', null=True, blank=True, verbose_name=_('avatar'))

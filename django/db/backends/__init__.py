@@ -1,18 +1,30 @@
-import decimal
-from threading import local
+from django.db.utils import DatabaseError
 
+try:
+    from django.utils.six.moves import _thread as thread
+except ImportError:
+    from django.utils.six.moves import _dummy_thread as thread
+from contextlib import contextmanager
+
+from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import util
-from django.utils import datetime_safe
+from django.db.transaction import TransactionManagementError
+from django.utils.functional import cached_property
 from django.utils.importlib import import_module
+from django.utils import six
+from django.utils.timezone import is_aware
 
-class BaseDatabaseWrapper(local):
+
+class BaseDatabaseWrapper(object):
     """
     Represents a database connection.
     """
     ops = None
+    vendor = 'unknown'
 
-    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
+    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS,
+                 allow_thread_sharing=False):
         # `settings_dict` should be a dictionary containing keys such as
         # NAME, USER, etc. It's called `settings_dict` instead of `settings`
         # to disambiguate it from Django settings modules.
@@ -20,14 +32,23 @@ class BaseDatabaseWrapper(local):
         self.queries = []
         self.settings_dict = settings_dict
         self.alias = alias
-        self.vendor = 'unknown'
         self.use_debug_cursor = None
 
+        # Transaction related attributes
+        self.transaction_state = []
+        self.savepoint_state = 0
+        self._dirty = None
+        self._thread_ident = thread.get_ident()
+        self.allow_thread_sharing = allow_thread_sharing
+
     def __eq__(self, other):
-        return self.settings_dict == other.settings_dict
+        return self.alias == other.alias
 
     def __ne__(self, other):
         return not self == other
+
+    def __hash__(self):
+        return hash(self.alias)
 
     def _commit(self):
         if self.connection is not None:
@@ -67,21 +88,247 @@ class BaseDatabaseWrapper(local):
             return
         self.cursor().execute(self.ops.savepoint_commit_sql(sid))
 
+    def abort(self):
+        """
+        Roll back any ongoing transaction and clean the transaction state
+        stack.
+        """
+        if self._dirty:
+            self._rollback()
+            self._dirty = False
+        while self.transaction_state:
+            self.leave_transaction_management()
+
+    def enter_transaction_management(self, managed=True):
+        """
+        Enters transaction management for a running thread. It must be balanced with
+        the appropriate leave_transaction_management call, since the actual state is
+        managed as a stack.
+
+        The state and dirty flag are carried over from the surrounding block or
+        from the settings, if there is no surrounding block (dirty is always false
+        when no current block is running).
+        """
+        if self.transaction_state:
+            self.transaction_state.append(self.transaction_state[-1])
+        else:
+            self.transaction_state.append(settings.TRANSACTIONS_MANAGED)
+
+        if self._dirty is None:
+            self._dirty = False
+        self._enter_transaction_management(managed)
+
+    def leave_transaction_management(self):
+        """
+        Leaves transaction management for a running thread. A dirty flag is carried
+        over to the surrounding block, as a commit will commit all changes, even
+        those from outside. (Commits are on connection level.)
+        """
+        if self.transaction_state:
+            del self.transaction_state[-1]
+        else:
+            raise TransactionManagementError(
+                "This code isn't under transaction management")
+        # We will pass the next status (after leaving the previous state
+        # behind) to subclass hook.
+        self._leave_transaction_management(self.is_managed())
+        if self._dirty:
+            self.rollback()
+            raise TransactionManagementError(
+                "Transaction managed block ended with pending COMMIT/ROLLBACK")
+        self._dirty = False
+
+    def validate_thread_sharing(self):
+        """
+        Validates that the connection isn't accessed by another thread than the
+        one which originally created it, unless the connection was explicitly
+        authorized to be shared between threads (via the `allow_thread_sharing`
+        property). Raises an exception if the validation fails.
+        """
+        if (not self.allow_thread_sharing
+            and self._thread_ident != thread.get_ident()):
+                raise DatabaseError("DatabaseWrapper objects created in a "
+                    "thread can only be used in that same thread. The object "
+                    "with alias '%s' was created in thread id %s and this is "
+                    "thread id %s."
+                    % (self.alias, self._thread_ident, thread.get_ident()))
+
+    def is_dirty(self):
+        """
+        Returns True if the current transaction requires a commit for changes to
+        happen.
+        """
+        return self._dirty
+
+    def set_dirty(self):
+        """
+        Sets a dirty flag for the current thread and code streak. This can be used
+        to decide in a managed block of code to decide whether there are open
+        changes waiting for commit.
+        """
+        if self._dirty is not None:
+            self._dirty = True
+        else:
+            raise TransactionManagementError("This code isn't under transaction "
+                "management")
+
+    def set_clean(self):
+        """
+        Resets a dirty flag for the current thread and code streak. This can be used
+        to decide in a managed block of code to decide whether a commit or rollback
+        should happen.
+        """
+        if self._dirty is not None:
+            self._dirty = False
+        else:
+            raise TransactionManagementError("This code isn't under transaction management")
+        self.clean_savepoints()
+
+    def clean_savepoints(self):
+        self.savepoint_state = 0
+
+    def is_managed(self):
+        """
+        Checks whether the transaction manager is in manual or in auto state.
+        """
+        if self.transaction_state:
+            return self.transaction_state[-1]
+        return settings.TRANSACTIONS_MANAGED
+
+    def managed(self, flag=True):
+        """
+        Puts the transaction manager into a manual state: managed transactions have
+        to be committed explicitly by the user. If you switch off transaction
+        management and there is a pending commit/rollback, the data will be
+        commited.
+        """
+        top = self.transaction_state
+        if top:
+            top[-1] = flag
+            if not flag and self.is_dirty():
+                self._commit()
+                self.set_clean()
+        else:
+            raise TransactionManagementError("This code isn't under transaction "
+                "management")
+
+    def commit_unless_managed(self):
+        """
+        Commits changes if the system is not in managed transaction mode.
+        """
+        self.validate_thread_sharing()
+        if not self.is_managed():
+            self._commit()
+            self.clean_savepoints()
+        else:
+            self.set_dirty()
+
+    def rollback_unless_managed(self):
+        """
+        Rolls back changes if the system is not in managed transaction mode.
+        """
+        self.validate_thread_sharing()
+        if not self.is_managed():
+            self._rollback()
+        else:
+            self.set_dirty()
+
+    def commit(self):
+        """
+        Does the commit itself and resets the dirty flag.
+        """
+        self.validate_thread_sharing()
+        self._commit()
+        self.set_clean()
+
+    def rollback(self):
+        """
+        This function does the rollback itself and resets the dirty flag.
+        """
+        self.validate_thread_sharing()
+        self._rollback()
+        self.set_clean()
+
+    def savepoint(self):
+        """
+        Creates a savepoint (if supported and required by the backend) inside the
+        current transaction. Returns an identifier for the savepoint that will be
+        used for the subsequent rollback or commit.
+        """
+        thread_ident = thread.get_ident()
+
+        self.savepoint_state += 1
+
+        tid = str(thread_ident).replace('-', '')
+        sid = "s%s_x%d" % (tid, self.savepoint_state)
+        self._savepoint(sid)
+        return sid
+
+    def savepoint_rollback(self, sid):
+        """
+        Rolls back the most recent savepoint (if one exists). Does nothing if
+        savepoints are not supported.
+        """
+        self.validate_thread_sharing()
+        if self.savepoint_state:
+            self._savepoint_rollback(sid)
+
+    def savepoint_commit(self, sid):
+        """
+        Commits the most recent savepoint (if one exists). Does nothing if
+        savepoints are not supported.
+        """
+        self.validate_thread_sharing()
+        if self.savepoint_state:
+            self._savepoint_commit(sid)
+
+    @contextmanager
+    def constraint_checks_disabled(self):
+        disabled = self.disable_constraint_checking()
+        try:
+            yield
+        finally:
+            if disabled:
+                self.enable_constraint_checking()
+
+    def disable_constraint_checking(self):
+        """
+        Backends can implement as needed to temporarily disable foreign key constraint
+        checking.
+        """
+        pass
+
+    def enable_constraint_checking(self):
+        """
+        Backends can implement as needed to re-enable foreign key constraint checking.
+        """
+        pass
+
+    def check_constraints(self, table_names=None):
+        """
+        Backends can override this method if they can apply constraint checking (e.g. via "SET CONSTRAINTS
+        ALL IMMEDIATE"). Should raise an IntegrityError if any invalid foreign key references are encountered.
+        """
+        pass
+
     def close(self):
+        self.validate_thread_sharing()
         if self.connection is not None:
             self.connection.close()
             self.connection = None
 
     def cursor(self):
-        from django.conf import settings
-        cursor = self._cursor()
+        self.validate_thread_sharing()
         if (self.use_debug_cursor or
             (self.use_debug_cursor is None and settings.DEBUG)):
-            return self.make_debug_cursor(cursor)
+            cursor = self.make_debug_cursor(self._cursor())
+        else:
+            cursor = util.CursorWrapper(self._cursor(), self)
         return cursor
 
     def make_debug_cursor(self, cursor):
         return util.CursorDebugWrapper(cursor, self)
+
 
 class BaseDatabaseFeatures(object):
     allows_group_by_pk = False
@@ -94,17 +341,27 @@ class BaseDatabaseFeatures(object):
     # Does the backend distinguish between '' and None?
     interprets_empty_strings_as_nulls = False
 
+    # Does the backend allow inserting duplicate rows when a unique_together
+    # constraint exists, but one of the unique_together columns is NULL?
+    ignores_nulls_in_unique_constraints = True
+
     can_use_chunked_reads = True
     can_return_id_from_insert = False
+    has_bulk_insert = False
     uses_autocommit = False
     uses_savepoints = False
+    can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
     # integer primary keys.
     related_fields_match_type = False
     allow_sliced_subqueries = True
+    has_select_for_update = False
+    has_select_for_update_nowait = False
+
     distinguishes_insert_from_update = True
-    supports_deleting_related_objects = True
+    supports_joins = True
+    supports_select_related = True
 
     # Does the default test database allow multiple connections?
     # Usually an indication that the test database is in-memory
@@ -156,43 +413,61 @@ class BaseDatabaseFeatures(object):
     # deferred
     can_defer_constraint_checks = False
 
-    # Features that need to be confirmed at runtime
-    # Cache whether the confirmation has been performed.
-    _confirmed = False
-    supports_transactions = None
-    supports_stddev = None
+    # date_interval_sql can properly handle mixed Date/DateTime fields and timedeltas
+    supports_mixed_date_datetime_comparisons = True
+
+    # Does the backend support tablespaces? Default to False because it isn't
+    # in the SQL standard.
+    supports_tablespaces = False
+
+    # Does the backend reset sequences between tests?
+    supports_sequence_reset = True
+
+    # Confirm support for introspected foreign keys
+    # Every database can do this reliably, except MySQL,
+    # which can't do it for MyISAM tables
+    can_introspect_foreign_keys = True
+
+    # Support for the DISTINCT ON clause
+    can_distinct_on_fields = False
 
     def __init__(self, connection):
         self.connection = connection
 
-    def confirm(self):
-        "Perform manual checks of any database features that might vary between installs"
-        self._confirmed = True
-        self.supports_transactions = self._supports_transactions()
-        self.supports_stddev = self._supports_stddev()
-
-    def _supports_transactions(self):
+    @cached_property
+    def supports_transactions(self):
         "Confirm support for transactions"
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
-        self.connection._commit()
-        cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
-        self.connection._rollback()
-        cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-        count, = cursor.fetchone()
-        cursor.execute('DROP TABLE ROLLBACK_TEST')
-        self.connection._commit()
+        try:
+            # Make sure to run inside a managed transaction block,
+            # otherwise autocommit will cause the confimation to
+            # fail.
+            self.connection.enter_transaction_management()
+            self.connection.managed(True)
+            cursor = self.connection.cursor()
+            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            self.connection._commit()
+            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            self.connection._rollback()
+            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+            count, = cursor.fetchone()
+            cursor.execute('DROP TABLE ROLLBACK_TEST')
+            self.connection._commit()
+            self.connection._dirty = False
+        finally:
+            self.connection.leave_transaction_management()
         return count == 0
 
-    def _supports_stddev(self):
+    @cached_property
+    def supports_stddev(self):
         "Confirm support for STDDEV and related stats functions"
         class StdDevPop(object):
             sql_function = 'STDDEV_POP'
 
         try:
             self.connection.ops.check_aggregate_support(StdDevPop())
+            return True
         except NotImplementedError:
-            self.supports_stddev = False
+            return False
 
 
 class BaseDatabaseOperations(object):
@@ -203,8 +478,9 @@ class BaseDatabaseOperations(object):
     """
     compiler_module = "django.db.models.sql.compiler"
 
-    def __init__(self):
-        self._cache = {}
+    def __init__(self, connection):
+        self.connection = connection
+        self._cache = None
 
     def autoinc_sql(self, table, column):
         """
@@ -215,10 +491,34 @@ class BaseDatabaseOperations(object):
         """
         return None
 
+    def bulk_batch_size(self, fields, objs):
+        """
+        Returns the maximum allowed batch size for the backend. The fields
+        are the fields going to be inserted in the batch, the objs contains
+        all the objects to be inserted.
+        """
+        return len(objs)
+
+    def cache_key_culling_sql(self):
+        """
+        Returns a SQL query that retrieves the first cache key greater than the
+        n smallest.
+
+        This is used by the 'db' cache backend to determine where to start
+        culling.
+        """
+        return "SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s"
+
     def date_extract_sql(self, lookup_type, field_name):
         """
         Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
         extracts a value from the given date field field_name.
+        """
+        raise NotImplementedError()
+
+    def date_interval_sql(self, sql, connector, timedelta):
+        """
+        Implements the date interval functionality for expressions
         """
         raise NotImplementedError()
 
@@ -245,6 +545,17 @@ class BaseDatabaseOperations(object):
         during a CREATE TABLE statement.
         """
         return ''
+
+    def distinct_sql(self, fields):
+        """
+        Returns an SQL DISTINCT clause which removes duplicate rows from the
+        result set. If any fields are given, only the given fields are being
+        checked for duplicates.
+        """
+        if fields:
+            raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
+        else:
+            return 'DISTINCT'
 
     def drop_foreignkey_sql(self):
         """
@@ -284,6 +595,15 @@ class BaseDatabaseOperations(object):
         """
         return []
 
+    def for_update_sql(self, nowait=False):
+        """
+        Returns the FOR UPDATE SQL clause to lock rows for an update operation.
+        """
+        if nowait:
+            return 'FOR UPDATE NOWAIT'
+        else:
+            return 'FOR UPDATE'
+
     def fulltext_search_sql(self, field_name):
         """
         Returns the SQL WHERE clause to use in order to perform a full-text
@@ -302,16 +622,16 @@ class BaseDatabaseOperations(object):
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
         """
-        from django.utils.encoding import smart_unicode, force_unicode
+        from django.utils.encoding import force_text
 
         # Convert params to contain Unicode values.
-        to_unicode = lambda s: force_unicode(s, strings_only=True, errors='replace')
+        to_unicode = lambda s: force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple([to_unicode(val) for val in params])
         else:
             u_params = dict([(to_unicode(k), to_unicode(v)) for k, v in params.items()])
 
-        return smart_unicode(sql) % u_params
+        return force_text(sql) % u_params
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -381,11 +701,9 @@ class BaseDatabaseOperations(object):
         in the namespace corresponding to the `compiler_module` attribute
         on this backend.
         """
-        if compiler_name not in self._cache:
-            self._cache[compiler_name] = getattr(
-                import_module(self.compiler_module), compiler_name
-            )
-        return self._cache[compiler_name]
+        if self._cache is None:
+            self._cache = import_module(self.compiler_module)
+        return getattr(self._cache, compiler_name)
 
     def quote_name(self, name):
         """
@@ -431,16 +749,37 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError
 
+    def set_time_zone_sql(self):
+        """
+        Returns the SQL that will set the connection's time zone.
+
+        Returns '' if the backend doesn't support time zones.
+        """
+        return ''
+
     def sql_flush(self, style, tables, sequences):
         """
         Returns a list of SQL statements required to remove all data from
         the given database tables (without actually removing the tables
         themselves).
 
+        The returned value also includes SQL statements required to reset DB
+        sequences passed in :param sequences:.
+
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
         """
         raise NotImplementedError()
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        """
+        Returns a list of the SQL statements required to reset sequences
+        passed in :param sequences:.
+
+        The `style` argument is a Style object as returned by either
+        color_style() or no_style() in django.core.management.color.
+        """
+        return []
 
     def sequence_reset_sql(self, style, model_list):
         """
@@ -450,7 +789,7 @@ class BaseDatabaseOperations(object):
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
         """
-        return [] # No sequence reset required by default.
+        return []  # No sequence reset required by default.
 
     def start_transaction_sql(self):
         """
@@ -465,24 +804,36 @@ class BaseDatabaseOperations(object):
 
     def tablespace_sql(self, tablespace, inline=False):
         """
-        Returns the SQL that will be appended to tables or rows to define
-        a tablespace. Returns '' if the backend doesn't use tablespaces.
+        Returns the SQL that will be used in a query to define the tablespace.
+
+        Returns '' if the backend doesn't support tablespaces.
+
+        If inline is True, the SQL is appended to a row; otherwise it's appended
+        to the entire CREATE TABLE or CREATE INDEX statement.
         """
         return ''
 
     def prep_for_like_query(self, x):
         """Prepares a value for use in a LIKE query."""
-        from django.utils.encoding import smart_unicode
-        return smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+        from django.utils.encoding import force_text
+        return force_text(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
     # Same as prep_for_like_query(), but called for "iexact" matches, which
     # need not necessarily be implemented using "LIKE" in the backend.
     prep_for_iexact_query = prep_for_like_query
 
+    def validate_autopk_value(self, value):
+        """
+        Certain backends do not accept some values for "serial" fields
+        (for example zero in MySQL). This method will raise a ValueError
+        if the value is invalid, otherwise returns validated value.
+        """
+        return value
+
     def value_to_db_auto(self, value):
         """
-        Transform a value to an object compatible with the auto field required
-        by the backend driver for auto columns.
+        Transform an AutoField value to an object compatible with what is expected
+        by the backend driver for automatic keys.
         """
         if value is None:
             return None
@@ -495,7 +846,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return datetime_safe.new_date(value).strftime('%Y-%m-%d')
+        return six.text_type(value)
 
     def value_to_db_datetime(self, value):
         """
@@ -504,16 +855,18 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         """
-        Transform a datetime value to an object compatible with what is expected
+        Transform a time value to an object compatible with what is expected
         by the backend driver for time columns.
         """
         if value is None:
             return None
-        return unicode(value)
+        if is_aware(value):
+            raise ValueError("Django does not support timezone-aware times.")
+        return six.text_type(value)
 
     def value_to_db_decimal(self, value, max_digits, decimal_places):
         """
@@ -549,19 +902,19 @@ class BaseDatabaseOperations(object):
         return self.year_lookup_bounds(value)
 
     def convert_values(self, value, field):
-        """Coerce the value returned by the database backend into a consistent type that
-        is compatible with the field type.
         """
+        Coerce the value returned by the database backend into a consistent type
+        that is compatible with the field type.
+        """
+        if value is None or field is None:
+            return value
         internal_type = field.get_internal_type()
-        if internal_type == 'DecimalField':
-            return value
-        elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
+        if internal_type == 'FloatField':
+            return float(value)
+        elif (internal_type and (internal_type.endswith('IntegerField')
+                                 or internal_type == 'AutoField')):
             return int(value)
-        elif internal_type in ('DateField', 'DateTimeField', 'TimeField'):
-            return value
-        # No field, or the field isn't known to be a decimal or integer
-        # Default to a float
-        return float(value)
+        return value
 
     def check_aggregate_support(self, aggregate_func):
         """Check that the backend supports the provided aggregate
@@ -569,7 +922,7 @@ class BaseDatabaseOperations(object):
         This is used on specific backends to rule out known aggregates
         that are known to have faulty implementations. If the named
         aggregate function has a known problem, the backend should
-        raise NotImplemented.
+        raise NotImplementedError.
         """
         pass
 
@@ -581,6 +934,12 @@ class BaseDatabaseOperations(object):
         """
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
+
+    def modify_insert_params(self, placeholders, params):
+        """Allow modification of insert parameters. Needed for Oracle Spatial
+        backend due to #10888.
+        """
+        return params
 
 class BaseDatabaseIntrospection(object):
     """
@@ -606,10 +965,23 @@ class BaseDatabaseIntrospection(object):
         """
         return name
 
-    def table_names(self):
-        "Returns a list of names of all tables that exist in the database."
-        cursor = self.connection.cursor()
-        return self.get_table_list(cursor)
+    def table_names(self, cursor=None):
+        """
+        Returns a list of names of all tables that exist in the database.
+        The returned table list is sorted by Python's default sorting. We
+        do NOT use database's ORDER BY here to avoid subtle differences
+        in sorting order between databases.
+        """
+        if cursor is None:
+            cursor = self.connection.cursor()
+        return sorted(self.get_table_list(cursor))
+
+    def get_table_list(self, cursor):
+        """
+        Returns an unsorted list of names of all tables that exist in the
+        database.
+        """
+        raise NotImplementedError
 
     def django_table_names(self, only_existing=False):
         """
@@ -629,6 +1001,7 @@ class BaseDatabaseIntrospection(object):
                     continue
                 tables.add(model._meta.db_table)
                 tables.update([f.m2m_db_table() for f in model._meta.local_many_to_many])
+        tables = list(tables)
         if only_existing:
             existing_tables = self.table_names()
             tables = [
@@ -646,7 +1019,7 @@ class BaseDatabaseIntrospection(object):
             for model in models.get_models(app):
                 if router.allow_syncdb(self.connection.alias, model):
                     all_models.append(model)
-        tables = map(self.table_name_converter, tables)
+        tables = list(map(self.table_name_converter, tables))
         return set([
             m for m in all_models
             if self.table_name_converter(m._meta.db_table) in tables
@@ -663,12 +1036,14 @@ class BaseDatabaseIntrospection(object):
             for model in models.get_models(app):
                 if not model._meta.managed:
                     continue
+                if model._meta.swapped:
+                    continue
                 if not router.allow_syncdb(self.connection.alias, model):
                     continue
                 for f in model._meta.local_fields:
                     if isinstance(f, models.AutoField):
                         sequence_list.append({'table': model._meta.db_table, 'column': f.column})
-                        break # Only one AutoField is allowed per model, so don't bother continuing.
+                        break  # Only one AutoField is allowed per model, so don't bother continuing.
 
                 for f in model._meta.local_many_to_many:
                     # If this is an m2m using an intermediate table,
@@ -677,6 +1052,34 @@ class BaseDatabaseIntrospection(object):
                         sequence_list.append({'table': f.m2m_db_table(), 'column': None})
 
         return sequence_list
+
+    def get_key_columns(self, cursor, table_name):
+        """
+        Backends can override this to return a list of (column_name, referenced_table_name,
+        referenced_column_name) for all key columns in given table.
+        """
+        raise NotImplementedError
+
+    def get_primary_key_column(self, cursor, table_name):
+        """
+        Returns the name of the primary key column for the given table.
+        """
+        for column in six.iteritems(self.get_indexes(cursor, table_name)):
+            if column[1]['primary_key']:
+                return column[0]
+        return None
+
+    def get_indexes(self, cursor, table_name):
+        """
+        Returns a dictionary of indexed fieldname -> infodict for the given
+        table, where each infodict is in the format:
+            {'primary_key': boolean representing whether it's the primary key,
+             'unique': boolean representing whether it's a unique index}
+
+        Only single-column indexes are introspected.
+        """
+        raise NotImplementedError
+
 
 class BaseDatabaseClient(object):
     """
@@ -693,6 +1096,7 @@ class BaseDatabaseClient(object):
 
     def runshell(self):
         raise NotImplementedError()
+
 
 class BaseDatabaseValidation(object):
     """

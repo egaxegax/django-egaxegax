@@ -3,10 +3,8 @@ import os
 import time
 from urllib2 import HTTPError, URLError
 
-from google.appengine.ext.testbed import Testbed
-
-from ..boot import PROJECT_DIR
-from ..utils import appid, have_appserver
+from djangoappengine.boot import PROJECT_DIR
+from djangoappengine.utils import appid, have_appserver
 
 
 REMOTE_API_SCRIPTS = (
@@ -29,7 +27,7 @@ def rpc_server_factory(*args, ** kwargs):
 class StubManager(object):
 
     def __init__(self):
-        self.testbed = Testbed()
+        self.testbed = None
         self.active_stubs = None
         self.pre_test_stubs = None
 
@@ -47,16 +45,22 @@ class StubManager(object):
 
         appserver_opts = connection.settings_dict.get('DEV_APPSERVER_OPTIONS', {})
         high_replication = appserver_opts.get('high_replication', False)
+        require_indexes = appserver_opts.get('require_indexes', False)
 
-        datastore_opts = {}
+        datastore_opts = {'require_indexes': require_indexes}
+
         if high_replication:
             from google.appengine.datastore import datastore_stub_util
             datastore_opts['consistency_policy'] = datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
 
+        if self.testbed is None:
+            from google.appengine.ext.testbed import Testbed
+            self.testbed = Testbed()
+
         self.testbed.activate()
         self.pre_test_stubs = self.active_stubs
         self.active_stubs = 'test'
-        self.testbed.init_datastore_v3_stub(**datastore_opts)
+        self.testbed.init_datastore_v3_stub(root_path=PROJECT_DIR, **datastore_opts)
         self.testbed.init_memcache_stub()
         self.testbed.init_taskqueue_stub(auto_task_running=True, root_path=PROJECT_DIR)
         self.testbed.init_urlfetch_stub()
@@ -79,7 +83,11 @@ class StubManager(object):
         args.update(connection.settings_dict.get('DEV_APPSERVER_OPTIONS', {}))
         log_level = logging.getLogger().getEffectiveLevel()
         logging.getLogger().setLevel(logging.WARNING)
-        from google.appengine.tools import dev_appserver
+
+        try:
+            from google.appengine.tools import dev_appserver
+        except ImportError:
+            from google.appengine.tools import old_dev_appserver as dev_appserver
         dev_appserver.SetupStubs('dev~' + appid, **args)
         logging.getLogger().setLevel(log_level)
         self.active_stubs = 'local'

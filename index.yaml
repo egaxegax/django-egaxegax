@@ -10,6 +10,12 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: auth_user
+  properties:
+  - name: username
+  - name: __key__
+    direction: desc
+
 - kind: django_admin_log
   properties:
   - name: user_id
@@ -51,6 +57,12 @@ indexes:
 - kind: my_greeting
   properties:
   - name: subject_id
+  - name: date
+    direction: desc
+
+- kind: my_photo
+  properties:
+  - name: album
   - name: date
     direction: desc
 

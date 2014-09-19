@@ -1,7 +1,14 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+
 {% block coltype %}colSM{% endblock %}
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; <a href="../">Documentation</a> &rsaquo; Tags</div>{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
+&rsaquo; {% trans 'Tags' %}
+</div>
+{% endblock %}
 {% block title %}Template tags{% endblock %}
 
 {% block content %}
@@ -15,9 +22,9 @@
     <h2>{% firstof library.grouper "Built-in tags" %}</h2>
     {% if library.grouper %}<p class="small quiet">To use these tags, put <code>{% templatetag openblock %} load {{ library.grouper }} {% templatetag closeblock %}</code> in your template before using the tag.</p><hr />{% endif %}
     {% for tag in library.list|dictsort:"name" %}
-    <h3 id="{{ library.grouper|default_if_none:"built_in" }}-{{ tag.name }}">{{ tag.name }}</h3>
-    <h4>{{ tag.title }}</h4>
-    <p>{{ tag.body }}</p>
+    <h3 id="{{ library.grouper|default:"built_in" }}-{{ tag.name }}">{{ tag.name }}</h3>
+    <h4>{{ tag.title|striptags }}</h4>
+    {{ tag.body }}
     {% if not forloop.last %}<hr />{% endif %}
     {% endfor %}
 </div>
@@ -36,7 +43,7 @@
     <h2>{% firstof library.grouper "Built-in tags" %}</h2>
     <ul>
     {% for tag in library.list|dictsort:"name" %}
-        <li><a href="#{{ library.grouper|default_if_none:"built_in" }}-{{ tag.name }}">{{ tag.name }}</a></li>
+        <li><a href="#{{ library.grouper|default:"built_in" }}-{{ tag.name }}">{{ tag.name }}</a></li>
     {% endfor %}
     </ul>
 </div>

@@ -1,7 +1,6 @@
 from django import forms
-import django.contrib.auth.forms as auth_forms
-from my.models import *
 from django.utils.translation import ugettext as _
+from my.models import *
 
 class CreateProfileForm(forms.ModelForm):
     class Meta:

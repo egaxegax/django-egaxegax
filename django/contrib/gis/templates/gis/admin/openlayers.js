@@ -1,6 +1,7 @@
-{# Author: Justin Bronn, Travis Pinney & Dane Springmeyer #}
+{% load l10n %}
+OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.SphericalMercator.projectForward);
 {% block vars %}var {{ module }} = {};
-{{ module }}.map = null; {{ module }}.controls = null; {{ module }}.panel = null; {{ module }}.re = new RegExp("^SRID=\d+;(.+)", "i"); {{ module }}.layers = {};
+{{ module }}.map = null; {{ module }}.controls = null; {{ module }}.panel = null; {{ module }}.re = new RegExp("^SRID=\\d+;(.+)", "i"); {{ module }}.layers = {};
 {{ module }}.modifiable = {{ modifiable|yesno:"true,false" }};
 {{ module }}.wkt_f = new OpenLayers.Format.WKT();
 {{ module }}.is_collection = {{ is_collection|yesno:"true,false" }};
@@ -67,7 +68,9 @@
 {{ module }}.clearFeatures = function (){
   {{ module }}.deleteFeatures();
   document.getElementById('{{ id }}').value = '';
+  {% localize off %}
   {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon }}, {{ default_lat }}), {{ default_zoom }});
+  {% endlocalize %}
 }
 // Add Select control
 {{ module }}.addSelectControl = function(){
@@ -106,10 +109,12 @@
 {% autoescape off %}{% for item in map_options.items %}      '{{ item.0 }}' : {{ item.1 }}{% if not forloop.last %},{% endif %}
 {% endfor %}{% endautoescape %}    };{% endblock %}
     // The admin map for this geometry field.
+    {% block map_creation %}
     {{ module }}.map = new OpenLayers.Map('{{ id }}_map', options);
     // Base Layer
-    {{ module }}.layers.base = {% block base_layer %}new OpenLayers.Layer.WMS( "{{ wms_name }}", "{{ wms_url }}", {layers: '{{ wms_layer }}'} );{% endblock %}
+    {{ module }}.layers.base = {% block base_layer %}new OpenLayers.Layer.WMS("{{ wms_name }}", "{{ wms_url }}", {layers: '{{ wms_layer }}'{{ wms_options|safe }}});{% endblock %}
     {{ module }}.map.addLayer({{ module }}.layers.base);
+    {% endblock %}
     {% block extra_layers %}{% endblock %}
     {% if is_linestring %}OpenLayers.Feature.Vector.style["default"]["strokeWidth"] = 3; // Default too thin for linestrings. {% endif %}
     {{ module }}.layers.vector = new OpenLayers.Layer.Vector(" {{ field_name }}");
@@ -136,7 +141,9 @@
           {{ module }}.map.zoomTo({{ point_zoom }});
       }
     } else {
+      {% localize off %}
       {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon }}, {{ default_lat }}), {{ default_zoom }});
+      {% endlocalize %}
     }
     // This allows editing of the geographic fields -- the modified WKT is
     // written back to the content field (as EWKT, so that the ORM will know

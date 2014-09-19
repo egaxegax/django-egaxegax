@@ -1,15 +1,47 @@
 import datetime
-import random
 
+import django
 from django.conf import settings
 from django.db.models.fields import NOT_PROVIDED
 from django.db.models.query import QuerySet
 from django.db.models.sql import aggregates as sqlaggregates
 from django.db.models.sql.compiler import SQLCompiler
-from django.db.models.sql.constants import LOOKUP_SEP, MULTI, SINGLE
+from django.db.models.sql.constants import MULTI, SINGLE
 from django.db.models.sql.where import AND, OR
 from django.db.utils import DatabaseError, IntegrityError
 from django.utils.tree import Node
+from django.db import connections
+
+try:
+    from django.db.models.sql.where import SubqueryConstraint
+except ImportError:
+    SubqueryConstraint = None
+
+try:
+    from django.db.models.sql.datastructures import EmptyResultSet
+except ImportError:
+    class EmptyResultSet(Exception):
+        pass
+
+
+if django.VERSION >= (1, 5):
+    from django.db.models.constants import LOOKUP_SEP
+else:
+    from django.db.models.sql.constants import LOOKUP_SEP
+
+if django.VERSION >= (1, 6):
+    def get_selected_fields(query):
+        if query.select:
+            return [info.field for info in (query.select +
+                        query.related_select_cols)]
+        else:
+            return query.model._meta.fields
+else:
+    def get_selected_fields(query):
+        if query.select_fields:
+            return (query.select_fields + query.related_select_fields)
+        else:
+            return query.model._meta.fields
 
 
 EMULATED_OPS = {
@@ -157,7 +189,7 @@ class NonrelQuery(object):
         leaf (a tuple).
         """
 
-        # TODO: Call get_db_prep_lookup directly, constrain.process
+        # TODO: Call get_db_prep_lookup directly, constraint.process
         #       doesn't do much more.
         constraint, lookup_type, annotation, value = child
         packed, value = constraint.process(lookup_type, value, self.connection)
@@ -173,7 +205,10 @@ class NonrelQuery(object):
         # is the parent's primary key, while the field the filter
         # should consider is the child's foreign key field.
         if column != field.column:
-            assert field.primary_key
+            if not field.primary_key:
+                raise DatabaseError("This database doesn't support filtering "
+                                    "on non-primary key ForeignKey fields.")
+
             field = (f for f in opts.fields if f.column == column).next()
             assert field.rel is not None
 
@@ -226,6 +261,10 @@ class NonrelQuery(object):
         result = []
         for child in children:
 
+            if SubqueryConstraint is not None \
+              and isinstance(child, SubqueryConstraint):
+                raise DatabaseError("Subqueries are not supported.")
+
             if isinstance(child, tuple):
                 constraint, lookup_type, _, value = child
 
@@ -236,7 +275,7 @@ class NonrelQuery(object):
                 #       them as SQL strings (QueryWrappers) to
                 #       filtering.
                 if isinstance(value, QuerySet):
-                    raise DatabaseError("Subqueries are not supported (yet).")
+                    raise DatabaseError("Subqueries are not supported.")
 
                 # Remove leafs that were automatically added by
                 # sql.Query.add_filter to handle negations of outer
@@ -332,8 +371,12 @@ class NonrelCompiler(SQLCompiler):
         to this compiler. Called by QuerySet methods.
         """
         fields = self.get_fields()
-        results = self.build_query(fields).fetch(
-            self.query.low_mark, self.query.high_mark)
+        try:
+            results = self.build_query(fields).fetch(
+                self.query.low_mark, self.query.high_mark)
+        except EmptyResultSet:
+            results = []
+
         for entity in results:
             yield self._make_result(entity, fields)
 
@@ -353,8 +396,11 @@ class NonrelCompiler(SQLCompiler):
             aggregate = aggregates[0]
             assert isinstance(aggregate, sqlaggregates.Count)
             opts = self.query.get_meta()
-            assert aggregate.col == '*' or \
-                   aggregate.col == (opts.db_table, opts.pk.column)
+            if aggregate.col != '*' and \
+                aggregate.col != (opts.db_table, opts.pk.column):
+                raise DatabaseError("This database backend only supports "
+                                    "count() queries on the primary key.")
+
             count = self.get_count()
             if result_type is SINGLE:
                 return [count]
@@ -401,6 +447,8 @@ class NonrelCompiler(SQLCompiler):
         required in most situations) or using the SQL-specific
         `QuerySet.extra()` to not work with nonrel back-ends.
         """
+        if hasattr(self.query, 'is_empty') and self.query.is_empty():
+            raise EmptyResultSet()
         if (len([a for a in self.query.alias_map if
                  self.query.alias_refcount[a]]) > 1 or
             self.query.distinct or self.query.extra or self.query.having):
@@ -416,7 +464,10 @@ class NonrelCompiler(SQLCompiler):
             high_mark = 1
         else:
             high_mark = self.query.high_mark
-        return self.build_query().count(high_mark)
+        try:
+            return self.build_query().count(high_mark)
+        except EmptyResultSet:
+            return 0
 
     def build_query(self, fields=None):
         """
@@ -431,7 +482,7 @@ class NonrelCompiler(SQLCompiler):
         query.order_by(self._get_ordering())
 
         # This at least satisfies the most basic unit tests.
-        if settings.DEBUG:
+        if connections[self.using].use_debug_cursor or (connections[self.using].use_debug_cursor is None and settings.DEBUG):
             self.connection.queries.append({'sql': repr(query)})
         return query
 
@@ -443,11 +494,7 @@ class NonrelCompiler(SQLCompiler):
 
         # We only set this up here because related_select_fields isn't
         # populated until execute_sql() has been called.
-        if self.query.select_fields:
-            fields = (self.query.select_fields +
-                      self.query.related_select_fields)
-        else:
-            fields = self.query.model._meta.fields
+        fields = get_selected_fields(self.query)
 
         # If the field was deferred, exclude it from being passed
         # into `resolve_columns` because it wasn't selected.
@@ -522,34 +569,30 @@ class NonrelInsertCompiler(NonrelCompiler):
     """
 
     def execute_sql(self, return_id=False):
-        field_values = {}
-        pk = self.query.get_meta().pk
-        for (field, value), column in zip(self.query.values,
-                                          self.query.columns):
-
-            # Raise an exception for non-nullable fields without a value.
-            if field is not None:
-                if not field.null and value is None:
+        to_insert = []
+        pk_field = self.query.get_meta().pk
+        for obj in self.query.objs:
+            field_values = {}
+            for field in self.query.fields:
+                value = field.get_db_prep_save(
+                    getattr(obj, field.attname) if self.query.raw else field.pre_save(obj, obj._state.adding),
+                    connection=self.connection
+                )
+                if value is None and not field.null and not field.primary_key:
                     raise IntegrityError("You can't set %s (a non-nullable "
                                          "field) to None!" % field.name)
 
-            # Use the primary key field when our sql.Query provides a
-            # value without a field.
-            if field is None:
-                field = pk
-            assert field.column == column
-            assert field not in field_values
+                # Prepare value for database, note that query.values have
+                # already passed through get_db_prep_save.
+                value = self.ops.value_for_db(value, field)
 
-            # Prepare value for database, note that query.values have
-            # already passed through get_db_prep_save.
-            value = self.ops.value_for_db(value, field)
+                field_values[field.column] = value
+            to_insert.append(field_values)
 
-            field_values[field] = value
-
-        key = self.insert(field_values, return_id=return_id)
+        key = self.insert(to_insert, return_id=return_id)
 
         # Pass the key value through normal database deconversion.
-        return self.ops.convert_values(self.ops.value_from_db(key, pk), pk)
+        return self.ops.convert_values(self.ops.value_from_db(key, pk_field), pk_field)
 
     def insert(self, values, return_id):
         """
@@ -594,4 +637,19 @@ class NonrelUpdateCompiler(NonrelCompiler):
 class NonrelDeleteCompiler(NonrelCompiler):
 
     def execute_sql(self, result_type=MULTI):
-        self.build_query([self.query.get_meta().pk]).delete()
+        try:
+            self.build_query([self.query.get_meta().pk]).delete()
+        except EmptyResultSet:
+            pass
+
+
+class NonrelAggregateCompiler(NonrelCompiler):
+    pass
+
+
+class NonrelDateCompiler(NonrelCompiler):
+    pass
+
+
+class NonrelDateTimeCompiler(NonrelCompiler):
+    pass

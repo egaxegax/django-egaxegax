@@ -4,12 +4,17 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 
 from django.core.exceptions import FieldError
 from django.db import connections
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import Date
-from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
+from django.utils.datastructures import SortedDict
+from django.utils.functional import Promise
+from django.utils.encoding import force_text
+from django.utils import six
+
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
         'AggregateQuery']
@@ -39,8 +44,45 @@ class DeleteQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             where.add((Constraint(None, field.column, field), 'in',
-                    pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]), AND)
+                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
+
+    def delete_qs(self, query, using):
+        """
+        Delete the queryset in one SQL query (if possible). For simple queries
+        this is done by copying the query.query.where to self.query, for
+        complex queries by using subquery.
+        """
+        innerq = query.query
+        # Make sure the inner query has at least one table in use.
+        innerq.get_initial_alias()
+        # The same for our new query.
+        self.get_initial_alias()
+        innerq_used_tables = [t for t in innerq.tables
+                              if innerq.alias_refcount[t]]
+        if ((not innerq_used_tables or innerq_used_tables == self.tables)
+            and not len(innerq.having)):
+            # There is only the base table in use in the query, and there are
+            # no aggregate filtering going on.
+            self.where = innerq.where
+        else:
+            pk = query.model._meta.pk
+            if not connections[using].features.update_can_self_select:
+                # We can't do the delete using subquery.
+                values = list(query.values_list('pk', flat=True))
+                if not values:
+                    return
+                self.delete_batch(values, using)
+                return
+            else:
+                innerq.clear_select_clause()
+                innerq.select, innerq.select_fields = [(self.get_initial_alias(), pk.column)], [None]
+                values = innerq
+            where = self.where_class()
+            where.add((Constraint(None, pk.column, pk), 'in', values), AND)
+            self.where = where
+        self.get_compiler(using).execute_sql(None)
+
 
 class UpdateQuery(Query):
     """
@@ -68,14 +110,13 @@ class UpdateQuery(Query):
         return super(UpdateQuery, self).clone(klass,
                 related_updates=self.related_updates.copy(), **kwargs)
 
-
     def update_batch(self, pk_list, values, using):
         pk_field = self.model._meta.pk
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.where.add((Constraint(None, pk_field.column, pk_field), 'in',
-                    pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
+                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]),
                     AND)
             self.get_compiler(using).execute_sql(None)
 
@@ -86,7 +127,7 @@ class UpdateQuery(Query):
         querysets.
         """
         values_seq = []
-        for name, val in values.iteritems():
+        for name, val in six.iteritems(values):
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
@@ -102,6 +143,10 @@ class UpdateQuery(Query):
         Used by add_update_values() as well as the "fast" update path when
         saving models.
         """
+        # Check that no Promise object passes to the query. Refs #10498.
+        values_seq = [(value[0], value[1], force_text(value[2]))
+                      if isinstance(value[2], Promise) else value
+                      for value in values_seq]
         self.values.extend(values_seq)
 
     def add_related_update(self, model, field, value):
@@ -124,7 +169,7 @@ class UpdateQuery(Query):
         if not self.related_updates:
             return []
         result = []
-        for model, values in self.related_updates.iteritems():
+        for model, values in six.iteritems(self.related_updates):
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
@@ -137,20 +182,19 @@ class InsertQuery(Query):
 
     def __init__(self, *args, **kwargs):
         super(InsertQuery, self).__init__(*args, **kwargs)
-        self.columns = []
-        self.values = []
-        self.params = ()
+        self.fields = []
+        self.objs = []
 
     def clone(self, klass=None, **kwargs):
         extras = {
-            'columns': self.columns[:],
-            'values': self.values[:],
-            'params': self.params
+            'fields': self.fields[:],
+            'objs': self.objs[:],
+            'raw': self.raw,
         }
         extras.update(kwargs)
         return super(InsertQuery, self).clone(klass, **extras)
 
-    def insert_values(self, insert_values, raw_values=False):
+    def insert_values(self, fields, objs, raw=False):
         """
         Set up the insert query from the 'insert_values' dictionary. The
         dictionary gives the model field names and their target values.
@@ -160,16 +204,15 @@ class InsertQuery(Query):
         parameters. This provides a way to insert NULL and DEFAULT keywords
         into the query, for example.
         """
-        placeholders, values = [], []
-        for field, val in insert_values:
-            placeholders.append((field, val))
-            self.columns.append(field.column)
-            values.append(val)
-        if raw_values:
-            self.values.extend([(None, v) for v in values])
-        else:
-            self.params += tuple(values)
-            self.values.extend(placeholders)
+        self.fields = fields
+        # Check that no Promise object reaches the DB. Refs #10498.
+        for field in fields:
+            for obj in objs:
+                value = getattr(obj, field.attname)
+                if isinstance(value, Promise):
+                    setattr(obj, field.attname, force_text(value))
+        self.objs = objs
+        self.raw = raw
 
 class DateQuery(Query):
     """
@@ -200,10 +243,8 @@ class DateQuery(Query):
                 % field.name
         alias = result[3][-1]
         select = Date((alias, field.column), lookup_type)
-        self.select = [select]
-        self.select_fields = [None]
-        self.select_related = False # See #7097.
-        self.set_extra_mask([])
+        self.clear_select_clause()
+        self.select, self.select_fields = [select], [None]
         self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
 

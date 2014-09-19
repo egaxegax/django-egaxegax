@@ -17,6 +17,7 @@ class CountyFeat(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=25)
+    name_txt = models.TextField(default='')
     population = models.IntegerField()
     density = models.DecimalField(max_digits=7, decimal_places=1)
     dt = models.DateField()
@@ -42,6 +43,9 @@ class ICity1(CityBase):
     
 class ICity2(ICity1):
     dt_time = models.DateTimeField(auto_now=True)
+
+class Invalid(models.Model):
+    point = models.PointField()
 
 # Mapping dictionaries for the models above.
 co_mapping = {'name' : 'Name',

@@ -1,0 +1,16 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ photo.album }} - {% trans 'photos, images, pictures' %} - {% trans 'Egax Portal' %}</title>
+<link rel="stylesheet" href="/media/css/main.css" type="text/css" />
+<style type="text/css">
+.viewcontent { text-align: center; }
+</style>
+</head>
+<body>
+<div class="viewcontent">
+<img src="{% url 'my.views.get_photo' id=photo.id %}" title="{{ photo.title }} | {{ photo.album }}" alt="{{ photo.album }}"/>
+</div>
+</body>
+</html>

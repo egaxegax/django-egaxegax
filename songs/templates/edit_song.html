@@ -4,13 +4,14 @@
 {% block title %}{% trans 'Edit song' %} - {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
 #topmenu li.songmenu { background-color: #cd984c; }
+#id_artist { color: #c8c8c8; }
 #id_title { width:100%; }
 {% endblock %}
 {% block pageheader %}{% trans 'Edit song' %}{% endblock %}
 {% block content %}
 <p>Добавляйте свои подборы и тексты.</p>
-{% if user.is_authenticated %}
-  <form action="{% url songs.views.edit_song id=form.initial.id %}" method="post">{% csrf_token %}
+{% if request.user.is_authenticated %}
+  <form action="{% url 'songs.views.edit_song' id=form.initial.id %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form }}
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>

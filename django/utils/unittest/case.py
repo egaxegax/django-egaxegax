@@ -241,9 +241,6 @@ class TestCase(unittest.TestCase):
         Cleanup items are called even if setUp fails (unlike tearDown)."""
         self._cleanups.append((function, args, kwargs))
 
-    def setUp(self):
-        "Hook method for setting up the test fixture before exercising it."
-
     @classmethod
     def setUpClass(cls):
         "Hook method for setting up class fixture before running tests in the class."
@@ -251,9 +248,6 @@ class TestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         "Hook method for deconstructing the class fixture after running all tests in the class."
-
-    def tearDown(self):
-        "Hook method for deconstructing the test fixture after testing it."
 
     def countTestCases(self):
         return 1
@@ -330,7 +324,7 @@ class TestCase(unittest.TestCase):
             success = False
             try:
                 self.setUp()
-            except SkipTest, e:
+            except SkipTest as e:
                 self._addSkip(result, str(e))
             except Exception:
                 result.addError(self, sys.exc_info())
@@ -339,7 +333,7 @@ class TestCase(unittest.TestCase):
                     testMethod()
                 except self.failureException:
                     result.addFailure(self, sys.exc_info())
-                except _ExpectedFailure, e:
+                except _ExpectedFailure as e:
                     addExpectedFailure = getattr(result, 'addExpectedFailure', None)
                     if addExpectedFailure is not None:
                         addExpectedFailure(self, e.exc_info)
@@ -355,7 +349,7 @@ class TestCase(unittest.TestCase):
                         warnings.warn("Use of a TestResult without an addUnexpectedSuccess method is deprecated",
                                       DeprecationWarning)
                         result.addFailure(self, sys.exc_info())
-                except SkipTest, e:
+                except SkipTest as e:
                     self._addSkip(result, str(e))
                 except Exception:
                     result.addError(self, sys.exc_info())
@@ -479,7 +473,7 @@ class TestCase(unittest.TestCase):
             excName = excClass.__name__
         else:
             excName = str(excClass)
-        raise self.failureException, "%s not raised" % excName
+        raise self.failureException("%s not raised" % excName)
 
     def _getAssertEqualityFunc(self, first, second):
         """Get a detailed comparison function for the types of the two args.
@@ -776,16 +770,16 @@ class TestCase(unittest.TestCase):
         """
         try:
             difference1 = set1.difference(set2)
-        except TypeError, e:
+        except TypeError as e:
             self.fail('invalid type when attempting set difference: %s' % e)
-        except AttributeError, e:
+        except AttributeError as e:
             self.fail('first argument does not support set difference: %s' % e)
 
         try:
             difference2 = set2.difference(set1)
-        except TypeError, e:
+        except TypeError as e:
             self.fail('invalid type when attempting set difference: %s' % e)
-        except AttributeError, e:
+        except AttributeError as e:
             self.fail('second argument does not support set difference: %s' % e)
 
         if not (difference1 or difference2):
@@ -831,8 +825,8 @@ class TestCase(unittest.TestCase):
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertDictEqual(self, d1, d2, msg=None):
-        self.assert_(isinstance(d1, dict), 'First argument is not a dictionary')
-        self.assert_(isinstance(d2, dict), 'Second argument is not a dictionary')
+        self.assertTrue(isinstance(d1, dict), 'First argument is not a dictionary')
+        self.assertTrue(isinstance(d2, dict), 'Second argument is not a dictionary')
 
         if d1 != d2:
             standardMsg = '%s != %s' % (safe_repr(d1, True), safe_repr(d2, True))
@@ -909,9 +903,9 @@ class TestCase(unittest.TestCase):
 
     def assertMultiLineEqual(self, first, second, msg=None):
         """Assert that two multi-line strings are equal."""
-        self.assert_(isinstance(first, basestring), (
+        self.assertTrue(isinstance(first, basestring), (
                 'First argument is not a string'))
-        self.assert_(isinstance(second, basestring), (
+        self.assertTrue(isinstance(second, basestring), (
                 'Second argument is not a string'))
 
         if first != second:
@@ -986,7 +980,7 @@ class TestCase(unittest.TestCase):
             return _AssertRaisesContext(expected_exception, self, expected_regexp)
         try:
             callable_obj(*args, **kwargs)
-        except expected_exception, exc_value:
+        except expected_exception as exc_value:
             if isinstance(expected_regexp, basestring):
                 expected_regexp = re.compile(expected_regexp)
             if not expected_regexp.search(str(exc_value)):
@@ -997,8 +991,7 @@ class TestCase(unittest.TestCase):
                 excName = expected_exception.__name__
             else:
                 excName = str(expected_exception)
-            raise self.failureException, "%s not raised" % excName
-
+            raise self.failureException("%s not raised" % excName)
 
     def assertRegexpMatches(self, text, expected_regexp, msg=None):
         """Fail the test unless the text matches the regular expression."""

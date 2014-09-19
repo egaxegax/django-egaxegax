@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django import http
 from django.db import models
 from django.contrib.databrowse.datastructures import EasyModel
@@ -61,7 +63,7 @@ class ModelDatabrowse(object):
 
     def main_view(self, request):
         easy_model = EasyModel(self.site, self.model)
-        html_snippets = mark_safe(u'\n'.join([p.model_index_html(request, self.model, self.site) for p in self.plugins.values()]))
+        html_snippets = mark_safe('\n'.join([p.model_index_html(request, self.model, self.site) for p in self.plugins.values()]))
         return render_to_response('databrowse/model_detail.html', {
             'model': easy_model,
             'root_url': self.site.root_url,
@@ -73,7 +75,7 @@ class DatabrowseSite(object):
         self.registry = {} # model_class -> databrowse_class
         self.root_url = None
 
-    def register(self, model_or_iterable, databrowse_class=None, **options):
+    def register(self, *model_list, **options):
         """
         Registers the given model(s) with the given databrowse site.
 
@@ -84,23 +86,19 @@ class DatabrowseSite(object):
 
         If a model is already registered, this will raise AlreadyRegistered.
         """
-        databrowse_class = databrowse_class or DefaultModelDatabrowse
-        if issubclass(model_or_iterable, models.Model):
-            model_or_iterable = [model_or_iterable]
-        for model in model_or_iterable:
+        databrowse_class = options.pop('databrowse_class', DefaultModelDatabrowse)
+        for model in model_list:
             if model in self.registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
             self.registry[model] = databrowse_class
 
-    def unregister(self, model_or_iterable):
+    def unregister(self, *model_list):
         """
         Unregisters the given model(s).
 
         If a model isn't already registered, this will raise NotRegistered.
         """
-        if issubclass(model_or_iterable, models.Model):
-            model_or_iterable = [model_or_iterable]
-        for model in model_or_iterable:
+        for model in model_list:
             if model not in self.registry:
                 raise NotRegistered('The model %s is not registered' % model.__name__)
             del self.registry[model]

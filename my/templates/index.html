@@ -2,6 +2,7 @@
 {% load i18n %}
 {% block pagestyle %}
 #topmenu li.mainmenu { background-color: #cd984c; }
+#myview { width: 700px; text-align: left; }
 {% endblock %}
 {% block pageheader %}{% trans 'Main' %}{% endblock %}
 {% block content %}
@@ -9,7 +10,16 @@
   Портал Григория Еремина. Фото, тексты, сообщения от автора. Заходите, смотрите, пишите заметки, оставляйте комментарии.
 </p>
 <p class="smaller">
-  P.S. Делай что можешь, с тем что имеешь, там где ты есть. <i>Теодор Рузвельт<i>. 
+  P.S. Делай что можешь, с тем что имеешь, там где ты есть. <i>Теодор Рузвельт</i>. 
 </p>
 <img src='/media/img/egaxegax.png' />
+<div id="myview" class=rfloat>
+  <dl>
+    <dt>Контакты:</dt>
+    <dd>Блог: <a class="smaller" href="http://egaxegax.blogspot.com">http://egaxegax.blogspot.com</a></dd>
+    <dd>Проекты: <a class="smaller" href="http://github.com/egaxegax">https://github.com/egaxegax</a></dd>
+    <dd>Почта: <a class="smaller" href="mailto:egax@bk.ru?subject=О%20сайте%20egaxegax.appspot.com&body=Хочу%20написать" target="_blank">egax@bk.ru</a>, 
+      <a class="smaller" href="mailto:egaxegax@gmail.com?subject=About%20egaxegax.appspot.com&body=Good%20site" target="_blank">egaxegax@gmail.com</a></dd>
+  </dl>
+</div>
 {% endblock %}

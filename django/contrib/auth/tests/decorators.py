@@ -1,7 +1,9 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tests.views import AuthViewsTestCase
+from django.contrib.auth.tests.utils import skipIfCustomUser
 
+
+@skipIfCustomUser
 class LoginRequiredTestCase(AuthViewsTestCase):
     """
     Tests the login_required decorators
@@ -25,14 +27,14 @@ class LoginRequiredTestCase(AuthViewsTestCase):
             pass
         login_required(normal_view)
 
-    def testLoginRequired(self, view_url='/login_required/', login_url=settings.LOGIN_URL):
+    def testLoginRequired(self, view_url='/login_required/', login_url='/login/'):
         """
         Check that login_required works on a simple view wrapped in a
         login_required decorator.
         """
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 302)
-        self.assert_(login_url in response['Location'])
+        self.assertTrue(login_url in response['Location'])
         self.login()
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 200)

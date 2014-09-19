@@ -1,6 +1,7 @@
 import cPickle as pickle
 import datetime
 
+from django.conf import settings
 from django.db.backends import (
     BaseDatabaseFeatures,
     BaseDatabaseOperations,
@@ -12,11 +13,14 @@ from django.db.utils import DatabaseError
 from django.utils.functional import Promise
 from django.utils.safestring import EscapeString, EscapeUnicode, SafeString, \
     SafeUnicode
+from django.utils import timezone
 
 from .creation import NonrelDatabaseCreation
 
 
 class NonrelDatabaseFeatures(BaseDatabaseFeatures):
+    # Most NoSQL databases don't have true transaction support.
+    supports_transactions = False
 
     # NoSQL databases usually return a key after saving a new object.
     can_return_id_from_insert = True
@@ -46,6 +50,7 @@ class NonrelDatabaseFeatures(BaseDatabaseFeatures):
              'AbstractIterableField', 'ListField', 'SetField', 'DictField',
              'EmbeddedModelField', 'BlobField'))
 
+    # Django 1.4 compatibility
     def _supports_transactions(self):
         return False
 
@@ -88,10 +93,6 @@ class NonrelDatabaseOperations(BaseDatabaseOperations):
           moving there code from `Field.get_db_prep_lookup` (and maybe
           `RelatedField.get_db_prep_lookup`).
     """
-
-    def __init__(self, connection):
-        self.connection = connection
-        super(NonrelDatabaseOperations, self).__init__()
 
     def pk_default_value(self):
         """
@@ -166,15 +167,32 @@ class NonrelDatabaseOperations(BaseDatabaseOperations):
         """
         return value
 
+    # Django 1.4 compatibility
     def year_lookup_bounds(self, value):
+        return self.year_lookup_bounds_for_datetime_field(value)
+
+    def year_lookup_bounds_for_date_field(self, value):
         """
-        Converts year bounds to datetime bounds as these can likely be
+        Converts year bounds to date bounds as these can likely be
         used directly, also adds one to the upper bound as it should be
         natural to use one strict inequality for BETWEEN-like filters
         for most nonrel back-ends.
         """
-        return [datetime.datetime(value, 1, 1, 0, 0, 0, 0),
-                datetime.datetime(value + 1, 1, 1, 0, 0, 0, 0)]
+        first = datetime.date(value, 1, 1)
+        second = datetime.date(value + 1, 1, 1)
+        return [first, second]
+
+    def year_lookup_bounds_for_datetime_field(self, value):
+        """
+        Converts year bounds to datetime bounds.
+        """
+        first = datetime.datetime(value, 1, 1, 0, 0, 0, 0)
+        second = datetime.datetime(value + 1, 1, 1, 0, 0, 0, 0)
+        if settings.USE_TZ:
+            tz = timezone.get_current_timezone()
+            first = timezone.make_aware(first, tz)
+            second = timezone.make_aware(second, tz)
+        return [first, second]
 
     def convert_values(self, value, field):
         """
@@ -610,7 +628,7 @@ class NonrelDatabaseValidation(BaseDatabaseValidation):
 
 class NonrelDatabaseIntrospection(BaseDatabaseIntrospection):
 
-    def table_names(self):
+    def table_names(self, cursor=None):
         """
         Returns a list of names of all tables that exist in the
         database.
@@ -621,13 +639,58 @@ class NonrelDatabaseIntrospection(BaseDatabaseIntrospection):
 class FakeCursor(object):
 
     def __getattribute__(self, name):
-        raise NotImplementedError("Cursors are not supported.")
+        raise Database.NotSupportedError("Cursors are not supported.")
 
     def __setattr__(self, name, value):
-        raise NotImplementedError("Cursors are not supported.")
+        raise Database.NotSupportedError("Cursors are not supported.")
 
+
+class FakeConnection(object):
+
+    def commit(self):
+        pass
+
+    def rollback(self):
+        pass
+
+    def cursor(self):
+        return FakeCursor()
+
+    def close(self):
+        pass
+
+
+class Database(object):
+    class Error(StandardError):
+        pass
+
+    class InterfaceError(Error):
+        pass
+
+    class DatabaseError(Error):
+        pass
+
+    class DataError(DatabaseError):
+        pass
+
+    class OperationalError(DatabaseError):
+        pass
+
+    class IntegrityError(DatabaseError):
+        pass
+
+    class InternalError(DatabaseError):
+        pass
+
+    class ProgrammingError(DatabaseError):
+        pass
+
+    class NotSupportedError(DatabaseError):
+        pass
 
 class NonrelDatabaseWrapper(BaseDatabaseWrapper):
+
+    Database = Database
 
     # These fake operators are required for SQLQuery.as_sql() support.
     operators = {
@@ -646,6 +709,18 @@ class NonrelDatabaseWrapper(BaseDatabaseWrapper):
         'istartswith': 'LIKE UPPER(%s)',
         'iendswith': 'LIKE UPPER(%s)',
     }
+
+    def get_connection_params(self):
+        return {}
+
+    def get_new_connection(self, conn_params):
+        return FakeConnection()
+
+    def init_connection_state(self):
+        pass
+
+    def _set_autocommit(self, autocommit):
+        pass
 
     def _cursor(self):
         return FakeCursor()

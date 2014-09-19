@@ -1,43 +1,91 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block description %}, {% trans 'photos' %}{% endblock %}
-{% block keywords %}, {% trans 'photos' %}{% endblock %}
-{% block title %}{% trans 'Photos' %} - {% endblock %}
+{% block description %}{% if album %}. {{ album }}{% endif %}, {% trans 'photos, images, pictures' %}{% endblock %}
+{% block keywords %}, {% if album %}{{ album }}{% endif %}, {% trans 'photos, images, pictures' %}{% endblock %}
+{% block title %}
+{% if album %}{{ album }} - {% trans 'photos, images, pictures' %}{% else %}{% trans 'Photos' %}{% endif %} - {% endblock %}
 {% block pagestyle %}
 #topmenu li.photomenu { background-color: #cd984c; }
-#viewcont { position: fixed; left:0; top:0; height: 100%; width: 100%; }
-#viewphoto { max-width:805px; background-color: #a07443; border: 1px solid #999999; }
+#viewcont { display: none; position: fixed; left: 0; top: 0; padding: 0 4px; background-color: #a07443; border: 1px solid #999999; }
 #viewheader { height: 1.5em; }
+#vieweditable { display: none; }
 #closebtn { background-color: #cd984c; }
-#viewfooter { text-align:left; }
-.info { font-size: 80%; color: #888888; width: 120px; text-align: center; }
 .inbar { margin: 1px 5px; padding: 1px 8px; }
 .edit b { color: #f2866b; }
-li.img img { margin: 16px 0 16px 0; }
 li.nav { padding: 0 4px 0 4px; }
 li.nav i { padding-left: 24px; }
 {% endblock %}
 {% block pageheader %}{% trans 'Photos' %}{% endblock %}
 {% block content %}
+<script type="text/javascript">
+  function viewphoto(id, photo_width, photo_height, photo_user_id) {
+    var viewCont = document.getElementById('viewcont'),
+        viewHeader = document.getElementById('viewheader'),
+        viewTitle = document.getElementById('viewtitle'),
+        viewEdit = document.getElementById('viewedit'),
+        viewDelete = document.getElementById('viewdelete'),
+        viewRef = document.getElementById('viewref'),
+        viewPhoto = document.getElementById('viewphoto'),
+        thumbPhoto = document.getElementById('thumb' + id);
+    // shrink to fit
+    var vh = window.innerHeight,
+        vw = window.innerWidth,
+        hh = viewHeader.offsetHeight;
+    var hr = vh / photo_height,
+        wr = vw / photo_width;
+    var mh = photo_height,
+        mw = photo_width;
+    var ratio = mh <= mw;
+    if (hr < 1) {
+      mh = mh * hr;
+      mw = mw * hr;
+      wr = vw / mw;
+    }
+    if (wr < 1) {
+      mw = mw * wr;
+    }
+    var sr = Math.floor(0.93 * (ratio ? mw : mh));
+    if (viewEdit) {
+      viewEdit.style.display = 'none';
+      viewDelete.style.display = 'none';
+      if ('{{ request.user.id }}' == photo_user_id) {
+        viewEdit.href = '/photos/edit/' + id;
+        viewDelete.href = '/photos/del/' + id;
+        viewEdit.style.display = 'inline';
+        viewDelete.style.display = 'inline';
+      }
+    }
+    viewTitle.innerHTML = thumbPhoto.title.split(' \n').splice(1);
+    viewRef.href = '/photos/view/' + id;
+    viewPhoto.src = thumbPhoto.src.substr(0, thumbPhoto.src.length-5) + '=s' + sr;
+    viewPhoto.onload = function() {
+      viewCont.style.left = (vw - mw)/2 + 'px';
+      viewCont.style.display = 'block';
+    }
+  }
+</script>
 <p>Подборка фотографий, снятых на телефон, о природе, местах, людях. Смотрите, добавляйте свои работы.</p>
+<p>Найдено <b>{{ photos_count }}</b> изображений.</p> 
 {% if photos.object_list %}
   <ul class="inl nomarg nopad smaller">
     <li class="nav">
   {% if photos.has_previous %}
-      <a class="nodecor" href="{% url my.views.list_photos %}?page={{ photos.previous_page_number }}">
+      <a class="nodecor" href="{% url 'my.views.list_photos' %}?page={{ photos.previous_page_number }}">
         <img src='/media/img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
-  {% else %}<i></i>
   {% endif %}
     </li>
+    <table class="inl"><tr>
   {% for photo in photos.object_list %}
-    <li class="img">
-      <a class="img nodecor" href="{% url my.views.list_photos id=photo.id %}?page={{ photos.number }}">
-        <img src="{{ photo.thumb_url }}=s128" title="{{ photo.title }} | {{ photo.album }}" alt="{{ photo.title }}"/></a>
-    </li>
+    <td align="center">
+      <a class="nodecor" href="javascript:viewphoto({{ photo.id }}, {{ photo.width }}, '{{ photo.height }}', '{{ photo.author.id }}');">
+        <img id="thumb{{ photo.id }}" src="{{ photo.thumb_url }}=s128" title="{{ photo.title }}" alt="{{ photo.title }}"/></a><br/>
+      <a class="smaller gray" href="{% url 'my.views.list_photos' id_album=photo.id %}">{{ photo.album }}</a>
+    </td>
   {% endfor %}
+    </tr></table>
     <li class="nav">
   {% if photos.has_next %}
-    <a class="nodecor" href="{% url my.views.list_photos %}?page={{ photos.next_page_number }}"><img src='/media/img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
+    <a class="nodecor" href="{% url 'my.views.list_photos' %}?page={{ photos.next_page_number }}"><img src='/media/img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
   {% else %}<i></i>
   {% endif %}
     </li>
@@ -45,35 +93,30 @@ li.nav i { padding-left: 24px; }
 {% else %}
   <p>{% trans 'No photos' %}.</p>
 {% endif %}
-{% if user.is_authenticated %}
-  <p class="smaller"><a href="{% url my.views.add_photo %}">{% trans 'Add photo' %}</a></p>
+{% if request.user.is_authenticated %}
+  <p class="smaller"><a href="{% url 'my.views.add_photo' %}">{% trans 'Add photo' %}</a></p>
 {% else %}
   <p class="smaller">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
-{% for photo in view %}
-  <table id="viewcont">
-  <tr><td align="center" valign="center">
-    <div id="viewphoto" class="wrap white">
-      <div id="viewheader">
-        <a class="nodecor" href="#" onclick="document.getElementById('viewcont').style.display='none';" title="{% trans 'Close' %}">
-          <div id="closebtn" class="smaller inbar rfloat"><b>x</b></div>
-        </a>
-        <div class="smaller inbar lfloat">
-          {{ photo.title }} | {{ photo.album }}
-          {% if user.is_authenticated and user.id == photo.author.id %}&nbsp;
-            <a class="nodecor smaller edit" href="{% url my.views.edit_photo id=photo.id %}" title="{% trans 'Edit' %}"><b>{% trans 'Edit' %}</b></a>   
-            <a class="nodecor smaller edit" href="{% url my.views.delete_photo id=photo.id %}" title="{% trans 'Delete' %}"><b>{% trans 'Delete' %}</b></a>
-          {% endif %}
-        </div>
-      </div>
-      <div id="viewcontent">
-        <a class="nodecor" href="{% url my.views.get_photo id=photo.id %}" target="_blank">
-          <img src="{{ photo.thumb_url }}=s800" title="{% trans 'Click to view full size' %}" alt="{{ v.title }}" />
-        </a>
-      </div>
+<!-- viewphoto -->
+<div id="viewcont" class="wrap white">
+  <div id="viewheader">
+    <a class="nodecor" href="#" onclick="document.getElementById('viewcont').style.display='none';" title="{% trans 'Close' %}">
+      <div id="closebtn" class="smaller inbar rfloat"><b>x</b></div>
+    </a>
+    <div class="smaller inbar lfloat">
+      <span id="viewtitle"></span>
+      {% if request.user.is_authenticated %}&nbsp;
+        <a id="viewedit" class="nodecor smaller edit" href="" title="{% trans 'Edit' %}"><b>{% trans 'Edit' %}</b></a>   
+        <a id="viewdelete" class="nodecor smaller edit" href="" title="{% trans 'Delete' %}"><b>{% trans 'Delete' %}</b></a>
+      {% endif %}
     </div>
   </div>
-  </td></tr>
-  </table>
-{% endfor %}
+  <div id="viewbody">
+    <a id="viewref" class="nodecor" href="" target="_blank">
+      <img id="viewphoto" src="" title="{% trans 'Click to view full size' %}" />
+    </a>
+  </div>
+</div>
+<!-- /viewphoto -->
 {% endblock %}

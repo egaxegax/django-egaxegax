@@ -28,12 +28,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os, sys, time
+import os, sys, time, signal
 
 try:
-    import thread
+    from django.utils.six.moves import _thread as thread
 except ImportError:
-    import dummy_thread as thread
+    from django.utils.six.moves import _dummy_thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
@@ -42,6 +42,10 @@ try:
 except ImportError:
     pass
 
+try:
+    import termios
+except ImportError:
+    termios = None
 
 RUN_RELOADER = True
 
@@ -50,9 +54,12 @@ _win = (sys.platform == "win32")
 
 def code_changed():
     global _mtimes, _win
-    for filename in filter(lambda v: v, map(lambda m: getattr(m, "__file__", None), sys.modules.values())):
+    filenames = [getattr(m, "__file__", None) for m in sys.modules.values()]
+    for filename in filter(None, filenames):
         if filename.endswith(".pyc") or filename.endswith(".pyo"):
             filename = filename[:-1]
+        if filename.endswith("$py.class"):
+            filename = filename[:-9] + ".py"
         if not os.path.exists(filename):
             continue # File might be in an egg, so it can't be reloaded.
         stat = os.stat(filename)
@@ -67,7 +74,23 @@ def code_changed():
             return True
     return False
 
+def ensure_echo_on():
+    if termios:
+        fd = sys.stdin
+        if fd.isatty():
+            attr_list = termios.tcgetattr(fd)
+            if not attr_list[3] & termios.ECHO:
+                attr_list[3] |= termios.ECHO
+                if hasattr(signal, 'SIGTTOU'):
+                    old_handler = signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+                else:
+                    old_handler = None
+                termios.tcsetattr(fd, termios.TCSANOW, attr_list)
+                if old_handler is not None:
+                    signal.signal(signal.SIGTTOU, old_handler)
+
 def reloader_thread():
+    ensure_echo_on()
     while RUN_RELOADER:
         if code_changed():
             sys.exit(3) # force reload
@@ -75,7 +98,7 @@ def reloader_thread():
 
 def restart_with_reloader():
     while True:
-        args = [sys.executable] + sys.argv
+        args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions] + sys.argv
         if sys.platform == "win32":
             args = ['"%s"' % arg for arg in args]
         new_environ = os.environ.copy()
@@ -93,7 +116,11 @@ def python_reloader(main_func, args, kwargs):
             pass
     else:
         try:
-            sys.exit(restart_with_reloader())
+            exit_code = restart_with_reloader()
+            if exit_code < 0:
+                os.kill(os.getpid(), -exit_code)
+            else:
+                sys.exit(exit_code)
         except KeyboardInterrupt:
             pass
 

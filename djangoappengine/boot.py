@@ -4,14 +4,14 @@ import sys
 
 def find_project_dir():
     """
-        Go through the path, and look for manage.py
+        Go through the path, and look for app.yaml
     """
     for path in sys.path:
-        abs_path = os.path.join(os.path.abspath(path), "manage.py")
+        abs_path = os.path.join(os.path.abspath(path), "app.yaml")
         if os.path.exists(abs_path):
             return os.path.dirname(abs_path)
 
-    raise RuntimeError("Unable to locate manage.py on sys.path")
+    raise RuntimeError("Unable to locate app.yaml on sys.path")
 
 PROJECT_DIR = find_project_dir()
 DATA_ROOT = os.path.join(PROJECT_DIR, '.gaedata')
@@ -38,6 +38,7 @@ def setup_env():
         paths = [os.path.join(PROJECT_DIR, 'google_appengine'),
                  os.environ.get('APP_ENGINE_SDK'),
                  '/usr/local/google_appengine',
+                 '/usr/local/opt/google-app-engine/share/google-app-engine',
                  '/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine']
         for path in os.environ.get('PATH', '').split(os.pathsep):
             path = path.rstrip(os.sep)
@@ -69,7 +70,10 @@ def setup_env():
         sys.path = [ sdk_path ] + sys.path
 
         # Then call fix_sys_path from the SDK
-        from dev_appserver import fix_sys_path
+        try:
+            from dev_appserver import fix_sys_path
+        except ImportError:
+            from old_dev_appserver import fix_sys_path
         fix_sys_path()
 
     setup_project()
@@ -146,7 +150,11 @@ def setup_project():
     # enable https connections (seem to be broken on Windows because
     # the _ssl module is disallowed).
     if not have_appserver:
-        from google.appengine.tools import dev_appserver
+        try:
+            from google.appengine.tools import dev_appserver
+        except ImportError:
+            from google.appengine.tools import old_dev_appserver as dev_appserver
+
         try:
             # Backup os.environ. It gets overwritten by the
             # dev_appserver, but it's needed by the subprocess module.
@@ -172,11 +180,15 @@ def setup_project():
                          "is disabled.")
     elif not on_production_server:
         try:
+            try:
+                from google.appengine.tools import dev_appserver
+            except ImportError:
+                from google.appengine.tools import old_dev_appserver as dev_appserver
+
             # Restore the real subprocess module.
             from google.appengine.api.mail_stub import subprocess
             sys.modules['subprocess'] = subprocess
             # Re-inject the buffer() builtin into the subprocess module.
-            from google.appengine.tools import dev_appserver
             subprocess.buffer = dev_appserver.buffer
         except Exception, e:
             logging.warn("Could not add the subprocess module to the "

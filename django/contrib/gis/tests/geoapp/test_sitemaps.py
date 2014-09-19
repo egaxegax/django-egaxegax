@@ -1,15 +1,27 @@
-import cStringIO
+from __future__ import absolute_import
+
+from io import BytesIO
 from xml.dom import minidom
 import zipfile
 
-from django.test import Client
-from django.utils import unittest
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.test import TestCase
 
-from models import City, Country
+from .models import City, Country
 
 
-class GeoSitemapTest(unittest.TestCase):
-    client = Client()
+class GeoSitemapTest(TestCase):
+
+    urls = 'django.contrib.gis.tests.geoapp.urls'
+
+    def setUp(self):
+        Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
+        self.old_Site_meta_installed = Site._meta.installed
+        Site._meta.installed = True
+
+    def tearDown(self):
+        Site._meta.installed = self.old_Site_meta_installed
 
     def assertChildNodes(self, elem, expected):
         "Taken from regressiontests/syndication/tests.py."
@@ -20,20 +32,20 @@ class GeoSitemapTest(unittest.TestCase):
     def test_geositemap_index(self):
         "Tests geographic sitemap index."
         # Getting the geo index.
-        doc = minidom.parseString(self.client.get('/geoapp/sitemap.xml').content)
+        doc = minidom.parseString(self.client.get('/sitemap.xml').content)
         index = doc.firstChild
-        self.assertEqual(index.getAttribute(u'xmlns'), u'http://www.sitemaps.org/schemas/sitemap/0.9')
+        self.assertEqual(index.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
         self.assertEqual(3, len(index.getElementsByTagName('sitemap')))
 
     def test_geositemap_kml(self):
         "Tests KML/KMZ geographic sitemaps."
         for kml_type in ('kml', 'kmz'):
-            doc = minidom.parseString(self.client.get('/geoapp/sitemaps/%s.xml' % kml_type).content)
+            doc = minidom.parseString(self.client.get('/sitemaps/%s.xml' % kml_type).content)
 
             # Ensuring the right sitemaps namespaces are present.
             urlset = doc.firstChild
-            self.assertEqual(urlset.getAttribute(u'xmlns'), u'http://www.sitemaps.org/schemas/sitemap/0.9')
-            self.assertEqual(urlset.getAttribute(u'xmlns:geo'), u'http://www.google.com/geo/schemas/sitemap/1.0')
+            self.assertEqual(urlset.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
+            self.assertEqual(urlset.getAttribute('xmlns:geo'), 'http://www.google.com/geo/schemas/sitemap/1.0')
 
             urls = urlset.getElementsByTagName('url')
             self.assertEqual(2, len(urls)) # Should only be 2 sitemaps.
@@ -51,7 +63,7 @@ class GeoSitemapTest(unittest.TestCase):
                     kml_doc = minidom.parseString(self.client.get(kml_url).content)
                 elif kml_type == 'kmz':
                     # Have to decompress KMZ before parsing.
-                    buf = cStringIO.StringIO(self.client.get(kml_url).content)
+                    buf = BytesIO(self.client.get(kml_url).content)
                     zf = zipfile.ZipFile(buf)
                     self.assertEqual(1, len(zf.filelist))
                     self.assertEqual('doc.kml', zf.filelist[0].filename)
@@ -66,14 +78,14 @@ class GeoSitemapTest(unittest.TestCase):
 
     def test_geositemap_georss(self):
         "Tests GeoRSS geographic sitemaps."
-        from feeds import feed_dict
+        from .feeds import feed_dict
 
-        doc = minidom.parseString(self.client.get('/geoapp/sitemaps/georss.xml').content)
+        doc = minidom.parseString(self.client.get('/sitemaps/georss.xml').content)
 
         # Ensuring the right sitemaps namespaces are present.
         urlset = doc.firstChild
-        self.assertEqual(urlset.getAttribute(u'xmlns'), u'http://www.sitemaps.org/schemas/sitemap/0.9')
-        self.assertEqual(urlset.getAttribute(u'xmlns:geo'), u'http://www.google.com/geo/schemas/sitemap/1.0')
+        self.assertEqual(urlset.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
+        self.assertEqual(urlset.getAttribute('xmlns:geo'), 'http://www.google.com/geo/schemas/sitemap/1.0')
 
         # Making sure the correct number of feed URLs were included.
         urls = urlset.getElementsByTagName('url')
