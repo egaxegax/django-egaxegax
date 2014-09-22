@@ -1,4 +1,5 @@
 from django import forms
+from captcha.fields import CaptchaField
 from django.utils.translation import ugettext as _
 from my.models import *
 
@@ -9,6 +10,7 @@ class CreateProfileForm(forms.ModelForm):
         widgets = {
             'about': forms.Textarea(attrs={'cols': 40, 'rows': 3}),
         }
+    captcha = CaptchaField(label=_('captcha'))
 
 class AddPhotoForm(forms.ModelForm):
     class Meta:

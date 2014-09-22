@@ -116,7 +116,7 @@ def create_new_user(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         form_profile = CreateProfileForm(request.POST, request.FILES)
-        if form.is_valid(): # and form_profile.is_valid():
+        if form.is_valid() and form_profile.is_valid():
             user = form.save(commit=False)
             # user must be active for login to work
             user.is_active = True

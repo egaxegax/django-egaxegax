@@ -20,7 +20,6 @@ li.nav i { padding-left: 24px; }
 <script type="text/javascript">
   function viewphoto(id, photo_width, photo_height, photo_user_id) {
     var viewCont = document.getElementById('viewcont'),
-        viewHeader = document.getElementById('viewheader'),
         viewTitle = document.getElementById('viewtitle'),
         viewEdit = document.getElementById('viewedit'),
         viewDelete = document.getElementById('viewdelete'),
@@ -29,8 +28,7 @@ li.nav i { padding-left: 24px; }
         thumbPhoto = document.getElementById('thumb' + id);
     // shrink to fit
     var vh = window.innerHeight,
-        vw = window.innerWidth,
-        hh = viewHeader.offsetHeight;
+        vw = window.innerWidth;
     var hr = vh / photo_height,
         wr = vw / photo_width;
     var mh = photo_height,

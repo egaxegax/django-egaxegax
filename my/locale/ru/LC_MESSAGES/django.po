@@ -23,6 +23,14 @@ msgstr "Аватар"
 msgid "img"
 msgstr "Картинка"
 
+#: forms.py
+
+msgid "comment"
+msgstr "Комментарий"
+
+msgid "captcha"
+msgstr "Код проверки"
+
 #: templates/base.html
 
 msgid "Egax Portal"

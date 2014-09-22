@@ -16,6 +16,7 @@ INSTALLED_APPS = (
     'django.contrib.markup',
     'djangotoolbox',
     'djangoappengine',
+    'captcha',
     'filetransfers',
     'upload',
     'my',
