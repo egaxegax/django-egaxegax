@@ -82,6 +82,8 @@ def index(request):
                                'logback': reverse('my.views.index')})
 
 def list_photos(request, **kw):
+    rows = 4
+    cols = 6 
     photos_list = []
     album =''
     if kw.get('id_album'): # filter by album
@@ -105,8 +107,9 @@ def list_photos(request, **kw):
         photos_list = eval(cache.get('photos:' + allkey))
     return render_to_response('photos.html',
                               {'request': request,
-                               'photos': PageList(request, photos_list, 6),
+                               'photos': PageList(request, photos_list, rows * cols),
                                'photos_count': len(photos_list),
+                               'rows_count': range(1, rows * cols + 1, cols),
                                'album': album,
                                'logback': reverse('my.views.list_photos')})
 

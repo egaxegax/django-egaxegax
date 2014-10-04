@@ -16,6 +16,12 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: captcha_captchastore
+  properties:
+  - name: hashkey
+  - name: response
+  - name: expiration
+
 - kind: django_admin_log
   properties:
   - name: user_id

@@ -10,9 +10,9 @@ from django.utils.translation import ugettext_lazy
 import datetime
 import json
 import re
-import six
+from captcha import six
 import os
-from six import u
+from captcha.six import u
 
 class CaptchaCase(TestCase):
     urls = 'captcha.tests.urls'

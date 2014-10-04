@@ -8,7 +8,7 @@ Contains forum with Markdown syntax support.
 ## Install
 
 To run local version install python27 and modules PIL, Pillow.
-Download google-appengine package > 1.5 (1.9.10 current develop). 
+Download google-appengine package (1.9.10 current develop). 
 Set environment and run as standart Django's project. E.g. in Windows shell:
 
     set PATH=c:\Python27;%PATH%

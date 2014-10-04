@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load myfilter %}
 {% block description %}{% if song_count %}. {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block keywords %}{% if song_count %}, {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}
@@ -56,7 +57,7 @@ input.submit { height: 26px; margin-left: 5px;}
   {% endif %}
   </dt>
   {% if last_count %}
-    <dd class="smaller">{{ song.date }}</dd>
+    <dd class="smaller">{{ song.date|time_since }} {% trans 'ago' %}</dd>
   {% endif %}
   </dl>
 {% endfor %}

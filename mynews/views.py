@@ -6,6 +6,7 @@ from django.core.exceptions import *
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render_to_response
+from django.template.defaultfilters import timesince
 from mynews.forms import *
 from mynews.models import *
 import time
@@ -30,13 +31,33 @@ def PageList(request, qst, per_page=5):
     except (EmptyPage, InvalidPage):
         return paginator.page(paginator.num_pages)
 
+def AddMsgListCache(theme, msg_list):
+    cache_list = []
+    for msg in msg_list:
+        cache_list.append({
+           'id': msg.id,
+           'content': msg.content,
+           'author': (hasattr(msg, 'author') and hasattr(msg.author, 'id') and {'id': msg.author.id, 'username': msg.author.username}) or {},
+           'date': msg.date.strftime('%Y-%m-%d %H:%M:%S') })
+    cache.add('news:' + theme, str(cache_list))
+
+def ClearMsgListCache():
+    cache.delete_many(['news:.full_list', 'news:.last_update'])
+
 # Controllers
 
 def list_msg(request, **kw):
     if kw.has_key('all'):
-        msg_list = News.objects.order_by('-date')
+        allkey = '.full_list'
+        if not cache.has_key('news:' + allkey):
+            msg_list = News.objects.order_by('-date')
+            AddMsgListCache(allkey, msg_list)
     else:
-        msg_list = News.objects.order_by('-date')[:4]
+        allkey = '.last_update'
+        if not cache.has_key('news:' + allkey):
+            msg_list = News.objects.order_by('-date')[:4]
+            AddMsgListCache(allkey, msg_list)
+    msg_list = eval(cache.get('news:' + allkey))
     return render_to_response('mynews.html',
                               {'request': request,
                                'news': PageList(request, msg_list),
@@ -54,6 +75,7 @@ def add_msg(request):
             if request.user.is_authenticated():
                 msg.author = request.user
             msg.save()
+            ClearMsgListCache()
     return HttpResponseRedirect(reverse('mynews.views.list_msg'))
 
 def edit_msg(request, **kw):
@@ -64,6 +86,7 @@ def edit_msg(request, **kw):
         if form.is_valid():
             msg = form.save(commit=False) 
             msg.save(force_update=True)
+            ClearMsgListCache()
             return HttpResponseRedirect(reverse('mynews.views.list_msg'))
     else:
         form = AddMsgForm(initial={'id': msg.id, 'content': msg.content}) 
@@ -73,8 +96,9 @@ def edit_msg(request, **kw):
 
 def delete_msg(request, **kw):
     if request.user.is_authenticated():
-        msg = get_object_or_404(News, id=ZI(kw.get('id')))         
-        if not msg.author or request.user.username == msg.author.username:
+        msg = get_object_or_404(News, id=ZI(kw.get('id')))
+        if request.user.is_superuser or hasattr(msg, 'author') and request.user.username == msg.author.username:         
+            ClearMsgListCache()
             msg.delete()
     return HttpResponseRedirect(reverse('mynews.views.list_msg'))
 

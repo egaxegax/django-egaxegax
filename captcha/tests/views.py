@@ -3,7 +3,7 @@ from captcha.fields import CaptchaField
 from django.template import RequestContext, loader
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-from six import u
+from captcha.six import u
 
 TEST_TEMPLATE = r'''
 {% load url from future %}
