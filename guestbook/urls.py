@@ -1,12 +1,13 @@
 from django.conf.urls import *
 
 urlpatterns = patterns('guestbook.views',
-    (r'^$', 'list_greetings'),
-    (r'^(?P<id>[0-9]*)/?$', 'list_greetings'),
+    (r'^$', 'list_posts'),
+    (r'^(?P<id>[0-9]*)/?$', 'list_posts'),
     (r'^subj/?$', 'list_subjects'),
-    (r'^subj/(?P<id_subj>[0-9]*)/?$', 'list_greetings'),
-    (r'^add/?$', 'create_greeting'),
-    (r'^edit/(?P<id>[0-9]*)/?$', 'edit_greeting'),
-    (r'^del/(?P<id>[0-9]*)/?$', 'delete_greeting'),
+    (r'^subj/(?P<id_subj>[0-9]*)/?$', 'list_posts'),
+    (r'^subjcp/?$', 'copy_subj'),
+    (r'^add/?$', 'add_post'),
+    (r'^edit/(?P<id>[0-9]*)/?$', 'edit_post'),
+    (r'^del/(?P<id>[0-9]*)/?$', 'delete_post'),
     (r'^user/(?P<id>[0-9]*)/?$', 'get_user_profile'),
 )

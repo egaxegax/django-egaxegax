@@ -1,7 +1,7 @@
 ﻿{% extends 'base.html' %}
 {% load i18n %}
-{% block description %}. {{ song.artist }} {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
-{% block keywords %}, {{ song.artist }} {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
+{% block description %}. {{ song.artist }}, {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
+{% block keywords %}, {{ song.artist }}, {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
 #topmenu li.songmenu { background-color: #cd984c; }
@@ -9,7 +9,7 @@
 {% endblock %}
 {% block pageheader %}{{ song.title }}{% endblock %}
 {% block content %}
-<a href="{% url 'songs.views.list_songs' id_art=song.id %}">{{ song.artist }}</a>
+<a href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a>
 {% if song.audio %}
 <p>
   <table>

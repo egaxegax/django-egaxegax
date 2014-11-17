@@ -54,7 +54,7 @@ msgid "Edit"
 msgstr "Править"
 
 msgid "previous"
-msgstr "пред"
+msgstr "Назад"
 
 msgid "Page"
 msgstr "Стр."
@@ -63,7 +63,7 @@ msgid "of"
 msgstr "из"
 
 msgid "next"
-msgstr "след"
+msgstr "Далее"
 
 msgid "Please authorize to post messages"
 msgstr "Войдите, чтобы оставлять сообщения"

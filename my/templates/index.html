@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% block description %}, {% trans 'info, contacts' %}{% endblock %}
+{% block keywords %}, {% trans 'info, contacts' %}{% endblock %}
+{% block title %}{% trans 'Main' %} - {% trans 'info, contacts' %} - {% endblock %}
 {% block pagestyle %}
 #topmenu li.mainmenu { background-color: #cd984c; }
 #myview { width: 700px; text-align: left; }

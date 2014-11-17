@@ -4,11 +4,11 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import *
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from guestbook.forms import *
 from guestbook.models import *
-import time
+import time, sys
 
 def ZI(s):
     try:
@@ -30,112 +30,191 @@ def PageList(request, qst, per_page=5):
     except (EmptyPage, InvalidPage):
         return paginator.page(paginator.num_pages)
 
+def AddSubjListCache(subj_list):
+    cache_list = []
+    for subj in subj_list:
+        if not subj.count:
+            subj.count = Greeting.objects.filter(subject=subj.id).count()
+        if not subj.date:
+            subj.date = Greeting.objects.filter(subject=subj.id).order_by('-date')[0].date
+        cache_list.append({
+           'id': subj.id,
+           'subject': subj.subject,
+           'count': subj.count,
+           'date': subj.date.strftime('%Y-%m-%d %H:%M:%S') })
+    cache.add('subjects:.full_list', str(cache_list))
+
+def AddPostCache(post):
+    cache_post = [{
+       'id': post.id,
+       'author': (hasattr(post, 'author') and {'id': post.author.id, 'username': post.author.username}) or {},
+       'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
+       'content': post.content,
+       'date': post.date.strftime('%Y-%m-%d %H:%M:%S') }]
+    cache.add('post:' + str(post.id), str(cache_post))
+
+def AddPostListCache(subj_id, posts_list):
+    cache_list = []
+    for post in posts_list:
+        cache_list.append({
+           'id': post.id,
+           'author': (hasattr(post, 'author') and {'id': post.author.id, 'username': post.author.username}) or {},
+           'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
+           'content': post.content,
+           'date': post.date.strftime('%Y-%m-%d %H:%M:%S') })
+    cache.add('posts:' + str(subj_id), str(cache_list))
+
+def ClearSubjListCache():
+    cache.delete_many(['subjects:.full_list'])
+
+def ClearPostCache(post):
+    cache.delete_many(['post:' + str(post.id)])
+
+def ClearPostListCache(subj_id):
+    cache.delete_many(['posts:.full_list', 'posts:' + str(subj_id)])
+
+# increment subject count
+def IncSubjCount(**kw):
+    if kw.get('subject'):
+        try:
+            form = AddSubjForm(instance=Greeting_Subject.objects.get(subject=kw['subject']))
+            subj = form.save(commit=False)
+            subj.count += kw.get('count', 1)
+            subj.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            subj.save(force_update=True)
+            if subj.count < 1:
+                subj.delete()
+        except:
+            form = AddSubjForm()
+            subj = form.save(commit=False)
+            subj.subject = kw['subject']
+            subj.count = kw.get('count', 1)
+            subj.save()
+        return subj
+
 # Controllers
 
-def list_greetings(request, **kw):
-    initial = {}  # form initial
+def copy_subj(request):
+    for subj in Greeting_Subject.objects.all():
+        form = AddSubjForm(instance=subj)
+        subj = form.save(commit=False)
+        subj.count = Greeting.objects.filter(subject=subj.id).count()
+        subj.date = Greeting.objects.filter(subject=subj.id).order_by('-date')[0].date
+        subj.save(force_update=True)
+    ClearSubjListCache()
+    return HttpResponse('Done.')
+
+def list_posts(request, **kw):
+    initial = {}
+    posts_list = []
     if kw.get('id'):
-        greetings_list = Greeting.objects.filter(id=ZI(kw.get('id')))
-        initial = {'id': kw.get('id')}
+        post_id = kw.get('id', '')
+        if not cache.has_key('post:' + post_id):
+            posts_list = Greeting.objects.filter(id=ZI(post_id))
+            AddPostCache(posts_list[0])
+        posts_list = eval(cache.get('post:' + post_id) or [])
+        if len(posts_list) and posts_list[0]['subject']:
+            initial = {'subject': posts_list[0]['subject']['subject']}
     elif kw.get('id_subj'):
-        greetings_list = Greeting.objects.filter(subject=ZI(kw.get('id_subj')))
-        initial = {'id_subj': kw.get('id_subj')}
+        subj_id = kw.get('id_subj', '') 
+        if not cache.has_key('posts:' + subj_id):
+            posts_list = Greeting.objects.filter(subject=ZI(subj_id)).order_by('-date')
+            AddPostListCache(subj_id, posts_list)
+        posts_list = eval(cache.get('posts:' + subj_id) or [])
+        if len(posts_list) and posts_list[0]['subject']:
+            initial['subject'] = posts_list[0]['subject']['subject']
     else:
-        greetings_list = Greeting.objects.all()
-    if initial:  # initial subject
-        if greetings_list.count():
-            if greetings_list[0].subject:
-                subject = Greeting_Subject.objects.filter(id=initial.get('id_subj') or greetings_list[0].subject.id)
-                if subject.count():
-                    initial['subject'] = subject[0].subject
-    greetings_list = greetings_list.order_by('-date')
-    return render_to_response('guestbook.html',
+        subj_id = '.full_list' 
+        if not cache.has_key('posts:' + subj_id):
+            posts_list = Greeting.objects.all().order_by('-date')
+            AddPostListCache(subj_id, posts_list)
+        posts_list = eval(cache.get('posts:' + subj_id) or [])
+    return render_to_response('posts.html',
                               {'request': request,
-                               'greetings': PageList(request, greetings_list),
+                               'posts': PageList(request, posts_list),
                                'subject': initial,
-                               'form': CreateGreetingForm(),
-                               'form_subject': CreateGreetingSubjectForm(initial=initial),
-                               'logback': reverse('guestbook.views.list_greetings')})
+                               'form': AddPostForm(),
+                               'form_subject': AddSubjForm(initial=initial),
+                               'logback': reverse('guestbook.views.list_posts')})
 
 def list_subjects(request):
-    subjects_list = Greeting_Subject.objects.all().order_by('subject')
-    subjects = PageList(request, subjects_list, 7)
-    # aggregates: count posts, last update
-    for i, o in enumerate(subjects.object_list):
-        m = Greeting.objects.filter(subject__id=o.id)
-        subjects.object_list[i].greeting_count = m.count()
-        if m.count():
-            m = m.order_by('-date')
-            subjects.object_list[i].updated = m[0].date
-            subjects.object_list[i].author = m[0].author
+    allkey = '.full_list'
+    if not cache.has_key('subjects:' + allkey):
+        subj_list = Greeting_Subject.objects.all().order_by('subject')
+        AddSubjListCache(subj_list)
+    subj_list = eval(cache.get('subjects:' + allkey))
     return render_to_response('subjects.html',
                               {'request': request,
-                               'subjects': subjects,
-                               'form': CreateGreetingForm(),
-                               'form_subject': CreateGreetingSubjectForm(),
+                               'subjects': PageList(request, subj_list, 7),
+                               'form': AddPostForm(),
+                               'form_subject': AddSubjForm(),
                                'logback': reverse('guestbook.views.list_subjects')})
 
 # Form actions
 
-def create_greeting(request):
+def add_post(request):
     if request.method == 'POST':
-        form_subject = CreateGreetingSubjectForm(request.POST)
-        form = CreateGreetingForm(request.POST)       
+        form_subject = AddSubjForm(request.POST)
+        form = AddPostForm(request.POST)       
         if form.is_valid():
-            greeting = form.save(commit=False)
+            post = form.save(commit=False)
+            post.author = request.user
             if form_subject.is_valid():
-                try:
-                    subject = Greeting_Subject.objects.get(subject=request.POST['subject'])
-                except:
-                    subject = form_subject.save()
-                greeting.subject = subject
-            if request.user.is_authenticated():
-                greeting.author = request.user
-            greeting.save()
+                subject = IncSubjCount(subject=request.POST['subject'])
+                post.subject = subject
+                ClearSubjListCache()
+                ClearPostListCache(subject.id)
+            ClearPostListCache('')
+            post.save()
     if 'subject' in locals():
-        return HttpResponseRedirect(reverse('guestbook.views.list_greetings', kwargs={'id_subj': subject.id}))
-    return HttpResponseRedirect(reverse('guestbook.views.list_greetings'))
+        return HttpResponseRedirect(reverse('guestbook.views.list_posts', kwargs={'id_subj': subject.id}))
+    return HttpResponseRedirect(reverse('guestbook.views.list_posts'))
 
-def edit_greeting(request, **kw):
-    id_greeting = ZI(kw.get('id'))
-    greeting = get_object_or_404(Greeting, id=id_greeting)
+def edit_post(request, **kw):
+    post_id = ZI(kw.get('id'))
+    post = get_object_or_404(Greeting, id=post_id)
     if request.method == 'POST':
-        form = CreateGreetingForm(request.POST, instance=greeting)
+        form = AddPostForm(request.POST, instance=post)
         if form.is_valid():
-            greeting = form.save(commit=False)
-            greeting.author = request.user
-            greeting.date = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()) 
-            greeting.save(force_update=True)
-            if greeting.subject is None:
-                return HttpResponseRedirect(reverse('guestbook.views.list_greetings'))
+            post = form.save(commit=False)
+            post.author = request.user
+            post.date = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+            post.save(force_update=True)
+            if post.subject:
+                IncSubjCount(subject=post.subject.subject, count=0)
+                ClearSubjListCache()
+                ClearPostListCache(post.subject.id)
+            ClearPostListCache('')
+            ClearPostCache(post)
+            if post.subject is None:
+                return HttpResponseRedirect(reverse('guestbook.views.list_posts'))
             else:
-                return HttpResponseRedirect(reverse('guestbook.views.list_greetings', kwargs={'id_subj': greeting.subject.id}))
+                return HttpResponseRedirect(reverse('guestbook.views.list_posts', kwargs={'id_subj': post.subject.id}))
     else:
-        form = CreateGreetingForm(initial={
-                                  'id': greeting.id,
-                                  'subject': greeting.subject,
-                                  'content': greeting.content}) 
-    return render_to_response('edit_greeting.html',
+        form = AddPostForm(initial={
+                          'id': post.id,
+                          'subject': post.subject,
+                          'content': post.content}) 
+    return render_to_response('edit_post.html',
                               {'request': request,
-                               'subject': greeting.subject,
-                               'form': form})    
+                               'subject': post.subject,
+                               'form': form,
+                               'focus': form['content'].id_for_label})
 
-def delete_greeting(request, **kw):
+def delete_post(request, **kw):
     if request.user.is_authenticated():
-        greeting = get_object_or_404(Greeting, id=ZI(kw.get('id')))
-        try:
-            subject = Greeting_Subject.objects.get(id=greeting.subject.id)
-        except:
-            subject = False          
-        if not greeting.author or request.user.username == greeting.author.username:
-            greeting.delete()
-            # delete empty subject
-            if subject:
-                if not Greeting.objects.filter(subject=subject.id).count():
-                    subject.delete()
+        post = get_object_or_404(Greeting, id=ZI(kw.get('id')))
+        if request.user.is_superuser or hasattr(post, 'author') and request.user.username == post.author.username:
+            if hasattr(post, 'subject') and post.subject:
+                IncSubjCount(subject=post.subject.subject, count=-1)
+                ClearSubjListCache()
+                ClearPostListCache(post.subject.id)
+            ClearPostListCache('')
+            ClearPostCache(post)
+            post.delete()
     if 'id_subj' in request.GET:
-        return HttpResponseRedirect(reverse('guestbook.views.list_greetings', kwargs={'id_subj': ZI(request.GET.get('id_subj'))}))
-    return HttpResponseRedirect(reverse('guestbook.views.list_greetings'))
+        return HttpResponseRedirect(reverse('guestbook.views.list_posts', kwargs={'id_subj': ZI(request.GET.get('id_subj'))}))
+    return HttpResponseRedirect(reverse('guestbook.views.list_posts'))
 
 def get_user_profile(request, **kw):
     if request.method == 'GET':
@@ -145,4 +224,4 @@ def get_user_profile(request, **kw):
                                   {'request': request,
                                    'record': m[0],
                                    'record_count': m.count(),
-                                   'logback': reverse('guestbook.views.list_greetings')})
+                                   'logback': reverse('guestbook.views.list_posts')})

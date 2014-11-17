@@ -36,6 +36,9 @@ msgstr "Код проверки"
 msgid "Egax Portal"
 msgstr "Портал Григория Еремина"
 
+msgid "info, contacts"
+msgstr "цели, задачи, контакты"
+
 msgid "Add user"
 msgstr "Добавить пользователя"
 
@@ -53,26 +56,11 @@ msgstr "Написать"
 
 #: templates/photos.html
 
-msgid "previous"
-msgstr "пред"
-
-msgid "Page"
-msgstr "Стр."
-
-msgid "of"
-msgstr "из"
-
-msgid "next"
-msgstr "след"
-
-msgid "photos, images, pictures"
-msgstr "фото, изображения, картинки"
+msgid "images, pictures, photos"
+msgstr "изображения, картинки, фото"
 
 msgid "No photos"
 msgstr "Нет фотографий"
-
-msgid "Please authorize to upload photos"
-msgstr "Войдите, чтобы добавлять фотографии"
 
 msgid "Add photo"
 msgstr "Добавить фото"
@@ -91,4 +79,19 @@ msgstr "Альбом"
 
 msgid "Close"
 msgstr "Закрыть"
+
+msgid "previous"
+msgstr "Назад"
+
+msgid "Page"
+msgstr "Стр."
+
+msgid "of"
+msgstr "из"
+
+msgid "next"
+msgstr "Далее"
+
+msgid "Please authorize to upload photos"
+msgstr "Войдите, чтобы добавлять фотографии"
 

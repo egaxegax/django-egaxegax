@@ -1,7 +1,0 @@
-artists: {{ art_count }}<br/>
-songs: {{ song_count }}<br/>
-<hr/>
-artist,count,ref_id<br>
-{% for art in songs %}
-  {{ art.artist }},{{art.count}},{{art.ref_id}},<br>
-{% endfor %}

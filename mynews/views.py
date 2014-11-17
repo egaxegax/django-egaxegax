@@ -92,7 +92,8 @@ def edit_msg(request, **kw):
         form = AddMsgForm(initial={'id': msg.id, 'content': msg.content}) 
     return render_to_response('edit_msg.html',
                               {'request': request,
-                               'form': form})
+                               'form': form,
+                               'focus': form['content'].id_for_label})
 
 def delete_msg(request, **kw):
     if request.user.is_authenticated():

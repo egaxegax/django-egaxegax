@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load markup %}
+{% load myfilter %}
+{% block description %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% trans 'Guestbook' %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
@@ -11,18 +13,18 @@
 {% block pageheader %}{% trans 'Guestbook' %}{% endblock %}
 {% block content %}
 <p>Читайте, пишите статьи и заметки, оставляйте комментарии на темы:</p>
-{% for subject in subjects.object_list %}
-  {% if subject.subject %}
+{% for subj in subjects.object_list %}
+  {% if subj.subject %}
     <dl class="messageitem">
-      <dt><a href="{% url 'guestbook.views.list_greetings' id_subj=subject.id %}">{{ subject.subject|escape }}</a>
-      <span class="smaller">[{{ subject.greeting_count }}]</span></dt>
+      <dt><a href="{% url 'guestbook.views.list_posts' id_subj=subj.id %}">{{ subj.subject|escape }}</a>
+      <span class="smaller">[{{ subj.count }}]</span></dt>
       <dd class="smaller">
-        <acronym title="{{ subject.updated|date:"Y-m-d H:i" }}">{{ subject.updated|timesince }}</acronym> {% trans 'ago' %} {% trans 'ago' %}
+        <acronym title="{{ subj.date|date:"Y-m-d H:i" }}">{{ subj.date|time_since }}</acronym> {% trans 'ago' %} {% trans 'ago' %}
       </dd>
     </dl>
   {% endif %}
 {% endfor %}
-<p class="smaller"><a href="{% url 'guestbook.views.list_greetings' %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
+<p class="smaller"><a href="{% url 'guestbook.views.list_posts' %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
 {% if subjects.object_list %}
   <p class="smaller">
     {% if subjects.has_previous %}
@@ -42,7 +44,7 @@
 {% endif %}
 {% if request.user.is_authenticated %}
   <p>
-    <form action="{% url 'guestbook.views.create_greeting' %}" method="post">{% csrf_token %}
+    <form action="{% url 'guestbook.views.add_post' %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form_subject }}{{ form }}     
       <tr><th></th><td>

@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import ugettext as _
 from guestbook.models import *
 
-class CreateGreetingForm(forms.ModelForm):
+class AddPostForm(forms.ModelForm):
     class Meta:
         model = Greeting
         exclude = ['author', 'subject', 'date']
@@ -10,6 +10,7 @@ class CreateGreetingForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'rows': 10}),
         }
 
-class CreateGreetingSubjectForm(forms.ModelForm):
+class AddSubjForm(forms.ModelForm):
     class Meta:
         model = Greeting_Subject
+        exclude = ['count']

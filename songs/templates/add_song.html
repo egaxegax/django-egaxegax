@@ -12,7 +12,7 @@
 {% if request.user.is_authenticated %}
   <form action="{% url 'songs.views.add_song' %}" method="post">{% csrf_token %}
     <table class="formpost">
-      {{ form }}
+      {{ form_art }}{{ form }}
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
   </form>

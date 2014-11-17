@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load markup %}
+{% load myfilter %}
+{% block description %}. {% if subject.subject %}{{ subject.subject }}{% endif %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
+{% block keywords %}, {% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
+{% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
+{% block pagestyle %}
+#topmenu li.guestmenu { background-color: #cd984c; }
+.messagetext { padding: 0 10px; }
+.messagebox { border: 1px solid #cccccc; border-radius: 4px; margin-bottom: 5px; }
+.messageblock { font-size: 70%; padding: 2px 8px; text-align: right; }
+.messagecred { color: gray; }
+{% endblock %}
+{% block pagestylelink %}
+<link rel="stylesheet" href="/media/css/syntax.css" />
+{% endblock %}
+{% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endblock %}
+{% block content %}
+<p>Читайте, пишите статьи и заметки, оставляйте комментарии.</p>
+{% for post in posts.object_list %}
+  <div class="messagebox">
+    <a id="id{{ post.id }}" name="id{{ post.id }}"></a>
+    <div class="messageblock"><a class="nodecor" href="{% url 'guestbook.views.list_posts' id=post.id %}"># {{ post.id }}</a></div>
+    <div class="messagetext">{{ post.content|markdown:"codehilite" }}</div>
+    <div class="messageblock">
+      {% if post.subject %}
+        <div><a class="nodecor" href="{% url 'guestbook.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a></div>
+      {% endif %}
+      <div class="messagecred">
+        {% if post.author %}
+          <b><a class="nodecor" href="{% url 'guestbook.views.get_user_profile' id=post.author.id %}">{{ post.author.username }}</a></b> {% trans 'wrote' %}
+        {% else %}
+          {% trans 'An anonymous person' %} {% trans 'wrote' %}
+        {% endif %}
+        <acronym title="{{ post.date|date:"Y-m-d H:i" }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
+        {% if request.user.is_authenticated and request.user.id == post.author.id or request.user.is_superuser %}
+          <a class="nodecor" href="{% url 'guestbook.views.edit_post' id=post.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor" href="{% url 'guestbook.views.delete_post' id=post.id %}{% if subject.subject %}?id_subj={{ post.subject.id }}{% endif %}">{% trans 'Delete' %}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endfor %}
+{% if posts.object_list %}
+  <p class="smaller">
+  {% if posts.has_previous %}
+    <a href="?page={{ posts.previous_page_number }}">‹ {% trans 'previous' %}</a>
+  {% endif %}
+  {% if posts.paginator.num_pages > 1 %}
+    <span class="current">
+      {% trans 'Page' %} {{ posts.number }} {% trans 'of' %} {{ posts.paginator.num_pages }}
+    </span>
+  {% endif %}
+  {% if posts.has_next %}
+    <a href="?page={{ posts.next_page_number }}">{% trans 'next' %} ›</a>
+  {% endif %}
+  </p>
+{% else %}
+  <p>{% trans 'No posts' %}.</p>
+{% endif %}
+{% if request.user.is_authenticated %}
+  <p>
+    <form action="{% url 'guestbook.views.add_post' %}" method="post">{% csrf_token %}
+    <table class="formpost">
+      {{ form_subject }}{{ form }}
+      <tr><th></th><td>
+        <table cellspacing="0" cellpadding="0" width="100%"><tr>
+          <td><input type="submit" value="{% trans 'Post' %}" /></td>
+          <td class="smaller" align="right">{% trans 'Support syntax' %} <b>Markdown</b></td></tr>
+        </table>
+      </td></tr>
+    </table>
+    </form>
+  </p>
+{% else %}
+  <p class="smaller">{% trans 'Please authorize to post messages' %}.</p>
+{% endif %}
+{% endblock %}

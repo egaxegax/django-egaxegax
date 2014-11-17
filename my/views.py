@@ -44,14 +44,31 @@ def FromTranslit(s):
     pattern = '|'.join(map(re.escape, sorted(r, key=len, reverse=True)))
     return re.sub(pattern, lambda m: r[m.group()], s)
 
+def AddAlbumListCache(allkey, photos_list):
+    album_list = {}
+    for photo in photos_list:
+        if not photo.album in album_list:
+            album_list[photo.album] = {
+               'album_count': 1,     
+               'id': photo.id,
+               'title': photo.title,
+               'album': photo.album,
+               'width': photo.width,
+               'height': photo.height,
+               'thumb_url': photo.thumb_url,
+               'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
+               'date': photo.date.strftime('%Y-%m-%d %H:%M:%S') }
+        else:
+            album_list[photo.album]['album_count'] += 1
+    cache.add('photos:' + allkey, str(album_list))
+
 def AddPhotoCache(photo):
     cache_photo = {
         'id': photo.id,
         'title': photo.title,
         'album': photo.album,
         'thumb_url': photo.thumb_url,
-        'date': photo.date.strftime('%Y-%m-%d %H:%M:%S')
-    }
+        'date': photo.date.strftime('%Y-%m-%d %H:%M:%S') }
     cache.add('photo:' + str(photo.id), str(cache_photo))
 
 def AddPhotosListCache(album, photos_list):
@@ -72,7 +89,29 @@ def ClearPhotoCache(photo):
     cache.delete_many(['photo:' + str(photo.id)])
 
 def ClearPhotosListCache(album):
-    cache.delete_many(['photos:.full_list', 'photos:' + album])
+    cache.delete_many(['photos:' + album])
+
+def ClearPhotosFullListCache():
+    cache.delete_many(['photos:.full_list'])
+
+def UpdateFullListCache(photo):
+    cache_id = 'photos:' + '.full_list' 
+    if cache.has_key(cache_id):
+        album_list = eval(cache.get('photos:.full_list'))
+        if not album_list.has_key(photo.album):
+            album_list[photo.album] = {'album_count': 0}
+        album_list[photo.album] = {
+           'album_count': album_list[photo.album]['album_count'] + 1,
+           'id': photo.id,
+           'title': photo.title,
+           'album': photo.album,
+           'width': photo.width,
+           'height': photo.height,
+           'thumb_url': photo.thumb_url,
+           'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
+           'date': photo.date.strftime('%Y-%m-%d %H:%M:%S') }
+        ClearPhotosFullListCache()
+        cache.add(cache_id, str(album_list))
 
 # Controllers
 
@@ -82,11 +121,11 @@ def index(request):
                                'logback': reverse('my.views.index')})
 
 def list_photos(request, **kw):
-    rows = 4
-    cols = 6 
-    photos_list = []
     album =''
     if kw.get('id_album'): # filter by album
+        rows = 4
+        cols = 6 
+        photos_list = []
         cache_photo_id = 'photo:' + kw.get('id_album', '')
         if not cache.has_key(cache_photo_id):
             mlist = Photo.objects.filter(id=ZI(kw.get('id_album')))
@@ -99,12 +138,15 @@ def list_photos(request, **kw):
                 photos_list = Photo.objects.filter(album=album).order_by('-date')
                 AddPhotosListCache(album, photos_list)
             photos_list = eval(cache.get('photos:' + album))
-    else: # full list
+    else: # full list by album
+        rows = 5
+        cols = 3
+        photos_list = {}
         allkey = '.full_list'
         if not cache.has_key('photos:' + allkey):
-            photos_list = Photo.objects.order_by('-date')
-            AddPhotosListCache(allkey, photos_list)
-        photos_list = eval(cache.get('photos:' + allkey))
+            photos_list = Photo.objects.all()
+            AddAlbumListCache(allkey, photos_list)
+        photos_list = eval(cache.get('photos:' + allkey)).values()
     return render_to_response('photos.html',
                               {'request': request,
                                'photos': PageList(request, photos_list, rows * cols),
@@ -149,6 +191,9 @@ def get_avatar(request, **kw):
 
 def add_photo(request):
     if request.method == 'POST':
+        if not 'title' in request.POST or not request.POST['title']: # title as filename
+            request.POST['title'] = ' '.join(os.path.splitext(str(request.FILES['img']))[0].split('_'))
+            request.POST['title1'] = '' 
         form = AddPhotoForm(request.POST, request.FILES)
         if form.is_valid():
             photo = form.save(commit=False)
@@ -156,7 +201,7 @@ def add_photo(request):
             data = blobstore.BlobReader(blob_key).read()
             try:
                 img = images.Image(image_data=data)
-                photo.title = FromTranslit(form.data['title1'])
+                photo.title = FromTranslit(form.data['title1']) or request.POST['title']
                 photo.album = FromTranslit(form.data['album1'])
                 photo.width = img.width
                 photo.height = img.height
@@ -164,7 +209,8 @@ def add_photo(request):
                 photo.author = request.user
                 photo = form.save()
                 ClearPhotosListCache(photo.album)
-                return HttpResponseRedirect(reverse('my.views.list_photos'))
+                UpdateFullListCache(photo)
+                return HttpResponseRedirect(reverse('my.views.list_photos', kwargs={'id_album': photo.id}))
             except:
                 pass
     else:
@@ -175,29 +221,32 @@ def add_photo(request):
                               {'request': request,
                                'form': form, 
                                'upload_url': upload_url,
-                               'upload_data': upload_data})
+                               'upload_data': upload_data,
+                               'focus': form['title'].id_for_label})
 
 def edit_photo(request, **kw):
     id_photo = ZI(kw.get('id'))
-    photo_old = get_object_or_404(Photo, id=id_photo)
+    photo = get_object_or_404(Photo, id=id_photo)
     if request.method == 'POST':
-        form = EditPhotoForm(request.POST, instance=photo_old)
+        ClearPhotosListCache(photo.album) # clear old
+        form = EditPhotoForm(request.POST, instance=photo)
         if form.is_valid():
             photo = form.save(commit=False)
             photo.save(force_update=True)
             ClearPhotoCache(photo)
-            ClearPhotosListCache(photo_old.album)
             ClearPhotosListCache(photo.album)
-            return HttpResponseRedirect(reverse('my.views.list_photos', kwargs={'id': id_photo}))
+            ClearPhotosFullListCache()
+            return HttpResponseRedirect(reverse('my.views.list_photos', kwargs={'id_album': kw.get('id', '')}))
     else:
         form = EditPhotoForm(initial={
-                             'id': photo_old.id,
-                             'title': photo_old.title,
-                             'album': photo_old.album,
-                             'thumb_url': photo_old.thumb_url})
+                             'id': photo.id,
+                             'title': photo.title,
+                             'album': photo.album,
+                             'thumb_url': photo.thumb_url})
     return render_to_response('edit_photo.html',
                               {'request': request,
-                               'form': form})
+                               'form': form,
+                               'focus': form['title'].id_for_label})
 
 def delete_photo(request, **kw):
     if request.user.is_authenticated():
@@ -205,6 +254,7 @@ def delete_photo(request, **kw):
         if request.user.is_superuser or hasattr(photo, 'author') and request.user.username == photo.author.username:
             ClearPhotoCache(photo)
             ClearPhotosListCache(photo.album)
+            ClearPhotosFullListCache()
             photo.delete()
     return HttpResponseRedirect(reverse('my.views.list_photos'))
 
