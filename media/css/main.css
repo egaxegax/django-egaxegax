@@ -1,7 +1,6 @@
 /* main stylesheets here */
-body { background-color: #ce994d; }
 body { font-family: Verdana,Helvetica,sans-serif; 
-  background: linear-gradient(to right, #cd984c 0%, #e2bd6f 24%, #fffbf0 34%, #e8b357 57%, #a85a34 67%, #713326 100%) repeat scroll 0 0 transparent; }
+  background: url(/media/img/bg/road.jpg) no-repeat fixed 50% 0 #6e2508; }
 #header { height: 70px; }
 #logo { width: 400px; margin-top: 25px; text-align: center; }
 #topnav ul li { margin-left: 20px; text-shadow: 1px 1px #713326; }
