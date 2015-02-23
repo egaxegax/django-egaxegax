@@ -2,7 +2,7 @@
 body { font-family: Verdana,Helvetica,sans-serif; 
   background: url(/media/img/bg/road.jpg) no-repeat fixed 50% 0 #6e2508; }
 #header { height: 70px; }
-#logo { width: 400px; margin-top: 25px; text-align: center; }
+#logo { width: 240px; margin-top: 25px; text-align: center; }
 #topnav ul li { margin-left: 20px; text-shadow: 1px 1px #713326; }
 #topban .ads { text-align: center; margin-top: 5px; }
 #topmenu { height: 50px; text-align: right; }

@@ -49,6 +49,7 @@ def AddPostCache(post):
        'id': post.id,
        'author': (hasattr(post, 'author') and {'id': post.author.id, 'username': post.author.username}) or {},
        'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
+       'title': post.title,
        'content': post.content,
        'date': post.date.strftime('%Y-%m-%d %H:%M:%S') }]
     cache.add('post:' + str(post.id), str(cache_post))
@@ -60,6 +61,7 @@ def AddPostListCache(subj_id, posts_list):
            'id': post.id,
            'author': (hasattr(post, 'author') and {'id': post.author.id, 'username': post.author.username}) or {},
            'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
+           'title': post.title,
            'content': post.content,
            'date': post.date.strftime('%Y-%m-%d %H:%M:%S') })
     cache.add('posts:' + str(subj_id), str(cache_list))
@@ -114,7 +116,9 @@ def list_posts(request, **kw):
             AddPostCache(posts_list[0])
         posts_list = eval(cache.get('post:' + post_id) or [])
         if len(posts_list) and posts_list[0]['subject']:
-            initial = {'subject': posts_list[0]['subject']['subject']}
+            initial['subject'] = posts_list[0]['subject']['subject']
+        if len(posts_list) and posts_list[0]['title']:
+            initial['title'] = posts_list[0]['title']
     elif kw.get('id_subj'):
         subj_id = kw.get('id_subj', '') 
         if not cache.has_key('posts:' + subj_id):
@@ -178,7 +182,7 @@ def edit_post(request, **kw):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.date = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+#            post.date = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
             post.save(force_update=True)
             if post.subject:
                 IncSubjCount(subject=post.subject.subject, count=0)
@@ -194,10 +198,12 @@ def edit_post(request, **kw):
         form = AddPostForm(initial={
                           'id': post.id,
                           'subject': post.subject,
+                          'title': post.title,
                           'content': post.content}) 
     return render_to_response('edit_post.html',
                               {'request': request,
                                'subject': post.subject,
+                               'title': post.title,
                                'form': form,
                                'focus': form['content'].id_for_label})
 
