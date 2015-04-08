@@ -4,7 +4,7 @@
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
-#topmenu li.guestmenu { background-color: #cd984c; }
+#top_menu li.guestmenu { border-bottom: 1px solid #d6d6d6; }
 {% endblock %}
 {% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endblock %}
 {% block content %}

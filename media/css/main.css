@@ -1,23 +1,22 @@
 /* main stylesheets here */
-body { font-family: Verdana,Helvetica,sans-serif; 
-  background: url(/media/img/bg/road.jpg) no-repeat fixed 50% 0 #6e2508; }
-#header { height: 70px; }
-#logo { width: 240px; margin-top: 25px; text-align: center; }
-#topnav ul li { margin-left: 20px; text-shadow: 1px 1px #713326; }
-#topban .ads { text-align: center; margin-top: 5px; }
-#topmenu { height: 50px; text-align: right; }
-#topmenu ul { padding: 15px; }
-#topmenu ul li { margin-left: 10px; padding: 5px 10px; border: 1px solid #d6d6d6;
-  border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px; }
-#topmenu ul li.photomenu { padding: 5px 20px; }
-#cont { padding: 10px; }
-#pageheader { padding: 15px; background-color: white; border-bottom: 1px dotted #cccccc; }
-#content { padding: 15px; background-color: white; }
-#footer { height: 50px; text-align: center; }
-.main { width: 966px; margin: 0 auto; }
+body { font-family: Verdana,Helvetica,sans-serif;
+  background: url(/media/img/bg/bg_dotted.png) repeat fixed 0 0 white; }
+#main_header { height: 70px; }
+#main_content .view { margin: 5px 0 5px 0; border: 1px solid #cccccc; }
+#main_footer { height: 50px; text-align: center; }
+#top_logo { width: 240px; margin-top: 25px; text-align: center; }
+#top_ban .ads { text-align: center; margin-top: 5px; }
+#top_nav ul li { margin-left: 20px; }
+#top_menu { height: 50px; text-align: right; }
+#top_menu ul { padding: 15px; }
+#top_menu ul li { margin-left: 10px; padding: 3px 20px; }
+#top_menu ul li.photomenu { padding: 4px 30px; }
+#page_header { padding: 15px; background-color: white; border-bottom: 1px dotted #cccccc; }
+#page_content { padding: 15px; background-color: white; }
+.main { width: 960px; margin: 0 auto; }
 .bg { background-color: #ce994d; }
-.wrap { margin-top: 5px; background: none repeat scroll 0 0 rgba(56,32,44,0.3); 
- border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px;}
+.wrap { background: none repeat scroll 0 0 rgba(50,100,150,0.8); 
+  border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px;}
 .gray { color: gray; }
 .white { color: #f4f4f4; }
 .white a { color: #f4f4f4; }

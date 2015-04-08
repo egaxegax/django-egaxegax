@@ -112,8 +112,8 @@ def list_posts(request, **kw):
     if kw.get('id'):
         post_id = kw.get('id', '')
         if not cache.has_key('post:' + post_id):
-            posts_list = Greeting.objects.filter(id=ZI(post_id))
-            AddPostCache(posts_list[0])
+            posts_list = get_object_or_404(Greeting, id=ZI(post_id))
+            AddPostCache(posts_list)
         posts_list = eval(cache.get('post:' + post_id) or [])
         if len(posts_list) and posts_list[0]['subject']:
             initial['subject'] = posts_list[0]['subject']['subject']
@@ -144,7 +144,7 @@ def list_posts(request, **kw):
 def list_subjects(request):
     allkey = '.full_list'
     if not cache.has_key('subjects:' + allkey):
-        subj_list = Greeting_Subject.objects.all().order_by('subject')
+        subj_list = Greeting_Subject.objects.all().order_by('-count')
         AddSubjListCache(subj_list)
     subj_list = eval(cache.get('subjects:' + allkey))
     return render_to_response('subjects.html',
