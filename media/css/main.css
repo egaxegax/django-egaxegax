@@ -3,13 +3,13 @@ body { font-family: Verdana,Helvetica,sans-serif;
   background: url(/media/img/bg/bg_dotted.png) repeat fixed 0 0 white; }
 #main_header { height: 70px; }
 #main_content .view { margin: 5px 0 5px 0; border: 1px solid #cccccc; }
-#main_footer { height: 50px; text-align: center; }
-#top_logo { width: 240px; margin-top: 25px; text-align: center; }
+#main_footer { height: 40px; text-align: center; }
+#top_logo { width: 240px; margin-top: 20px; text-align: center; }
 #top_ban .ads { text-align: center; margin-top: 5px; }
-#top_nav ul li { margin-left: 20px; }
-#top_menu { height: 50px; text-align: right; }
-#top_menu ul { padding: 15px; }
-#top_menu ul li { margin-left: 10px; padding: 3px 20px; }
+#top_nav ul li { margin: 10px; }
+#top_menu { height: 40px; text-align: right; }
+#top_menu ul { padding: 10px; }
+#top_menu ul li { margin-left: 10px; padding: 0px 20px; }
 #top_menu ul li.photomenu { padding: 4px 30px; }
 #page_header { padding: 15px; background-color: white; border-bottom: 1px dotted #cccccc; }
 #page_content { padding: 15px; background-color: white; }

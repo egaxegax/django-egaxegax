@@ -47,7 +47,6 @@
     {% if request.user.is_authenticated %}
       <li>{% trans 'Welcome,' %} <b>{{ request.user.username }}</b></li>
     {% else %}
-      <li>{% trans 'Logged out' %}</li>
       <li><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>      
     {% endif %}
     </ul>
@@ -74,7 +73,7 @@
   </div>
 </div>
 <div id="main_footer" class="main wrap smaller white">
-  <table width="100%" cellpadding="0" cellspacing="10"><tr><td align="right" width="50%">
+  <table width="100%" cellpadding="0" cellspacing="5"><tr><td align="right" width="50%">
 <!--LiveInternet counter--><script type="text/javascript"><!--
 document.write("<a href='http://www.liveinternet.ru/click' "+
 "target=_blank><img src='//counter.yadro.ru/hit?t12.3;r"+
