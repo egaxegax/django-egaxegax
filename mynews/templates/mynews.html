@@ -4,7 +4,7 @@
 {% load markup %}
 {% block description %}, {% trans 'updates, comments, news' %}{% endblock %}
 {% block keywords %}, {% trans 'updates, comments, news' %}{% endblock %}
-{% block title %}{% trans 'News' %} - {% trans 'updates, comments, news' %} - {% endblock %}
+{% block title %}{% trans 'My news' %} - {% trans 'updates, comments, news' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.newsmenu { border-bottom: 1px solid #d6d6d6; }
 .msgfooter { font-size: 70%; padding: 2px 8px; text-align: right; }
@@ -12,9 +12,9 @@
 .msgbox { border: 1px solid #cccccc; border-radius: 4px; margin-bottom: 5px; }
 {% endblock %}
 {% block pagestylelink %}
-<link rel="stylesheet" href="/media/css/syntax.css" />
+<link rel="stylesheet" href="{{ MEDIA_URL }}css/syntax.css" />
 {% endblock %}
-{% block pageheader %}{% trans 'News' %}{% endblock %}
+{% block pageheader %}{% trans 'My news' %}{% endblock %}
 {% block content %}
 <p>Что нового? Новости, изменения, обновления на сайте, сообщения от пользователей.</p>
 {% for msg in news.object_list %}

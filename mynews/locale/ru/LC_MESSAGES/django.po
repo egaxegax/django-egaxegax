@@ -24,6 +24,9 @@ msgstr "Новости"
 
 #: templates/mynews.html
 
+msgid "My news"
+msgstr "Новости и сообщения"
+
 msgid "updates, comments, news"
 msgstr "сообщения, комментарии, новости"
 

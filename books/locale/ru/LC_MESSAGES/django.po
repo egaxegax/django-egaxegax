@@ -1,0 +1,87 @@
+# egaxegax.appspot.com.
+# Copyright (C) 2011
+# This file is distributed under the same license as the Django package.
+# egaxegax@gmail.com, 2015.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: models.py
+
+msgid "writer"
+msgstr "Писатель"
+
+msgid "content"
+msgstr "Текст"
+
+msgid "title"
+msgstr "Название"
+
+msgid "part"
+msgstr "Часть"
+
+#: templates/base.html
+
+msgid "Books"
+msgstr "Книги"
+
+msgid "books"
+msgstr "проза, книги, библиотека, собрание сочинений"
+
+#: templates/books.html
+
+msgid "Library"
+msgstr "Онлайн-библиотека"
+
+msgid "previous"
+msgstr "Назад"
+
+msgid "Page"
+msgstr "Стр."
+
+msgid "of"
+msgstr "из"
+
+msgid "next"
+msgstr "Далее"
+
+#: templates/song.html
+
+msgid "ago"
+msgstr "назад"
+
+msgid "No books"
+msgstr "Нет книг"
+
+msgid "Please authorize to add books"
+msgstr "Войдите, чтобы добавлять книги"
+
+msgid "Add book"
+msgstr "Добавить книгу"
+
+msgid "Edit"
+msgstr "Править"
+
+msgid "Edit book"
+msgstr "Править текст"
+
+msgid "Added"
+msgstr "Добавил"
+
+msgid "Full list"
+msgstr "Весь список"
+
+msgid "Profile"
+msgstr "Профайл"
+
+msgid "Search by title"
+msgstr "Найти по названию"
+
+msgid "Search result"
+msgstr "Найдено"

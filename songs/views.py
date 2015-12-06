@@ -6,6 +6,7 @@ from django.core.exceptions import *
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response
+from django.template.context import RequestContext
 from django.db.models import Q
 from songs.forms import *
 from songs.models import *
@@ -166,20 +167,21 @@ def list_art(request, **kw):
             AddArtListCache(artkey, art_list)
         art_list = eval(cache.get('arts:' + artkey))
         art_count = len(art_list)
-    return render_to_response('songs.html',
+    return render_to_response('songs.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'art_index': art_index,
                                'form': SearchForm(initial={'search':request.GET.get('search')}),
                                'song_count': song_count,
                                'art_count': art_count,
                                'songs': PageList(request, art_list, per_page),
-                               'logback': reverse('songs.views.list_art')})
+                               'logback': reverse('songs.views.list_art')}))
 
 def list_songs(request, **kw):
     song_count = 0
     song_last_count = 0
     search_count = 0
-    per_page = 10
+    per_page = 100
     song_list = []
     if kw.get('id_art'): # filter by art
         art_id = ZI(kw.get('id_art'))
@@ -201,7 +203,8 @@ def list_songs(request, **kw):
             AddSongListCache(artist, song_list)
         song_list = eval(cache.get('songs:' + artist))
         song_last_count = len(song_list)
-    return render_to_response('songs.html',
+    return render_to_response('songs.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'art_index': art_index,
                                'form': SearchForm(initial={'search':request.GET.get('search')}),
@@ -209,7 +212,7 @@ def list_songs(request, **kw):
                                'last_count': song_last_count,
                                'search_count': search_count,
                                'songs': PageList(request, song_list, per_page),                              
-                               'logback': reverse('songs.views.list_songs')})
+                               'logback': reverse('songs.views.list_songs')}))
 
 # Form actions
 
@@ -230,11 +233,12 @@ def add_song(request):
     else:
         form = AddSongForm()
         form_art = AddArtForm()
-    return render_to_response('add_song.html',
+    return render_to_response('add_song.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'form': form,
                                'form_art': form_art,
-                               'focus': form_art['artist'].id_for_label})
+                               'focus': form_art['artist'].id_for_label}))
 
 def edit_song(request, **kw):
     song_id = ZI(kw.get('id'))
@@ -255,10 +259,11 @@ def edit_song(request, **kw):
                            'id': song.id,
                            'title': song.title,
                            'content': song.content})
-    return render_to_response('edit_song.html',
+    return render_to_response('edit_song.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'form': form,
-                               'focus': form['content'].id_for_label})
+                               'focus': form['content'].id_for_label}))
 
 def edit_song_file(request, **kw):
     song_id = ZI(kw.get('id'))
@@ -274,12 +279,13 @@ def edit_song_file(request, **kw):
         form = AddSongFileForm(initial={'id': song.id})
     view_url = reverse('songs.views.edit_song_file', kwargs={'id': song_id})
     upload_url, upload_data = prepare_upload(request, view_url)
-    return render_to_response('edit_song_file.html',
+    return render_to_response('edit_song_file.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'form': form, 
                                'file_name': os.path.basename(song.audio.name),
                                'upload_url': upload_url,
-                               'upload_data': upload_data})
+                               'upload_data': upload_data}))
 
 def delete_song(request, **kw):
     if request.user.is_authenticated():
@@ -304,11 +310,12 @@ def get_song(request, **kw):
             song.content = t
             AddSongCache(song)
         song = eval(cache.get('song:' + song_id))
-        return render_to_response('song.html',
+        return render_to_response('song.html', 
+                                  context_instance=RequestContext(request,
                                   {'request': request,
                                    'song': song,
                                    'autoplay': request.GET.get('a', 0),
-                                   'logback': reverse('songs.views.get_song', kwargs={'id': song_id}) })
+                                   'logback': reverse('songs.views.get_song', kwargs={'id': song_id}) }))
 
 def get_song_file(request, **kw):
     if request.method == 'GET':
@@ -322,8 +329,9 @@ def get_user_profile(request, **kw):
     if request.method == 'GET':
         user = get_object_or_404(User, id=ZI(kw.get('id')))
         m = Song.objects.filter(author__id=user.id)
-        return render_to_response('get_user_profile.html',
+        return render_to_response('get_user_profile.html', 
+                                  context_instance=RequestContext(request,
                                   {'request': request,
                                    'record': m[0],
                                    'record_count': m.count(),
-                                   'logback': reverse('songs.views.list_songs')})
+                                   'logback': reverse('songs.views.list_songs')}))

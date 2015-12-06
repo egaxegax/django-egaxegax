@@ -4,7 +4,6 @@ import django
 from django.conf import settings
 from django.db.models.fields import NOT_PROVIDED
 from django.db.models.query import QuerySet
-from django.db.models.sql import aggregates as sqlaggregates
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.constants import MULTI, SINGLE
 from django.db.models.sql.where import AND, OR
@@ -42,7 +41,6 @@ else:
             return (query.select_fields + query.related_select_fields)
         else:
             return query.model._meta.fields
-
 
 EMULATED_OPS = {
     'exact': lambda x, y: y in x if isinstance(x, (list, tuple)) else x == y,
@@ -90,7 +88,7 @@ class NonrelQuery(object):
         self.compiler = compiler
         self.connection = compiler.connection
         self.ops = compiler.connection.ops
-        self.query = compiler.query # sql.Query
+        self.query = compiler.query  # sql.Query
         self.fields = fields
         self._negated = False
 
@@ -189,12 +187,38 @@ class NonrelQuery(object):
         leaf (a tuple).
         """
 
-        # TODO: Call get_db_prep_lookup directly, constraint.process
-        #       doesn't do much more.
-        constraint, lookup_type, annotation, value = child
-        packed, value = constraint.process(lookup_type, value, self.connection)
-        alias, column, db_type = packed
-        field = constraint.field
+        if django.VERSION < (1, 7):
+            # TODO: Call get_db_prep_lookup directly, constraint.process
+            #       doesn't do much more.
+            constraint, lookup_type, annotation, value = child
+            packed, value = constraint.process(lookup_type, value, self.connection)
+            alias, column, db_type = packed
+            field = constraint.field
+        else:
+            rhs, rhs_params = child.process_rhs(self.compiler, self.connection)
+
+            lookup_type = child.lookup_name
+
+            # Since NoSql databases generally don't support aggregation or
+            # annotation we simply pass true in this case unless the query has a
+            # get_aggregation method defined. It's a little troubling however that
+            # the _nomalize_lookup_value method seems to only use this value in the case
+            # that the value is an iterable and the lookup_type equals isnull.
+            if hasattr(self, 'get_aggregation'):
+                annotation = self.get_aggregation(using=self.connection)[None]
+            else:
+                annotation = True
+
+            value = rhs_params
+
+            packed = child.lhs.get_group_by_cols()[0]
+
+            if django.VERSION < (1, 8):
+                alias, column = packed
+            else:
+                alias = packed.alias
+                column = packed.target.column
+            field = child.lhs.output_field
 
         opts = self.query.model._meta
         if alias and alias != opts.db_table:
@@ -261,8 +285,7 @@ class NonrelQuery(object):
         result = []
         for child in children:
 
-            if SubqueryConstraint is not None \
-              and isinstance(child, SubqueryConstraint):
+            if SubqueryConstraint is not None and isinstance(child, SubqueryConstraint):
                 raise DatabaseError("Subqueries are not supported.")
 
             if isinstance(child, tuple):
@@ -338,7 +361,13 @@ class NonrelQuery(object):
     def _order_in_memory(self, lhs, rhs):
         for field, ascending in self.compiler._get_ordering():
             column = field.column
-            result = cmp(lhs.get(column), rhs.get(column))
+
+            # TOOD: cmp is removed in python 3. Rewrite this logic to leverage
+            # the __eq__() special function.
+            a = lhs.get(column)
+            b = rhs.get(column)
+
+            result = (a > b) - (a < b)
             if result != 0:
                 return result if ascending else -result
         return 0
@@ -365,17 +394,19 @@ class NonrelCompiler(SQLCompiler):
     # Public API
     # ----------------------------------------------
 
-    def results_iter(self):
+    def results_iter(self, results=None):
         """
         Returns an iterator over the results from executing query given
         to this compiler. Called by QuerySet methods.
         """
-        fields = self.get_fields()
-        try:
-            results = self.build_query(fields).fetch(
-                self.query.low_mark, self.query.high_mark)
-        except EmptyResultSet:
-            results = []
+
+        if results is None:
+            fields = self.get_fields()
+            try:
+                results = self.build_query(fields).fetch(
+                    self.query.low_mark, self.query.high_mark)
+            except EmptyResultSet:
+                results = []
 
         for entity in results:
             yield self._make_result(entity, fields)
@@ -388,27 +419,38 @@ class NonrelCompiler(SQLCompiler):
         Handles SQL-like aggregate queries. This class only emulates COUNT
         by using abstract NonrelQuery.count method.
         """
+        self.pre_sql_setup()
+
         aggregates = self.query.aggregate_select.values()
 
         # Simulate a count().
         if aggregates:
             assert len(aggregates) == 1
             aggregate = aggregates[0]
-            assert isinstance(aggregate, sqlaggregates.Count)
+            if django.VERSION < (1, 8):
+                if aggregate.sql_function != 'COUNT':
+                    raise NotImplementedError("The database backend only supports count() queries.")
+            else:
+                if aggregate.function != 'COUNT':
+                    raise NotImplementedError("The database backend only supports count() queries.")
+
             opts = self.query.get_meta()
-            if aggregate.col != '*' and \
-                aggregate.col != (opts.db_table, opts.pk.column):
-                raise DatabaseError("This database backend only supports "
-                                    "count() queries on the primary key.")
+
+            if django.VERSION < (1, 8):
+                if aggregate.col != '*' and aggregate.col != (opts.db_table, opts.pk.column):
+                    raise DatabaseError("This database backend only supports "
+                                        "count() queries on the primary key.")
+            else:
+                # Fair warning: the latter part of this or statement hasn't been tested
+                if aggregate.input_field.value != '*' and aggregate.input_field != (opts.db_table, opts.pk.column):
+                    raise DatabaseError("This database backend only supports "
+                                        "count() queries on the primary key.")
 
             count = self.get_count()
             if result_type is SINGLE:
                 return [count]
             elif result_type is MULTI:
                 return [[count]]
-
-        raise NotImplementedError("The database backend only supports "
-                                  "count() queries.")
 
     # ----------------------------------------------
     # Additional NonrelCompiler API
@@ -429,8 +471,9 @@ class NonrelCompiler(SQLCompiler):
                 value = field.get_default()
             else:
                 value = self.ops.value_from_db(value, field)
-                value = self.query.convert_values(value, field,
-                                                  self.connection)
+                # This is the default behavior of ``query.convert_values``
+                # until django 1.8, where multiple converters are a thing.
+                value = self.connection.ops.convert_values(value, field)
             if value is None and not field.null:
                 raise IntegrityError("Non-nullable field %s can't be None!" %
                                      field.name)
@@ -449,9 +492,8 @@ class NonrelCompiler(SQLCompiler):
         """
         if hasattr(self.query, 'is_empty') and self.query.is_empty():
             raise EmptyResultSet()
-        if (len([a for a in self.query.alias_map if
-                 self.query.alias_refcount[a]]) > 1 or
-            self.query.distinct or self.query.extra or self.query.having):
+        if (len([a for a in self.query.alias_map if self.query.alias_refcount[a]]) > 1
+                or self.query.distinct or self.query.extra or self.query.having):
             raise DatabaseError("This query is not supported by the database.")
 
     def get_count(self, check_exists=False):
@@ -482,8 +524,12 @@ class NonrelCompiler(SQLCompiler):
         query.order_by(self._get_ordering())
 
         # This at least satisfies the most basic unit tests.
-        if connections[self.using].use_debug_cursor or (connections[self.using].use_debug_cursor is None and settings.DEBUG):
-            self.connection.queries.append({'sql': repr(query)})
+        if django.VERSION < (1, 8):
+            if connections[self.using].use_debug_cursor or (connections[self.using].use_debug_cursor is None and settings.DEBUG):
+                self.connection.queries.append({'sql': repr(query)})
+        else:
+            if connections[self.using].force_debug_cursor or (connections[self.using].force_debug_cursor is None and settings.DEBUG):
+                self.connection.queries.append({'sql': repr(query)})
         return query
 
     def get_fields(self):
@@ -569,6 +615,8 @@ class NonrelInsertCompiler(NonrelCompiler):
     """
 
     def execute_sql(self, return_id=False):
+        self.pre_sql_setup()
+
         to_insert = []
         pk_field = self.query.get_meta().pk
         for obj in self.query.objs:
@@ -614,6 +662,8 @@ class NonrelInsertCompiler(NonrelCompiler):
 class NonrelUpdateCompiler(NonrelCompiler):
 
     def execute_sql(self, result_type):
+        self.pre_sql_setup()
+
         values = []
         for field, _, value in self.query.values:
             if hasattr(value, 'prepare_database_save'):

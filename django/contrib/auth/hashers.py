@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import base64
-import functools
+import binascii
 import hashlib
 
 from django.dispatch import receiver
@@ -9,17 +9,19 @@ from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_bytes, force_str
+from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
     pbkdf2, constant_time_compare, get_random_string)
+from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_noop as _
 
 
-UNUSABLE_PASSWORD = '!'  # This will never be a valid encoded hash
-MAXIMUM_PASSWORD_LENGTH = 4096  # The maximum length a password can be to prevent DoS
+UNUSABLE_PASSWORD_PREFIX = '!'  # This will never be a valid encoded hash
+UNUSABLE_PASSWORD_SUFFIX_LENGTH = 40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX
 HASHERS = None  # lazily loaded from PASSWORD_HASHERS
 PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
+
 
 @receiver(setting_changed)
 def reset_hashers(**kwargs):
@@ -29,23 +31,11 @@ def reset_hashers(**kwargs):
         PREFERRED_HASHER = None
 
 
-def password_max_length(max_length):
-    def inner(fn):
-        @functools.wraps(fn)
-        def wrapper(self, password, *args, **kwargs):
-            if len(password) > max_length:
-                raise ValueError("Invalid password; Must be less than or equal"
-                                 " to %d bytes" % max_length)
-            return fn(self, password, *args, **kwargs)
-        return wrapper
-    return inner
-
-
 def is_password_usable(encoded):
-    if encoded is None or encoded == UNUSABLE_PASSWORD:
+    if encoded is None or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
         return False
     try:
-        hasher = identify_hasher(encoded)
+        identify_hasher(encoded)
     except ValueError:
         return False
     return True
@@ -59,13 +49,15 @@ def check_password(password, encoded, setter=None, preferred='default'):
     If setter is specified, it'll be called when you need to
     regenerate the password.
     """
-    if not password or not is_password_usable(encoded):
+    if password is None or not is_password_usable(encoded):
         return False
 
     preferred = get_hasher(preferred)
     hasher = identify_hasher(encoded)
 
     must_update = hasher.algorithm != preferred.algorithm
+    if not must_update:
+        must_update = preferred.must_update(encoded)
     is_correct = hasher.verify(password, encoded)
     if setter and is_correct and must_update:
         setter(password)
@@ -76,13 +68,15 @@ def make_password(password, salt=None, hasher='default'):
     """
     Turn a plain-text password into a hash for database storage
 
-    Same as encode() but generates a new random salt.  If
-    password is None or blank then UNUSABLE_PASSWORD will be
-    returned which disallows logins.
+    Same as encode() but generates a new random salt.
+    If password is None then a concatenation of
+    UNUSABLE_PASSWORD_PREFIX and a random string will be returned
+    which disallows logins. Additional random string reduces chances
+    of gaining access to staff or superuser accounts.
+    See ticket #20079 for more info.
     """
-    if not password:
-        return UNUSABLE_PASSWORD
-
+    if password is None:
+        return UNUSABLE_PASSWORD_PREFIX + get_random_string(UNUSABLE_PASSWORD_SUFFIX_LENGTH)
     hasher = get_hasher(hasher)
 
     if not salt:
@@ -98,13 +92,7 @@ def load_hashers(password_hashers=None):
     if not password_hashers:
         password_hashers = settings.PASSWORD_HASHERS
     for backend in password_hashers:
-        try:
-            mod_path, cls_name = backend.rsplit('.', 1)
-            mod = importlib.import_module(mod_path)
-            hasher_cls = getattr(mod, cls_name)
-        except (AttributeError, ImportError, ValueError):
-            raise ImproperlyConfigured("hasher not found: %s" % backend)
-        hasher = hasher_cls()
+        hasher = import_by_path(backend)()
         if not getattr(hasher, 'algorithm'):
             raise ImproperlyConfigured("hasher doesn't specify an "
                                        "algorithm name: %s" % backend)
@@ -189,12 +177,12 @@ class BasePasswordHasher(object):
                 name = mod_path = self.library
             try:
                 module = importlib.import_module(mod_path)
-            except ImportError:
-                raise ValueError("Couldn't load %s password algorithm "
-                                 "library" % name)
+            except ImportError as e:
+                raise ValueError("Couldn't load %r algorithm library: %s" %
+                                 (self.__class__.__name__, e))
             return module
-        raise ValueError("Hasher '%s' doesn't specify a library attribute" %
-                         self.__class__)
+        raise ValueError("Hasher %r doesn't specify a library attribute" %
+                         self.__class__.__name__)
 
     def salt(self):
         """
@@ -226,22 +214,24 @@ class BasePasswordHasher(object):
         """
         raise NotImplementedError()
 
+    def must_update(self, encoded):
+        return False
+
 
 class PBKDF2PasswordHasher(BasePasswordHasher):
     """
     Secure password hashing using the PBKDF2 algorithm (recommended)
 
-    Configured to use PBKDF2 + HMAC + SHA256 with 10000 iterations.
+    Configured to use PBKDF2 + HMAC + SHA256 with 12000 iterations.
     The result is a 64 byte binary string.  Iterations may be changed
     safely but you must rename the algorithm if you change SHA256.
     """
     algorithm = "pbkdf2_sha256"
-    iterations = 10000
+    iterations = 12000
     digest = hashlib.sha256
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt, iterations=None):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         if not iterations:
             iterations = self.iterations
@@ -249,7 +239,6 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
         hash = base64.b64encode(hash).decode('ascii').strip()
         return "%s$%d$%s$%s" % (self.algorithm, iterations, salt, hash)
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         algorithm, iterations, salt, hash = encoded.split('$', 3)
         assert algorithm == self.algorithm
@@ -266,6 +255,10 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
             (_('hash'), mask_hash(hash)),
         ])
 
+    def must_update(self, encoded):
+        algorithm, iterations, salt, hash = encoded.split('$', 3)
+        return int(iterations) != self.iterations
+
 
 class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
     """
@@ -278,37 +271,61 @@ class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
     digest = hashlib.sha1
 
 
-class BCryptPasswordHasher(BasePasswordHasher):
+class BCryptSHA256PasswordHasher(BasePasswordHasher):
     """
     Secure password hashing using the bcrypt algorithm (recommended)
 
     This is considered by many to be the most secure algorithm but you
-    must first install the py-bcrypt library.  Please be warned that
+    must first install the bcrypt library.  Please be warned that
     this library depends on native C code and might cause portability
     issues.
     """
-    algorithm = "bcrypt"
-    library = ("py-bcrypt", "bcrypt")
+    algorithm = "bcrypt_sha256"
+    digest = hashlib.sha256
+    library = ("bcrypt", "bcrypt")
     rounds = 12
 
     def salt(self):
         bcrypt = self._load_library()
         return bcrypt.gensalt(self.rounds)
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         bcrypt = self._load_library()
         # Need to reevaluate the force_bytes call once bcrypt is supported on
         # Python 3
-        data = bcrypt.hashpw(force_bytes(password), salt)
-        return "%s$%s" % (self.algorithm, data)
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
+        # Hash the password prior to using bcrypt to prevent password truncation
+        #   See: https://code.djangoproject.com/ticket/20138
+        if self.digest is not None:
+            # We use binascii.hexlify here because Python3 decided that a hex encoded
+            #   bytestring is somehow a unicode.
+            password = binascii.hexlify(self.digest(force_bytes(password)).digest())
+        else:
+            password = force_bytes(password)
+
+        data = bcrypt.hashpw(password, salt)
+        return "%s$%s" % (self.algorithm, force_text(data))
+
     def verify(self, password, encoded):
         algorithm, data = encoded.split('$', 1)
         assert algorithm == self.algorithm
         bcrypt = self._load_library()
-        return constant_time_compare(data, bcrypt.hashpw(force_bytes(password), data))
+
+        # Hash the password prior to using bcrypt to prevent password truncation
+        #   See: https://code.djangoproject.com/ticket/20138
+        if self.digest is not None:
+            # We use binascii.hexlify here because Python3 decided that a hex encoded
+            #   bytestring is somehow a unicode.
+            password = binascii.hexlify(self.digest(force_bytes(password)).digest())
+        else:
+            password = force_bytes(password)
+
+        # Ensure that our data is a bytestring
+        data = force_bytes(data)
+        # force_bytes() necessary for py-bcrypt compatibility
+        hashpw = force_bytes(bcrypt.hashpw(password, data))
+
+        return constant_time_compare(data, hashpw)
 
     def safe_summary(self, encoded):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
@@ -322,20 +339,37 @@ class BCryptPasswordHasher(BasePasswordHasher):
         ])
 
 
+class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
+    """
+    Secure password hashing using the bcrypt algorithm
+
+    This is considered by many to be the most secure algorithm but you
+    must first install the bcrypt library.  Please be warned that
+    this library depends on native C code and might cause portability
+    issues.
+
+    This hasher does not first hash the password which means it is subject to
+    the 72 character bcrypt password truncation, most use cases should prefer
+    the BCryptSha512PasswordHasher.
+
+    See: https://code.djangoproject.com/ticket/20138
+    """
+    algorithm = "bcrypt"
+    digest = None
+
+
 class SHA1PasswordHasher(BasePasswordHasher):
     """
     The SHA1 password hashing algorithm (not recommended)
     """
     algorithm = "sha1"
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         hash = hashlib.sha1(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
@@ -358,14 +392,12 @@ class MD5PasswordHasher(BasePasswordHasher):
     """
     algorithm = "md5"
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         hash = hashlib.md5(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
@@ -396,13 +428,11 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     def salt(self):
         return ''
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         assert salt == ''
         hash = hashlib.sha1(force_bytes(password)).hexdigest()
         return 'sha1$$%s' % hash
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         encoded_2 = self.encode(password, '')
         return constant_time_compare(encoded, encoded_2)
@@ -432,12 +462,10 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     def salt(self):
         return ''
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         assert salt == ''
         return hashlib.md5(force_bytes(password)).hexdigest()
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         if len(encoded) == 37 and encoded.startswith('md5$$'):
             encoded = encoded[5:]
@@ -463,7 +491,6 @@ class CryptPasswordHasher(BasePasswordHasher):
     def salt(self):
         return get_random_string(2)
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         crypt = self._load_library()
         assert len(salt) == 2
@@ -471,7 +498,6 @@ class CryptPasswordHasher(BasePasswordHasher):
         # we don't need to store the salt, but Django used to do this
         return "%s$%s$%s" % (self.algorithm, '', data)
 
-    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         crypt = self._load_library()
         algorithm, salt, data = encoded.split('$', 2)
@@ -486,3 +512,4 @@ class CryptPasswordHasher(BasePasswordHasher):
             (_('salt'), salt),
             (_('hash'), mask_hash(data, show=3)),
         ])
+

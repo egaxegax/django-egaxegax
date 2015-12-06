@@ -6,6 +6,7 @@ from django.core.exceptions import *
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render_to_response
+from django.template.context import RequestContext
 from guestbook.forms import *
 from guestbook.models import *
 import time, sys
@@ -133,13 +134,14 @@ def list_posts(request, **kw):
             posts_list = Greeting.objects.all().order_by('-date')
             AddPostListCache(subj_id, posts_list)
         posts_list = eval(cache.get('posts:' + subj_id) or [])
-    return render_to_response('posts.html',
+    return render_to_response('posts.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'posts': PageList(request, posts_list),
                                'subject': initial,
                                'form': AddPostForm(),
                                'form_subject': AddSubjForm(initial=initial),
-                               'logback': reverse('guestbook.views.list_posts')})
+                               'logback': reverse('guestbook.views.list_posts')}))
 
 def list_subjects(request):
     allkey = '.full_list'
@@ -147,12 +149,13 @@ def list_subjects(request):
         subj_list = Greeting_Subject.objects.all().order_by('-count')
         AddSubjListCache(subj_list)
     subj_list = eval(cache.get('subjects:' + allkey))
-    return render_to_response('subjects.html',
+    return render_to_response('subjects.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'subjects': PageList(request, subj_list, 7),
                                'form': AddPostForm(),
                                'form_subject': AddSubjForm(),
-                               'logback': reverse('guestbook.views.list_subjects')})
+                               'logback': reverse('guestbook.views.list_subjects')}))
 
 # Form actions
 
@@ -200,12 +203,13 @@ def edit_post(request, **kw):
                           'subject': post.subject,
                           'title': post.title,
                           'content': post.content}) 
-    return render_to_response('edit_post.html',
+    return render_to_response('edit_post.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'subject': post.subject,
                                'title': post.title,
                                'form': form,
-                               'focus': form['content'].id_for_label})
+                               'focus': form['content'].id_for_label}))
 
 def delete_post(request, **kw):
     if request.user.is_authenticated():
@@ -226,8 +230,9 @@ def get_user_profile(request, **kw):
     if request.method == 'GET':
         user = get_object_or_404(User, id=ZI(kw.get('id')))
         m = Greeting.objects.filter(author__id=user.id)
-        return render_to_response('get_user_profile.html',
+        return render_to_response('get_user_profile.html', 
+                                  context_instance=RequestContext(request,
                                   {'request': request,
                                    'record': m[0],
                                    'record_count': m.count(),
-                                   'logback': reverse('guestbook.views.list_posts')})
+                                   'logback': reverse('guestbook.views.list_posts')}))

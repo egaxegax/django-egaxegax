@@ -2,13 +2,13 @@
 <html>
 <head>{% load i18n %}
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-<meta name="description" content="Портал Григория Еремина. Тексты, фото, статьи, заметки от автора{% block description %}{% endblock %}"/>
+<meta name="description" content="Портал Григория Еремина. Тексты, фото, статьи, заметки{% block description %}{% endblock %}"/>
 <meta name="keywords" content="Портал Григория Еремина, Григорий Еремин, Grigoriy Eremin, egax, egaxegax{% block keywords %}{% endblock %}"/>
 <meta name="google-site-verification" content="tDIIwt3nNSOeRwaSbOPKjWIuVvKvi6E7YCLV_WOnCqE" />
 <meta name='yandex-verification' content='5b93c57666b143ad' />
 <title>{% block title %}{% endblock %}Портал Григория Еремина</title>
-<link rel='shortcut icon' href='/media/img/favicon.ico?1322400151' />
-<link rel="stylesheet" href="/media/css/main.css" type="text/css" />
+<link rel='shortcut icon' href='{{ MEDIA_URL }}img/favicon.ico?1322400151' />
+<link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css" type="text/css" />
 {% block pagestylelink %}{% endblock %}
 <style type="text/css">{% block pagestyle %}{% endblock %}</style>
 <!--Google counter-->
@@ -27,19 +27,18 @@
 <div id="main_header" class="main">
   <div id="top_logo" class="lfloat">
     <a class="nodecor" href="/">
-      <img src="/media/img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
+      <img src="{{ MEDIA_URL }}img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
     </a>
   </div>
   <div id="top_ban" class="lfloat">
     <!--Banner-->
-    <div class="ads">
+    <!--div class="ads">
       <center>
       <script language="JavaScript"> var loc = ''; </script>
       <script language="JavaScript1.4">try{ var loc = escape(top.location.href); }catch(e){;}</script>
       <script language="JavaScript">document.write("<sc"+"ript language='JavaScript' src='http://ad.ir.ru/bb.cgi?cmd=ad&hreftarget=_blank&pubid=174681219&pg=1&r=js&ssi=nofillers&vbn=10001&num=1&w=468&h=60&&ref="+escape(document.referrer)+"&loc="+loc+"&nocache="+Math.round(Math.random()*999111)+"'>\n</sc"+"ript>");</script>
-      <!--script language="JavaScript">document.write("<sc"+"ript language='JavaScript' src='http://ad6.bannerbank.ru/bb.cgi?cmd=ad&hreftarget=_blank&pubid=173549900&pg=1&r=js&ssi=nofillers&vbn=924&num=2&w=234&h=60&&ref="+escape(document.referrer)+"&loc="+loc+"&nocache="+Math.round(Math.random()*999111)+"'>\n</sc"+"ript>");</script-->
       <br/></center>
-    </div>
+    </div-->
     <!--/Banner-->
   </div>
   <div id="top_nav" class="rfloat smaller">
@@ -64,7 +63,8 @@
     <li class="newsmenu"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}">{% trans 'News' %}</a></li>
     <li class="guestmenu"><a class="nodecor" href="{% url 'guestbook.views.list_subjects' %}">{% trans 'Guestbook' %}</a></li>
     <li class="photomenu"><a class="nodecor" href="{% url 'my.views.list_photos' %}">{% trans 'Photos' %}</a></li>
-    <li class="songmenu"><a class="nodecor" href="{% url 'songs.views.list_songs' %}">{% trans 'Chords' %}</a></li></ul>
+    <li class="songmenu"><a class="nodecor" href="{% url 'songs.views.list_songs' %}">{% trans 'Chords' %}</a></li>
+    <li class="bookmenu"><a class="nodecor" href="{% url 'books.views.list_books' %}">{% trans 'Books' %}</a></li></ul>
 </div>
 <div id="main_content" class="main">
   <div class="view">
@@ -86,7 +86,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 "border='0' width='88' height='31'><\/a>")
 //--></script><!--/LiveInternet-->
   </td><td align="left">
-   <i>{% trans 'Write to' %}</i> <a href="/about/">egaxegax</a>
+    <a class="smaller" href="/about/">egaxegax</a>
   </td></tr>
   </table>
 </div>

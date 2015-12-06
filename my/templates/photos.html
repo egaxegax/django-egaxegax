@@ -4,7 +4,7 @@
 {% block description %}{% if album %}. {{ album }}{% endif %}, {% trans 'images, pictures, photos' %}{% endblock %}
 {% block keywords %}, {% if album %}{{ album }}, {% endif %}{% trans 'images, pictures, photos' %}{% endblock %}
 {% block title %}
-{% if album %}{{ album }}{% else %}{% trans 'Photos' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
+{% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.photomenu { border-bottom: 1px solid #d6d6d6; }
 #viewcont { width: 100%; height: 100%; visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
@@ -14,7 +14,7 @@
 li.nav { padding: 0 4px 0 4px; }
 li.nav i { padding-left: 24px; }
 {% endblock %}
-{% block pageheader %}{% trans 'Photos' %}{% endblock %}
+{% block pageheader %}{% trans 'Photogallery' %}{% endblock %}
 {% block content %}
 <script type="text/javascript">
   function viewphoto(counter, photo_id, photo_width, photo_height, photo_user_id) {
@@ -80,7 +80,7 @@ li.nav i { padding-left: 24px; }
     {% if photos.has_previous %}
       <td>{% if forloop.counter == 1 %}
         <a class="nodecor" href="{% if album %}{% url 'my.views.list_photos' id_album=photo.id %}{% else %}{% url 'my.views.list_photos' %}{% endif %}?page={{ photos.previous_page_number }}">
-          <img src='/media/img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
+          <img src='{{ MEDIA_URL }}img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
       {% endif %}</td>
     {% endif %}
       {% if album %}
@@ -100,7 +100,7 @@ li.nav i { padding-left: 24px; }
     {% if photos.has_next %}
       <td>{% if forloop.revcounter == 1 %}
         <a class="nodecor" href="{% if album %}{% url 'my.views.list_photos' id_album=photo.id %}{% else %}{% url 'my.views.list_photos' %}{% endif %}?page={{ photos.next_page_number }}">
-          <img src='/media/img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
+          <img src='{{ MEDIA_URL }}img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
       {% endif %}</td>
     {% endif %}
   {% endfor %}

@@ -65,9 +65,21 @@ class Serializer(base.Serializer):
         if field.rel.through._meta.auto_created:
             if self.use_natural_keys and hasattr(field.rel.to, 'natural_key'):
                 m2m_value = lambda value: value.natural_key()
+                self._current[field.name] = [m2m_value(related)
+                        for related in getattr(obj, field.name).iterator()]
+            elif field.rel.get_related_field().primary_key:
+                m2m_value = lambda value: smart_unicode(
+                    getattr(value, related_query.target_field_name + '_id'),
+                    strings_only=True)
+                related_query = getattr(obj, field.name)
+                filters = {related_query.source_field_name: obj._get_pk_val()}
+                query = field.rel.through.objects.filter(**filters)
+                self._current[field.name] = sorted((m2m_value(m2m_entity)
+                                                    for m2m_entity in query),
+                                                   reverse=True)
             else:
                 m2m_value = lambda value: smart_text(value._get_pk_val(), strings_only=True)
-            self._current[field.name] = [m2m_value(related)
+                self._current[field.name] = [m2m_value(related)
                                for related in getattr(obj, field.name).iterator()]
 
     def getvalue(self):
@@ -88,7 +100,7 @@ def Deserializer(object_list, **options):
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
         Model = _get_model(d["model"])
-        data = {Model._meta.pk.attname: Model._meta.pk.to_python(d["pk"])}
+        data = {Model._meta.pk.attname: Model._meta.pk.to_python(d.get("pk", None))}
         m2m_data = {}
         model_fields = Model._meta.get_all_field_names()
 
@@ -143,7 +155,7 @@ def Deserializer(object_list, **options):
 
 def _get_model(model_identifier):
     """
-    Helper to look up a model from an "app_label.module_name" string.
+    Helper to look up a model from an "app_label.model_name" string.
     """
     try:
         Model = models.get_model(*model_identifier.split("."))

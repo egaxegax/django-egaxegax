@@ -16,6 +16,16 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: books_book
+  properties:
+  - name: index
+  - name: part
+
+- kind: books_book
+  properties:
+  - name: writer_id
+  - name: title
+
 - kind: captcha_captchastore
   properties:
   - name: hashkey
@@ -54,6 +64,17 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: my_book
+  properties:
+  - name: title
+  - name: __key__
+    direction: desc
+
+- kind: my_book
+  properties:
+  - name: writer
+  - name: title
+
 - kind: my_greeting
   properties:
   - name: subject
@@ -72,6 +93,12 @@ indexes:
   - name: date
     direction: desc
 
+- kind: my_photo
+  properties:
+  - name: date
+  - name: __key__
+    direction: desc
+
 - kind: my_profile
   properties:
   - name: __key__
@@ -86,3 +113,9 @@ indexes:
   properties:
   - name: artist
   - name: title
+
+- kind: mynews_news
+  properties:
+  - name: date
+  - name: __key__
+    direction: desc

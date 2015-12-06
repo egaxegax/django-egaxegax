@@ -440,3 +440,57 @@ transformers:
     - property: count
       external_name: count
 
+- kind: books_writer
+  connector: csv
+  connector_options:
+    encoding: windows-1251
+  property_map:
+    - property: __key__
+      external_name: key
+      export_transform: transform.key_id_or_name_as_string
+      import_transform: transform.none_if_empty(int)
+
+    - property: writer
+      external_name: writer
+
+    - property: count
+      external_name: count
+      import_transform: transform.none_if_empty(int)
+
+
+- kind: books_book
+  connector: csv
+  connector_options:
+    encoding: windows-1251
+  property_map:
+    - property: __key__
+      external_name: key
+      export_transform: transform.key_id_or_name_as_string
+      import_transform: transform.none_if_empty(int)
+
+    - property: author_id
+      external_name: author_id
+      import_transform: transform.none_if_empty(int)
+
+    - property: content
+      external_name: content
+      import_transform: db.Text
+
+    - property: date
+      external_name: date
+      import_transform: transform.import_date_time('%Y-%m-%dT%H:%M:%S')
+      export_transform: transform.export_date_time('%Y-%m-%dT%H:%M:%S')
+    - property: index
+      external_name: index
+      import_transform: transform.none_if_empty(int)
+
+    - property: part
+      external_name: part
+      import_transform: transform.none_if_empty(int)
+
+    - property: writer_id
+      external_name: writer_id
+      import_transform: transform.none_if_empty(int)
+
+    - property: title
+      external_name: title

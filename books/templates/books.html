@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load myfilter %}
+{% block description %}{% if book_count %}. {% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}, {% trans 'books' %}{% endblock %}
+{% block keywords %}{% if book_count %}, {% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}, {% trans 'books' %}{% endblock %}
+{% block title %}
+{% if search_count %}{% trans 'Search result' %}{% endif %}
+{% if book_count and not search_count %}{% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}
+{% if not book_count and not search_count %}{% trans 'Books' %}{% endif %}
+ - {% trans 'books' %} - {% endblock %}
+{% block pagestyle %}
+#top_menu li.bookmenu { border-bottom: 1px solid #d6d6d6; }
+.indexlist { text-align: center; background-color: #d6d6d6; padding: 2px 8px; font-size: 70%; }
+.messageitem { background-color: #e4e4e4; min-height: 2em; padding: 0 10px; margin: 2px; }
+.messageitem dt { padding-top: 5px; }
+.messageitem dd { padding-bottom: 5px; color: gray; }
+#id_search { height: 12px; margin-left: 10px; }
+input.submit { height: 26px; margin-left: 5px;}
+{% endblock %}
+{% block pageheader %}
+{% if search_count %}{% trans 'Search result' %}{% endif %}
+{% if book_count and not search_count %}{% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}
+{% if not book_count and not search_count %}{% trans 'Library' %}{% endif %}
+{% endblock %}
+{% block content %}
+<div class="indexlist">
+  <a href="{% url 'books.views.list_wrt' %}">{% trans 'Full list' %}</a>
+  {% for i, v in wrt_index.items %}
+    <a class="nodecor" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
+  {% endfor %}
+  <form class="search" action="{% url 'books.views.list_books' %}" method="get">{% csrf_token %}
+    {{ form }}
+    <input class="submit" type="submit" value="{% trans 'Search' %}" />
+  </form>
+</div>
+<p>
+Коллекция книг различных жанров отечественных и зарубежных авторов. 
+Все тексты взяты из свободных источников и представлены исключительно для ознакомления.
+</p>
+{% if book_count %}
+  <p>Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей и {% endif %}<b>{{ book_count }}</b> книг.</p>
+{% endif %}
+{% if last_count %}
+  <p>Последние добавления:</p>
+{% endif %}
+{% for book in books.object_list %}
+  <dl class="messageitem"><dt>
+  {% if wrt_count %}
+    <a href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer }}</a>
+  {% endif %}
+  {% if last_count or search_count%}
+    <a href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>
+  {% endif %}
+  {% if book.count %}
+    <span class="smaller">[{{ book.count }}]</span>
+  {% else %}
+    <a class="nodecor" href="{% url 'books.views.get_book' ind=book.index %}">{{ book.title|escape }}</a>
+  {% endif %}
+  </dt>
+  {% if last_count %}
+    <dd class="smaller">{{ book.date|time_since }} {% trans 'ago' %}</dd>
+  {% endif %}
+  </dl>
+{% endfor %}
+{% if books.object_list %}
+  <p class="smaller">
+    {% if books.has_previous %}
+      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">‹ {% trans 'previous' %}</a>
+    {% endif %}
+    {% if books.paginator.num_pages > 1 %}
+      <span class="current">
+        {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
+      </span>
+    {% endif %}
+    {% if books.has_next %}
+      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">{% trans 'next' %} ›</a>
+    {% endif %}
+  </p>
+{% else %}
+  <p>{% trans 'No books' %}.</p>
+{% endif %}
+{% if request.user.is_authenticated %}
+  <p class="smaller"><a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a></p>
+{% else %}
+  <p class="smaller">{% trans 'Please authorize to add books' %}.</p>
+{% endif %}
+{% endblock %}

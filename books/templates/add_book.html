@@ -1,0 +1,22 @@
+﻿{% extends 'base.html' %}
+{% load i18n %}
+{% block keywords %}, {% trans 'books' %}{% endblock %}
+{% block title %}{% trans 'Add book' %} - {% trans 'books' %} - {% endblock %}
+{% block pagestyle %}
+#top_menu li.bookmenu { border-bottom: 1px solid #d6d6d6; }
+#id_title { width:100%; }
+{% endblock %}
+{% block pageheader %}{% trans 'Add book' %}{% endblock %}
+{% block content %}
+<p>Добавляйте свои тексты книг по главам или частям. </p>
+{% if request.user.is_authenticated %}
+  <form action="{% url 'books.views.add_book' %}" method="post">{% csrf_token %}
+    <table class="formpost">
+      {{ form_wrt }}{{ form }}
+      <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
+    </table>
+  </form>
+{% else %}
+  <p>{% trans "You don't have permission to edit anything." %}</p>
+{% endif %}
+{% endblock %}

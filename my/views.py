@@ -8,6 +8,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response
+from django.template.context import RequestContext
 from google.appengine.api import images
 from google.appengine.ext import blobstore
 from my.forms import *
@@ -116,14 +117,15 @@ def UpdateFullListCache(photo):
 # Controllers
 
 def index(request):
-    return render_to_response('index.html',
+    return render_to_response('index.html', 
+                              context_instance=RequestContext(request, 
                               {'request': request,
-                               'logback': reverse('my.views.index')})
+                               'logback': reverse('my.views.index')}))
 
 def list_photos(request, **kw):
     album =''
     if kw.get('id_album'): # filter by album
-        rows = 4
+        rows = 1
         cols = 6 
         photos_list = []
         cache_photo_id = 'photo:' + kw.get('id_album', '')
@@ -147,13 +149,14 @@ def list_photos(request, **kw):
             photos_list = Photo.objects.all()
             AddAlbumListCache(allkey, photos_list)
         photos_list = eval(cache.get('photos:' + allkey)).values()
-    return render_to_response('photos.html',
+    return render_to_response('photos.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'photos': PageList(request, photos_list, rows * cols),
                                'photos_count': len(photos_list),
                                'rows_count': range(1, rows * cols + 1, cols),
                                'album': album,
-                               'logback': reverse('my.views.list_photos')})
+                               'logback': reverse('my.views.list_photos')}))
 
 # Form actions
 
@@ -167,7 +170,7 @@ def create_new_user(request):
             user.is_active = True
             user.save()
             profile = form_profile.save(commit=False)
-            profile.user = User.objects.get(username__exact=request.POST['username'])
+            profile.user = user #User.objects.get(username__exact=request.POST['username'])
             profile.save()
             return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
     else:
@@ -175,12 +178,13 @@ def create_new_user(request):
         form_profile = CreateProfileForm()
     view_url = reverse('my.views.create_new_user')
     upload_url, upload_data = prepare_upload(request, view_url)
-    return render_to_response('user_create_form.html',
+    return render_to_response('user_create_form.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'form': form, 
                                'form_profile': form_profile,
                                'upload_url': upload_url,
-                               'upload_data': upload_data}) 
+                               'upload_data': upload_data}))
 
 def get_avatar(request, **kw):
     profile = get_object_or_404(Profile, user__exact=ZI(kw.get('id')))
@@ -217,12 +221,13 @@ def add_photo(request):
         form = AddPhotoForm()
     view_url = reverse('my.views.add_photo')
     upload_url, upload_data = prepare_upload(request, view_url)
-    return render_to_response('add_photo.html',
+    return render_to_response('add_photo.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'form': form, 
                                'upload_url': upload_url,
                                'upload_data': upload_data,
-                               'focus': form['title'].id_for_label})
+                               'focus': form['title'].id_for_label}))
 
 def edit_photo(request, **kw):
     id_photo = ZI(kw.get('id'))
@@ -243,10 +248,11 @@ def edit_photo(request, **kw):
                              'title': photo.title,
                              'album': photo.album,
                              'thumb_url': photo.thumb_url})
-    return render_to_response('edit_photo.html',
+    return render_to_response('edit_photo.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'form': form,
-                               'focus': form['title'].id_for_label})
+                               'focus': form['title'].id_for_label}))
 
 def delete_photo(request, **kw):
     if request.user.is_authenticated():
@@ -270,6 +276,7 @@ def view_photo(request, **kw):
             photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
             AddPhotoCache(photo)
         photo = eval(cache.get(cache_photo_id))
-        return render_to_response('view_photo.html',
+        return render_to_response('view_photo.html', 
+                                  context_instance=RequestContext(request,
                                   {'request': request,
-                                   'photo': photo})
+                                   'photo': photo}))

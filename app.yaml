@@ -10,14 +10,12 @@ builtins:
 handlers:
 - url: /remote_api
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
-  login: admin
 
 - url: /_ah/queue/deferred
   script: djangoappengine/deferred/handler.py
-  login: admin
 
 - url: /media/admin
-  static_dir: django/contrib/admin/media
+  static_dir: django/contrib/admin/static
   expiration: '0'
 
 - url: /media

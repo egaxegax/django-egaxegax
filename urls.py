@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     (r'^guestbook/', include('guestbook.urls')),
     (r'^photos/', include(my.urls.photos)),
     (r'^songs/', include('songs.urls')),
+    (r'^books/', include('books.urls')),
     (r'^upload/', include('upload.urls')),
     (r'^admin/', include(admin.site.urls)),
 

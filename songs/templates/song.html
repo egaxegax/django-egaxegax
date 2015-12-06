@@ -1,5 +1,6 @@
 ﻿{% extends 'base.html' %}
 {% load i18n %}
+{% load myfilter %}
 {% block description %}. {{ song.artist }}, {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block keywords %}, {{ song.artist }}, {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
@@ -15,17 +16,18 @@
 </script>
 <!--/VK comments-->
 {% endblock %}
-{% block pageheader %}{{ song.title }}{% endblock %}
+{% block pageheader %}
+<a href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a> {{ song.title }}
+{% endblock %}
 {% block content %}
-<a href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a>
 {% if song.audio %}
 <p>
   <table>
   <tr><td align="center" valign="center">
   {% trans 'Listen' %}: &nbsp; 
   </td><td>
-    <object class="playerpreview" type="application/x-shockwave-flash" data="/media/player_mp3_mini.swf" width="200" height="25">
-      <param name="movie" value="/media/player_mp3_mini.swf" />
+    <object class="playerpreview" type="application/x-shockwave-flash" data="{{ MEDIA_URL }}player_mp3_mini.swf" width="200" height="25">
+      <param name="movie" value="{{ MEDIA_URL }}player_mp3_mini.swf" />
       <param name="bgcolor" value="#085c68" />
       <param name="FlashVars" value="{% if autoplay %}autoplay=1&{% endif %}mp3={% url 'songs.views.get_song_file' id=song.id %}" />
     </object>
@@ -40,7 +42,8 @@
 VK.Widgets.Comments("vk_comments", {limit: 10, width: "640", attach: "*"});
 </script>
 <!--/VK comments-->
-<p class="smaller">{% trans 'Added' %} <a href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> {{ song.date }}</p>
+<p class="smaller">{% trans 'Added' %} <a href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> 
+<acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}</p>
 {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
   <p class="smaller">
     <a href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>

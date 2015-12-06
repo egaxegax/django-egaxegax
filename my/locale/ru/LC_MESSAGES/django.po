@@ -56,6 +56,9 @@ msgstr "Написать"
 
 #: templates/photos.html
 
+msgid "Photogallery"
+msgstr "Фотогалерея"
+
 msgid "images, pictures, photos"
 msgstr "изображения, картинки, фото"
 

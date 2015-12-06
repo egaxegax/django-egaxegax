@@ -6,6 +6,7 @@ from django.core.exceptions import *
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render_to_response
+from django.template.context import RequestContext
 from django.template.defaultfilters import timesince
 from mynews.forms import *
 from mynews.models import *
@@ -58,12 +59,13 @@ def list_msg(request, **kw):
             msg_list = News.objects.order_by('-date')[:4]
             AddMsgListCache(allkey, msg_list)
     msg_list = eval(cache.get('news:' + allkey))
-    return render_to_response('mynews.html',
+    return render_to_response('mynews.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'news': PageList(request, msg_list),
                                'list_all': kw.has_key('all'),
                                'form': AddMsgForm(),
-                               'logback': reverse('mynews.views.list_msg')})
+                               'logback': reverse('mynews.views.list_msg')}))
 
 # Form actions
 
@@ -90,10 +92,11 @@ def edit_msg(request, **kw):
             return HttpResponseRedirect(reverse('mynews.views.list_msg'))
     else:
         form = AddMsgForm(initial={'id': msg.id, 'content': msg.content}) 
-    return render_to_response('edit_msg.html',
+    return render_to_response('edit_msg.html', 
+                              context_instance=RequestContext(request,
                               {'request': request,
                                'form': form,
-                               'focus': form['content'].id_for_label})
+                               'focus': form['content'].id_for_label}))
 
 def delete_msg(request, **kw):
     if request.user.is_authenticated():
@@ -107,8 +110,9 @@ def get_user_profile(request, **kw):
     if request.method == 'GET':
         user = get_object_or_404(User, id=ZI(kw.get('id')))
         m = News.objects.filter(author__id=user.id)
-        return render_to_response('get_user_profile.html',
+        return render_to_response('get_user_profile.html', 
+                                  context_instance=RequestContext(request,
                                   {'request': request,
                                    'record': m[0],
                                    'record_count': m.count(),
-                                   'logback': reverse('mynews.views.list_msg')})
+                                   'logback': reverse('mynews.views.list_msg')}))

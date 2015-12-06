@@ -13,11 +13,10 @@
 .messagecred { color: gray; }
 {% endblock %}
 {% block pagestylelink %}
-<link rel="stylesheet" href="/media/css/syntax.css" />
+<link rel="stylesheet" href="{{ MEDIA_URL }}css/syntax.css" />
 {% endblock %}
 {% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endblock %}
 {% block content %}
-<p>Читайте, пишите статьи и заметки, оставляйте комментарии.</p>
 {% for post in posts.object_list %}
   <div class="messagebox">
     <a id="id{{ post.id }}" name="id{{ post.id }}"></a>
