@@ -184,7 +184,8 @@ def list_books(request, **kw):
 def get_book(request, **kw):
     if request.method == 'GET':
         book_ind = kw.get('ind', '')
-        if not cache.has_key('book:' + book_ind):
+        if not cache.has_key('book:.parts.' + book_ind):
+            print 111
             part_list = Book.objects.filter(index=ZI(book_ind)).order_by('part')
             parts = []
             for book in part_list:
