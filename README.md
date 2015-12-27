@@ -1,7 +1,7 @@
 django-egaxegax
 ===============
 
-<b>begaxegax.appspot.com</b> full source code. Appengine Python Django-nonrel project.
+**egaxegax.appspot.com** full source code. Appengine Python Django-nonrel project.
 
 Содержит блог с поддержкой синтаксиса Markdown.
 
