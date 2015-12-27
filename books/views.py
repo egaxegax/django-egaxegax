@@ -61,6 +61,7 @@ def AddBookCache(book):
         'author': (hasattr(book, 'author') and {'id': book.author.id, 'username': book.author.username}) or {},
         'date': book.date.strftime('%Y-%m-%d %H:%M:%S') }
     cache.add('book:' + str(book.index) + '.' + str(book.part), str(cache_book))
+    return cache_book
 
 def AddBookPartsCache(book_ind, parts):
     cache.add('book:.parts.' + str(book_ind), str(parts))
@@ -185,17 +186,20 @@ def get_book(request, **kw):
     if request.method == 'GET':
         book_ind = kw.get('ind', '')
         if not cache.has_key('book:.parts.' + book_ind):
-            print 111
             part_list = Book.objects.filter(index=ZI(book_ind)).order_by('part')
             parts = []
             for book in part_list:
-                AddBookCache(book)
                 parts.append(book.part)
             AddBookPartsCache(book_ind, parts)
         parts = eval(cache.get('book:.parts.' + book_ind))
         part_list = []
         for part in parts:
-            part_list.append( eval(cache.get('book:' + book_ind + '.' + str(part))) )
+            if not cache.has_key('book:' + book_ind + '.' + str(part)):
+                plist = Book.objects.filter(Q(index=ZI(book_ind))&Q(part=part))
+                for book in plist:
+                    part_list.append( AddBookCache(book) )
+            else:
+                part_list.append( eval(cache.get('book:' + book_ind + '.' + str(part))) )
         if not part_list:
             raise Http404
         return render_to_response('book.html', 
@@ -213,10 +217,15 @@ def add_book(request):
         form_wrt = AddWrtForm(request.POST)
         if form.is_valid():
             book = form.save(commit=False)
+            writer = form_wrt.save(commit=False)
             book.author = request.user
-            wrt = IncWrtCount(writer=request.POST['writer'])
+            book.index = abs(zlib.crc32(writer.writer.encode('utf-8') + ' ' + book.title.encode('utf-8')))
+            book_list = Book.objects.filter(index=book.index)
+            if len(book_list):
+                wrt = book_list[0].writer
+            else:
+                wrt = IncWrtCount(writer=writer.writer)
             book.writer = wrt
-            book.index = abs(zlib.crc32(wrt.writer.encode('utf-8') + ' ' + book.title.encode('utf-8')))
             book.save()
             ClearWrtListCache(wrt.writer[0].capitalize())
             ClearBookListCache(wrt.id)
@@ -261,9 +270,11 @@ def delete_book(request, **kw):
     if request.user.is_authenticated():
         book = get_object_or_404(Book, id=ZI(kw.get('id')))         
         if request.user.is_superuser or hasattr(book, 'author') and request.user.username == book.author.username:
-            IncWrtCount(writer=book.writer.writer, count=-1)
-            ClearWrtListCache(book.writer.writer[0].capitalize())
-            ClearBookListCache(book.writer.id)
+            book_list = Book.objects.filter(index=book.index)
+            if len(book_list) == 1:
+                IncWrtCount(writer=book.writer.writer, count=-1)
+                ClearWrtListCache(book.writer.writer[0].capitalize())
+                ClearBookListCache(book.writer.id)
             ClearBookCache(book.index)
             book.delete()
     return HttpResponseRedirect(reverse('books.views.list_books'))

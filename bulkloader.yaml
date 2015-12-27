@@ -21,6 +21,7 @@ python_preamble:
 - import: google.appengine.ext.db
 - import: google.appengine.api.datastore
 - import: google.appengine.api.users
+- import: csv_fix
 
 transformers:
 
@@ -443,7 +444,7 @@ transformers:
 - kind: books_writer
   connector: csv
   connector_options:
-    encoding: windows-1251
+    encoding: utf-8
   property_map:
     - property: __key__
       external_name: key
@@ -461,7 +462,7 @@ transformers:
 - kind: books_book
   connector: csv
   connector_options:
-    encoding: windows-1251
+    encoding: utf-8
   property_map:
     - property: __key__
       external_name: key
