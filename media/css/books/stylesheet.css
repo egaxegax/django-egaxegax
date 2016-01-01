@@ -18,24 +18,24 @@
     line-height: 1;
     text-align: left;
     border: Silver solid 1px;
-    margin: 1em 0
+    margin: 0.5em 0
     }
 .calibre3 {
     color: Black;
     display: block;
-    height: 2px;
-    border: currentColor inset 1px;
+ /*   height: 2px; */
+    border: currentColor inset 0px;
     margin: 0.5em auto
     }
 .calibre4 {
-    background-color: #F4F4F4;
+/*    background-color: #F4F4F4;
     display: block;
     font-size: 1em;
     font-style: normal;
     font-weight: bold;
     text-align: center;
     border: Gray solid 1px;
-    margin: 1.33em 0
+    margin: 1.33em 0 */
     }
 .calibre5 {
     background-color: #E7E7E7;
@@ -46,7 +46,7 @@
     line-height: 1;
     text-align: left;
     border: Black solid 1px;
-    margin: 0.67em 0
+    margin: 0.5em 0
     }
 .calibre6 {
     display: block;

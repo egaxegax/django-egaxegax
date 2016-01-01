@@ -150,24 +150,24 @@ def list_books(request, **kw):
     book_count = 0
     book_last_count = 0
     search_count = 0
-    per_page = 10
+    per_page = 100
     book_list = []
     if kw.get('id_wrt'): # filter by wrt
         wrt_id = ZI(kw.get('id_wrt'))
         if not cache.has_key('books:' + str(wrt_id)):
-            book_list = Book.objects.filter(writer=wrt_id).order_by('title')
+            book_list = Book.objects.defer('content').filter(writer=wrt_id).order_by('title')
             AddBookListCache(wrt_id, book_list)
         book_list = eval(cache.get('books:' + str(wrt_id)))
         book_count = len(book_list)
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
-        book_list = Book.objects.filter(Q(title__startswith=st))
+        book_list = Book.objects.defer('content').filter(Q(title__startswith=st))
         book_count = len(book_list)
         search_count = book_count
     else:  # last update
         wrt_id = '.last_update'
         if not cache.has_key('books:' + wrt_id):
-            book_list = Book.objects.order_by('-date')[:7]
+            book_list = Book.objects.defer('content').order_by('-date')[:7]
             AddBookListCache(wrt_id, book_list)
         book_list = eval(cache.get('books:' + wrt_id))
         book_last_count = len(book_list)
