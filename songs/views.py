@@ -320,7 +320,7 @@ def get_song(request, **kw):
 def get_song_file(request, **kw):
     if request.method == 'GET':
         song = get_object_or_404(Song, id=ZI(kw.get('id')))
-        fname = os.path.basename(song.audio.name)
+        fname = os.path.basename(song.audio.name.encode('cp1251'))
         response = HttpResponse(song.audio, mimetype='audio/mp3')
         response['Content-Disposition'] = 'attachment; filename="'+ fname +'"'
         return response
