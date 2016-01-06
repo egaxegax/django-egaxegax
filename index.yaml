@@ -23,6 +23,18 @@ indexes:
 
 - kind: books_book
   properties:
+  - name: part
+  - name: date
+    direction: desc
+
+- kind: books_book
+  properties:
+  - name: part
+  - name: writer_id
+  - name: title
+
+- kind: books_book
+  properties:
   - name: writer_id
   - name: title
 
