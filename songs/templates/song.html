@@ -42,7 +42,7 @@
 VK.Widgets.Comments("vk_comments", {limit: 10, width: "640", attach: "*"});
 </script>
 <!--/VK comments-->
-<p class="smaller">{% trans 'Added' %} <a href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> 
+<p class="smaller">{% trans 'Added' %} <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> 
 <acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}</p>
 {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
   <p class="smaller">

@@ -144,6 +144,7 @@ def list_posts(request, **kw):
                                'logback': reverse('guestbook.views.list_posts')}))
 
 def list_subjects(request):
+    per_page = 100
     allkey = '.full_list'
     if not cache.has_key('subjects:' + allkey):
         subj_list = Greeting_Subject.objects.all().order_by('-count')
@@ -152,7 +153,7 @@ def list_subjects(request):
     return render_to_response('subjects.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
-                               'subjects': PageList(request, subj_list, 7),
+                               'subjects': PageList(request, subj_list, per_page),
                                'form': AddPostForm(),
                                'form_subject': AddSubjForm(),
                                'logback': reverse('guestbook.views.list_subjects')}))

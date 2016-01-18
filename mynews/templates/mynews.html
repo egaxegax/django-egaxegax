@@ -6,7 +6,7 @@
 {% block keywords %}, {% trans 'updates, comments, news' %}{% endblock %}
 {% block title %}{% trans 'My news' %} - {% trans 'updates, comments, news' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.newsmenu { border-bottom: 1px solid #d6d6d6; }
+#top_menu li.newsmenu { border-bottom: 1px solid #3855c0; }
 .msgfooter { font-size: 70%; padding: 2px 8px; text-align: right; }
 .msgtext { padding: 0 10px; }
 .msgbox { border: 1px solid #cccccc; border-radius: 4px; margin-bottom: 5px; }
@@ -21,7 +21,7 @@
   <div class="msgbox">
     <div class="msgtext">{{ msg.content|markdown:"codehilite" }}</div>
     <div class="msgfooter">
-      <b><a class="nodecor" href="{% url 'mynews.views.get_user_profile' id=msg.author.id %}">{{ msg.author.username }}</a></b>
+      <a class="nodecor" href="{% url 'mynews.views.get_user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>
       {% trans 'added' %} <acronym title="{{ msg.date }}">{{ msg.date|time_since }}</acronym> {% trans 'ago' %}
       {% if request.user.is_authenticated and request.user.id == msg.author.id or request.user.is_superuser %}
         <a class="nodecor" href="{% url 'mynews.views.edit_msg' id=msg.id %}">{% trans 'Edit' %}</a>

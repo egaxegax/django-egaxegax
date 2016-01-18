@@ -249,7 +249,7 @@ def edit_song(request, **kw):
             song = form.save(commit=False)
             song.content = song.content.strip('\r\n')
             song.author = request.user
-            song.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) 
+            #-- song.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
             song.save(force_update=True)
             ClearSongListCache(song.artist)
             ClearSongCache(song)

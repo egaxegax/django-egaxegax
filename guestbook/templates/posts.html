@@ -6,7 +6,7 @@
 {% block keywords %}, {% if subject.title %}{{ subject.title }}{% endif %}, {% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.title %}{{ subject.title }}{% else %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.guestmenu { border-bottom: 1px solid #d6d6d6; }
+#top_menu li.guestmenu { border-bottom: 1px solid #3855c0; }
 .messagetext { padding: 0 10px; }
 .messagebox { border: 1px solid #cccccc; border-radius: 4px; margin-bottom: 5px; }
 .messageblock { font-size: 70%; padding: 2px 8px; text-align: right; }
@@ -30,7 +30,7 @@
       {% endif %}
       <div class="messagecred">
         {% if post.author %}
-          <b><a class="nodecor" href="{% url 'guestbook.views.get_user_profile' id=post.author.id %}">{{ post.author.username }}</a></b> {% trans 'wrote' %}
+          <a class="nodecor" href="{% url 'guestbook.views.get_user_profile' id=post.author.id %}">{{ post.author.username }}</a> {% trans 'wrote' %}
         {% else %}
           {% trans 'An anonymous person' %} {% trans 'wrote' %}
         {% endif %}
