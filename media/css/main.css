@@ -1,6 +1,6 @@
 /* main stylesheets here */
 body { font-family: Verdana,Helvetica,sans-serif;
-  background-color: white; color: #505050; }
+  background-color: white; color: #405050; }
 #main_header { height: 70px; }
 #my_content { background-color: #f9f9f9; }
 #main_content .view { min-height: 450px;  border: 1px dotted #e5e5e5; border-radius: 4px; }
@@ -13,6 +13,7 @@ body { font-family: Verdana,Helvetica,sans-serif;
 #top_menu ul li { margin-left: 10px; padding: 0px 20px; }
 #page_header { padding: 12px; font-size: 16px; line-height: 30px; font-weight: normal; color: #505050; }
 #page_content { padding: 15px; }
+h2 { font-size: 18px; }
 .main { width: 960px; margin: 0 auto; }
 .bg { background-color: #ce994d; }
 .wrap { background-color: #f9f9f9; }
@@ -24,7 +25,7 @@ body { font-family: Verdana,Helvetica,sans-serif;
 .formpost { width: 100%; }
 .formpost th { width: 8%; }
 .formpost textarea { width: 100%; }
-a { color: #3855c0; }
+a { color: #2845a0; }
 .gray a { color: #91949c; }
 a.nodecor { text-decoration:none; }
 a.nodecor img { border: 0 none; }

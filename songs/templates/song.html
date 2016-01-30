@@ -5,7 +5,7 @@
 {% block keywords %}, {{ song.artist }}, {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.songmenu { border-bottom: 1px solid #d6d6d6; }
+#top_menu li.songmenu { border-bottom: 1px solid #3855c0; }
 .songitem { border: 1px solid #cccccc; border-radius: 4px; padding: 10px; }
 {% endblock %}
 {% block pagescript %}
@@ -26,11 +26,12 @@
   <tr><td align="center" valign="center">
   {% trans 'Listen' %}: &nbsp; 
   </td><td>
-    <object class="playerpreview" type="application/x-shockwave-flash" data="{{ MEDIA_URL }}player_mp3_mini.swf" width="200" height="25">
+    <!--object class="playerpreview" type="application/x-shockwave-flash" data="{{ MEDIA_URL }}player_mp3_mini.swf" width="200" height="25">
       <param name="movie" value="{{ MEDIA_URL }}player_mp3_mini.swf" />
       <param name="bgcolor" value="#085c68" />
       <param name="FlashVars" value="{% if autoplay %}autoplay=1&{% endif %}mp3={% url 'songs.views.get_song_file' id=song.id %}" />
-    </object>
+    </object-->
+    <audio src="{% url 'songs.views.get_song_file' id=song.id %}" controls></audio>
   </td></tr>
   </table>
 </p>
