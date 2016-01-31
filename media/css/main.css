@@ -13,15 +13,14 @@ body { font-family: Verdana,Helvetica,sans-serif;
 #top_menu ul li { margin-left: 10px; padding: 0px 20px; }
 #page_header { padding: 12px; font-size: 16px; line-height: 30px; font-weight: normal; color: #505050; }
 #page_content { padding: 15px; }
-h2 { font-size: 18px; }
+h2 { font-size: 20px; }
 .main { width: 960px; margin: 0 auto; }
 .bg { background-color: #ce994d; }
 .wrap { background-color: #f9f9f9; }
 .wrap2 { background-color: white; }
 .wrap_header { background-color: #f5f5f5; border-bottom: 1px solid #e5e5e5; }
 .gray { color: gray; }
-.white { color: #f4f4f4; }
-.white a { color: #f4f4f4; }
+.white { color: #f0f0f0; }
 .formpost { width: 100%; }
 .formpost th { width: 8%; }
 .formpost textarea { width: 100%; }

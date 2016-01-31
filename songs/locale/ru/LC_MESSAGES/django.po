@@ -1,7 +1,7 @@
 # egaxegax.appspot.com.
 # Copyright (C) 2011
 # This file is distributed under the same license as the Django package.
-# egaxegax@gmail.com, 2013.
+# egaxegax@gmail.com, 2016.
 #
 #, fuzzy
 msgid ""
@@ -41,7 +41,7 @@ msgid "Chords"
 msgstr "Аккорды"
 
 msgid "Chords, lyrics"
-msgstr "Аккорды и тексты"
+msgstr "Аккорды и тексты песен"
 
 #: templates/songs.html
 
