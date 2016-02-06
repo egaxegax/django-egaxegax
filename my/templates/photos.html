@@ -7,21 +7,21 @@
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.photomenu { border-bottom: 1px solid #3855c0; }
-#viewcont { width: 100%; height: 100%; visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
-#viewcont td span { color: rgba(255,255,255,0.8); text-align: center; font-size: 40pt;  font-family: Courier New, monospace; }
+#viewtab { width: 100%; height: 100%; visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
+#viewtab td span { color: rgba(255,255,255,0.8); text-align: center; font-size: 40pt;  font-family: Courier New, monospace; }
 .albcont { border: 1px dotted lightgray; }
 .photocont { max-width: 150px; }
 {% endblock %}
 {% block pageheader %}{% trans 'Photogallery' %}{% endblock %}
 {% block content %}
+<script src="/media/js/dbcartasvg.js"></script>
 <script type="text/javascript">
+  var childs = [];
   function viewphoto(counter, photo_id, photo_width, photo_height, photo_user_id) {
-    var viewCont = document.getElementById('viewcont'),
+    var viewCont = document.getElementById('viewtab'),
         viewFull = document.getElementById('viewfull'),
         viewEdit = document.getElementById('viewedit'),
         viewDelete = document.getElementById('viewdelete'),
-        viewRef = document.getElementById('viewref'),
-        viewPhoto = document.getElementById('viewphoto'),
         thumbPhoto = document.getElementById('thumb' + counter);
     // shrink to fit
     var vh = window.innerHeight,
@@ -30,7 +30,7 @@
         wr = vw / photo_width;
     var mh = photo_height,
         mw = photo_width;
-    var ratio = mh <= mw;
+    var ratio = (mh <= mw);
     if (hr < 1) {
       mh = mh * hr;
       mw = mw * hr;
@@ -51,11 +51,42 @@
       }
     }
     viewFull.href = '/photos/view/' + photo_id;
-    viewRef.href = 'javascript:viewnext(' + counter + ')';
+    // add img
+    var viewPhoto = new Image();
     viewPhoto.src = thumbPhoto.src.substr(0, thumbPhoto.src.length-5) + '=s' + sr;
     viewPhoto.title = thumbPhoto.title;
     viewPhoto.onload = function() {
       viewCont.style.visibility = 'visible';
+      if (!window.dw){
+        dw = new dbCartaSvg({
+          id: 'viewcont',
+          height: viewCont.offsetHeight,
+          bg: 'transparent',
+          sbarpos: 'left'
+        });
+      }
+      for (var i=0; i<childs.length; i++) {
+        dw.vp.removeChild(childs[i]);
+      }
+      childs = [];
+      var ratio = this.width/this.height;
+      var crds = [[-90*ratio,90],[90*ratio,-90]],
+          pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
+      var link = dw.append('a', {});
+      link.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:viewnext('+counter+')');
+      var img = dw.append(link, 'image', {
+        width:  pts[0][0]-pts[1][0],
+        height: pts[0][1]-pts[1][1],
+        x: pts[1][0],
+        y: pts[1][1],
+        preserveAspectRatio:'none'
+      });
+      img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
+      dw.attr(img, {
+        title: "{% trans 'next' %}",
+        cursor: 'pointer'
+      });
+      childs.push(link);
     }
   }
   function viewnext(counter) {
@@ -112,14 +143,16 @@
   <p class="smaller">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
 <!-- viewphoto -->
-<table id="viewcont"><tr>
-<td align="center">
+<table id="viewtab"><tr>
+<td id="viewcont" align="center">
+<!--
   <a id="viewref" class="nodecor" href="">
     <img id="viewphoto" src="" title="{% trans 'next' %}" />
   </a>
+-->
 </td>
 <td width="1%">
-  <a id="viewclose" class="nodecor" href="#" onclick="document.getElementById('viewcont').style.visibility='hidden';" title="{% trans 'Close' %}">
+  <a id="viewclose" class="nodecor" href="#" onclick="document.getElementById('viewtab').style.visibility='hidden';" title="{% trans 'Close' %}">
     <span>&#x2715;</span>
   </a><br/><br/><br/>
   <a id="viewfull" class="nodecor" href="" title="{% trans 'Click to view full size' %}" target="_blank">
