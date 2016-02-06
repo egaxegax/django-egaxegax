@@ -57,6 +57,8 @@ def AddBookCache(book):
         'title': book.title,
         'index': book.index,
         'part': book.part,
+        'prev_part': book.part - 1,
+        'next_part': book.part + 1,
         'content': book.content,
         'author': (hasattr(book, 'author') and {'id': book.author.id, 'username': book.author.username}) or {},
         'date': book.date.strftime('%Y-%m-%d %H:%M:%S') }
@@ -185,29 +187,16 @@ def list_books(request, **kw):
 def get_book(request, **kw):
     if request.method == 'GET':
         book_ind = kw.get('ind', '')
-        if not cache.has_key('book:.parts.' + book_ind):
-            part_list = Book.objects.filter(index=ZI(book_ind)).order_by('part')
-            parts = []
-            for book in part_list:
-                parts.append(book.part)
-            AddBookPartsCache(book_ind, parts)
-        parts = eval(cache.get('book:.parts.' + book_ind))
-        part_list = []
-        for part in parts:
-            if not cache.has_key('book:' + book_ind + '.' + str(part)):
-                plist = Book.objects.filter(Q(index=ZI(book_ind))&Q(part=part))
-                for book in plist:
-                    part_list.append( AddBookCache(book) )
-            else:
-                part_list.append( eval(cache.get('book:' + book_ind + '.' + str(part))) )
-        if not part_list:
-            raise Http404
+        part = kw.get('part', '') or 0
+        if not cache.has_key('book:' + book_ind + '.' + str(part)):
+            book = get_object_or_404(Book, Q(index=ZI(book_ind))&Q(part=part))
+            AddBookCache(book)
+        book = eval(cache.get('book:' + book_ind + '.' + str(part)))
         return render_to_response('book.html', 
                                   context_instance=RequestContext(request,
                                   {'request': request,
-                                   'book': part_list[0],
-                                   'books': PageList(request, part_list, 1),
-                                   'logback': reverse('books.views.get_book', kwargs={'ind': book_ind}) }))
+                                   'book': book,
+                                   'logback': reverse('books.views.get_book', kwargs={'ind': book_ind, 'part': part}) }))
 
 # Form actions
 
@@ -253,7 +242,7 @@ def edit_book(request, **kw):
             book.save(force_update=True)
             ClearBookListCache(book.writer.id)
             ClearBookCache(book.index)
-            return HttpResponseRedirect(reverse('books.views.get_book', kwargs={'ind': book.index}))
+            return HttpResponseRedirect(reverse('books.views.get_book', kwargs={'ind': book.index, 'part': book.part}))
     else:
         form = AddBookForm(initial={
                            'id': book.id,

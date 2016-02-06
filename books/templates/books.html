@@ -54,7 +54,7 @@ input.submit { height: 26px; margin-left: 5px;}
   {% if book.count %}
     <span class="smaller">[{{ book.count }}]</span>
   {% else %}
-    <a class="nodecor" href="{% url 'books.views.get_book' ind=book.index %}">{{ book.title|escape }}</a>
+    <a class="nodecor" href="{% url 'books.views.get_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
   {% endif %}
   </dt>
   {% if last_count %}

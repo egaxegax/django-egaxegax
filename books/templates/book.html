@@ -1,9 +1,9 @@
 ﻿{% extends 'base.html' %}
 {% load i18n %}
 {% load myfilter %}
-{% block description %}. {% with books.object_list|first as book %}{{ book.writer.writer }}, {{ book.title }}{% endwith %}, {% trans 'books' %}{% endblock %}
-{% block keywords %}, {% with books.object_list|first as book %}{{ book.writer.writer }}, {{ book.title }}{% endwith %}, {% trans 'books' %}{% endblock %}
-{% block title %}{% with books.object_list|first as book %}{{ book.writer.writer }} - {{ book.title }}{% endwith %}, {% trans 'books' %} - {% endblock %}
+{% block description %}. {{ book.writer.writer }}, {{ book.title }}, {% trans 'books' %}{% endblock %}
+{% block keywords %}, {{ book.writer.writer }}, {{ book.title }}, {% trans 'books' %}{% endblock %}
+{% block title %}{{ book.writer.writer }} - {{ book.title }}, {% trans 'books' %} - {% endblock %}
 {% block pagestylelink %}
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/books/stylesheet.css" type="text/css" />
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/books/page_styles.css" type="text/css" />
@@ -16,38 +16,25 @@
 {% block pagescript %}
 {% endblock %}
 {% block pageheader %}
-{% with books.object_list|first as book %}
   <a href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a><br>{{ book.title }}
-{% endwith %}
 {% endblock %}
 {% block content %}
-{% for book in books.object_list %}
   <div class="calibre">{{ book.content|safe }}</div>  
-  <p class="smaller">{% trans 'part' %} {{ book.part }}</p>
-  <p class="smaller">{% trans 'Added' %} <a href="{% url 'books.views.get_user_profile' id=book.author.id %}">{{ book.author.username }}</a> 
-  <acronym title="{{ book.date }}">{{ book.date|time_since }}</acronym> {% trans 'ago' %}</p>
-{% endfor %}
-{% if books.object_list %}
   <p class="smaller">
-    {% if books.has_previous %}
-      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">‹ {% trans 'previous' %}</a>
+    {% if book.prev_part >= 0 %}
+      <a href="{% url 'books.views.get_book' ind=book.index part=book.prev_part %}">‹ {% trans 'previous' %}</a>
     {% endif %}
-    {% if books.paginator.num_pages > 1 %}
-      <span class="current">
-        {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
-      </span>
-    {% endif %}
-    {% if books.has_next %}
-      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">{% trans 'next' %} ›</a>
+      {% trans 'part' %} {{ book.part }} 
+    {% if book.next_part >= 0 %}
+      <a href="{% url 'books.views.get_book' ind=book.index part=book.next_part %}">{% trans 'next' %} ›</a>
     {% endif %}
   </p>
-{% else %}
-  <p>{% trans 'No books' %}.</p>
-{% endif %}
+  <p class="smaller">{% trans 'Added' %} <a href="{% url 'books.views.get_user_profile' id=book.author.id %}">{{ book.author.username }}</a> 
+    <acronym title="{{ book.date }}">{{ book.date|time_since }}</acronym> {% trans 'ago' %}</p>
 {% if request.user.is_authenticated and request.user.id == book.author.id or request.user.is_superuser %}
   <p class="smaller">
-    {% with books.object_list|first as book %}<a href="{% url 'books.views.edit_book' id=book.id %}{% endwith %}">{% trans 'Edit' %}</a>
-    {% with books.object_list|first as book %}<a href="{% url 'books.views.delete_book' id=book.id %}{% endwith %}">{% trans 'Delete' %}</a>
+    <a href="{% url 'books.views.edit_book' id=book.id %}">{% trans 'Edit' %}</a>
+    <a href="{% url 'books.views.delete_book' id=book.id %}">{% trans 'Delete' %}</a>
   </p>
 {% endif %}
 {% endblock %}

@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Кол-во файлов в папках
+# Count files in subdir in dir $1.
 
 mdir=$1
 
