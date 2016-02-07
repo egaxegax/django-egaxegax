@@ -72,6 +72,10 @@ def AddBookListCache(wrt_id, book_list):
     cache_list = []
     dlist = []
     for book in book_list:
+        try:
+            book.writer
+        except:
+            continue
         dkey = book.writer.writer + ' ' + book.title
         if not dkey in dlist: 
             dlist.append(dkey)
