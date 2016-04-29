@@ -7,8 +7,13 @@
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.photomenu { border-bottom: 1px solid #3855c0; }
-#viewtab { width: 100%; height: 100%; visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
+#viewtab { padding:0 margin: 0; width: 100%; height: 100%; visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
 #viewtab td span { color: rgba(255,255,255,0.8); text-align: center; font-size: 40pt;  font-family: Courier New, monospace; }
+#viewcol { vertical-align: center; padding:0; width: 120px; }
+#viewcol img {border:2px transparent solid} 
+#viewcol img:hover {border:2px yellow solid}
+#viewdiv { overflow: auto; }
+#viewpan { vertical-align: top; }
 .albcont { border: 1px dotted lightgray; }
 .photocont { max-width: 150px; }
 {% endblock %}
@@ -16,83 +21,95 @@
 {% block content %}
 <script src="/media/js/dbcartasvg.js"></script>
 <script type="text/javascript">
-  var childs = [];
-  function viewphoto(counter, photo_id, photo_width, photo_height, photo_user_id) {
-    var viewCont = document.getElementById('viewtab'),
-        viewFull = document.getElementById('viewfull'),
-        viewEdit = document.getElementById('viewedit'),
-        viewDelete = document.getElementById('viewdelete'),
-        thumbPhoto = document.getElementById('thumb' + counter);
-    // shrink to fit
-    var vh = window.innerHeight,
-        vw = window.innerWidth;
-    var hr = vh / photo_height,
-        wr = vw / photo_width;
-    var mh = photo_height,
-        mw = photo_width;
-    var ratio = (mh <= mw);
-    if (hr < 1) {
-      mh = mh * hr;
-      mw = mw * hr;
-      wr = vw / mw;
-    }
-    if (wr < 1) {
-      mw = mw * wr;
-    }
-    var sr = Math.floor(0.93 * (ratio ? mw : mh));
-    if (viewEdit) {
-      viewEdit.style.display = 'none';
-      viewDelete.style.display = 'none';
-      if ('{{ request.user.id }}' == photo_user_id || '{{ request.user.is_superuser }}') {
-        viewEdit.href = '/photos/edit/' + photo_id;
-        viewDelete.href = '/photos/del/' + photo_id;
-        viewEdit.style.display = 'inline';
-        viewDelete.style.display = 'inline';
-      }
-    }
-    viewFull.href = '/photos/view/' + photo_id;
-    // add img
-    var viewPhoto = new Image();
-    viewPhoto.src = thumbPhoto.src.substr(0, thumbPhoto.src.length-5) + '=s' + sr;
-    viewPhoto.title = thumbPhoto.title;
-    viewPhoto.onload = function() {
-      viewCont.style.visibility = 'visible';
-      if (!window.dw){
-        dw = new dbCartaSvg({
-          id: 'viewcont',
-          height: viewCont.offsetHeight,
-          bg: 'transparent',
-          sbarpos: 'left'
-        });
-      }
-      for (var i=0; i<childs.length; i++) {
-        dw.vp.removeChild(childs[i]);
-      }
-      childs = [];
-      var ratio = this.width/this.height;
-      var crds = [[-90*ratio,90],[90*ratio,-90]],
-          pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
-      var link = dw.append('a', {});
-      link.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:viewnext('+counter+')');
-      var img = dw.append(link, 'image', {
-        width:  pts[0][0]-pts[1][0],
-        height: pts[0][1]-pts[1][1],
-        x: pts[1][0],
-        y: pts[1][1],
-        preserveAspectRatio:'none'
-      });
-      img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
-      dw.attr(img, {
-        title: "{% trans 'next' %}",
-        cursor: 'pointer'
-      });
-      childs.push(link);
-    }
-  }
-  function viewnext(counter) {
-    var nref = document.getElementById('thumbref' + String(++counter)) || document.getElementById('thumbref1');
+var childs = [];
+var imload = [];
+function viewphoto(counter, photo_id, photo_title, photo_user_id){
+	var vTab = document.getElementById('viewtab'),
+    	vCont = document.getElementById('viewcont'),
+    	vCol = document.getElementById('viewcol'),
+    	vDiv = document.getElementById('viewdiv'),
+       	vFull = document.getElementById('viewfull'),
+       	vEdit = document.getElementById('viewedit'),
+       	vDel = document.getElementById('viewdelete'),
+       	vPrev = document.getElementById('viewprev'),
+       	vNext = document.getElementById('viewnext'),
+       	thumbPhoto = document.getElementById('thumb' + counter);
+  	var thumb, k=1;
+  	while(thumb = document.getElementById('thumb'+k)){
+    	var el2 = document.createElement('img');
+    	el2.style.display = 'block';
+    	el2.width = 100;
+    	el2.id = '_' + thumb.id;
+    	el2.src = thumb.src;
+    	el2.onclick = function(){
+    		vPhoto.id = '_' + this.id;
+      		vPhoto.src = this.src.substr(0, this.src.length-5);
+    	};
+    	el2.onload = function(){
+    		var i;
+    		for(i=0; i<vDiv.children.length; i++){
+    			if (this.src == vDiv.children[i].src) break;
+    		}
+    		if (i==vDiv.children.length){
+      			vDiv.style.maxHeight = vCol.offsetHeight + 'px';
+      			vDiv.appendChild(this);
+    		}
+    	};
+		k++;
+  	}
+  	// img
+	if (vEdit) {
+	  	vEdit.style.display = 'none';
+	  	vDel.style.display = 'none';
+	  	if ('{{ request.user.id }}' == photo_user_id || '{{ request.user.is_superuser }}') {
+	    	vEdit.href = '/photos/edit/' + photo_id;
+	    	vDel.href = '/photos/del/' + photo_id;
+	    	vEdit.style.display = 'inline';
+	    	vDel.style.display = 'inline';
+	  	}
+	}
+	vFull.href = '/photos/view/' + photo_id;
+	// add img
+	var vPhoto = new Image();
+	vPhoto.src = thumbPhoto.src.substr(0, thumbPhoto.src.length-5);
+	vPhoto.id = '__' + thumbPhoto.id;
+	vPhoto.title = thumbPhoto.title;
+  	vPhoto.onload = function() {
+		vTab.style.visibility = 'visible';
+		vPrev.href = 'javascript:viewchange(' + (Number(this.id.substr(7))-1) + ')';
+		vNext.href = 'javascript:viewchange(' + (Number(this.id.substr(7))+1) + ')';
+		if (!window.dw)
+			dw = new dbCartaSvg({
+				id:'viewcont',
+				height: vCont.offsetHeight,
+				bg: 'transparent',
+				sbarpos: 'left'
+			});
+	    for (var i=0; i<childs.length; i++)
+	      	dw.vp.removeChild(childs[i]);
+	    childs = [];
+	    var ratio = this.width/this.height;
+	    var crds = [[-90*ratio,90],[90*ratio,-90]],
+	        pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
+	    var img = dw.append('image', {
+		    width:  pts[0][0]-pts[1][0],
+		    height: pts[0][1]-pts[1][1],
+		    x: pts[1][0],
+	    	y: pts[1][1],
+	      	preserveAspectRatio:'none'
+	    });
+	    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
+	    dw.attr(img, {
+	      	title: photo_title,
+	      	cursor: 'pointer'
+	    });
+	    childs.push(img);    
+	}
+}
+function viewchange(counter) {
+    var nref = document.getElementById('thumb' + String(counter)) || document.getElementById('thumb1');
     if (nref) nref.click();
-  }
+}
 </script>
 <p>Подборка фотографий, снятых на телефон, о природе, местах, людях. Смотрите, добавляйте свои работы.</p>
 {% if photos_count %}
@@ -114,7 +131,7 @@
     {% endif %}
       {% if album %}
         <td class="photocont" align="center">
-          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }}, {{ photo.id }}, {{ photo.width }}, {{ photo.height }}, '{{ photo.author.id }}');">
+          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }}, {{ photo.id }}, '{{ photo.title }}', '{{ photo.author.id }}');">
             <img id="thumb{{ forloop.counter }}" src="{{ photo.thumb_url }}=s128" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
             <span class="gray smaller">{{ photo.title }}</span></a>
         </td>
@@ -143,26 +160,31 @@
   <p class="smaller">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
 <!-- viewphoto -->
-<table id="viewtab"><tr>
-<td id="viewcont" align="center">
-<!--
-  <a id="viewref" class="nodecor" href="">
-    <img id="viewphoto" src="" title="{% trans 'next' %}" />
-  </a>
--->
+<table id="viewtab">
+<tr>
+<td id="viewcol">
+<div id="viewdiv"></div>
 </td>
 <td width="1%">
+<a id="viewprev" class="nodecor" href="#"><span>&lsaquo;</span></a>
+</td>
+<td id="viewcont"></td>
+<td width="1%">
+<a id="viewnext" class="nodecor" href="#"><span>&rsaquo;</span></a>
+</td>
+<td id="viewpan" width="1%">
   <a id="viewclose" class="nodecor" href="#" onclick="document.getElementById('viewtab').style.visibility='hidden';" title="{% trans 'Close' %}">
     <span>&#x2715;</span>
-  </a><br/><br/><br/>
+  </a><br/>
   <a id="viewfull" class="nodecor" href="" title="{% trans 'Click to view full size' %}" target="_blank">
     <span>&#x2750;</span>
-  </a><br/><br/><br/>
+  </a><br/>
   {% if request.user.is_authenticated %}
-    <a id="viewedit" class="nodecor" href="" title="{% trans 'Edit' %}"><span>&#x2710;</span></a><br/><br/><br/>
+    <a id="viewedit" class="nodecor" href="" title="{% trans 'Edit' %}"><span>&#x2710;</span></a><br/>
     <a id="viewdelete" class="nodecor" href="" title="{% trans 'Delete' %}"><span>&#x2672;</span></a>
   {% endif %}
-</td></tr>
+</td>
+</tr>
 </table>
 <!-- /viewphoto -->
 {% endblock %}
