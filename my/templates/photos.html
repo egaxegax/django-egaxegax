@@ -7,13 +7,13 @@
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.photomenu { border-bottom: 1px solid #3855c0; }
-#viewtab { padding:0 margin: 0; width: 100%; height: 100%; visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
+#viewtab { visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
 #viewtab td span { color: rgba(255,255,255,0.8); text-align: center; font-size: 40pt;  font-family: Courier New, monospace; }
 #viewcol { vertical-align: center; padding:0; width: 120px; }
 #viewcol img {border:2px transparent solid} 
 #viewcol img:hover {border:2px yellow solid}
 #viewdiv { overflow: auto; }
-#viewpan { vertical-align: top; }
+.pan { padding:0 margin: 0; width: 100%; height: 100%; }
 .albcont { border: 1px dotted lightgray; }
 .photocont { max-width: 150px; }
 {% endblock %}
@@ -23,6 +23,17 @@
 <script type="text/javascript">
 var childs = [];
 var imload = [];
+
+{% if album %}
+
+if(window.addEventListener) {
+    window.addEventListener('load', function(){ viewchange(1); }, false);
+} else {
+   window.attachEvent('onload', function(){ viewchange(1); });
+}
+
+{% endif %}
+
 function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	var vTab = document.getElementById('viewtab'),
     	vCont = document.getElementById('viewcont'),
@@ -76,7 +87,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	vPhoto.title = thumbPhoto.title;
   	vPhoto.onload = function() {
 		vTab.style.visibility = 'visible';
-		vPrev.href = 'javascript:viewchange(' + (Number(this.id.substr(7))-1) + ')';
+		vPrev.href = 'javascript:viewchange(' + (-(Number(this.id.substr(7))-1)) + ')';
 		vNext.href = 'javascript:viewchange(' + (Number(this.id.substr(7))+1) + ')';
 		if (!window.dw)
 			dw = new dbCartaSvg({
@@ -107,8 +118,19 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	}
 }
 function viewchange(counter) {
-    var nref = document.getElementById('thumb' + String(counter)) || document.getElementById('thumb1');
-    if (nref) nref.click();
+    var nref = document.getElementById('thumb' + String(Math.abs(counter)));
+    if (nref) {
+    	nref.click();
+    } else if (counter<=0 && {% if photos.has_previous %}1{% else %}0{% endif %}){
+    	var nref = document.getElementById('pageprev');
+    	if (nref) nref.click();    	
+    } else if (counter>0 && {% if photos.has_next %}1{% else %}0{% endif %}){
+    	var nref = document.getElementById('pagenext');
+    	if (nref) nref.click();    	
+    } else {
+    	var nref = document.getElementById('thumb1');
+    	if (nref) nref.click();    	
+    };
 }
 </script>
 <p>Подборка фотографий, снятых на телефон, о природе, местах, людях. Смотрите, добавляйте свои работы.</p>
@@ -125,7 +147,7 @@ function viewchange(counter) {
     {% if forloop.counter in rows_count %}<tr>{% endif %}
     {% if photos.has_previous %}
       <td>{% if forloop.counter == 1 %}
-        <a class="nodecor" href="{% if album %}{% url 'my.views.list_photos' id_album=photo.id %}{% else %}{% url 'my.views.list_photos' %}{% endif %}?page={{ photos.previous_page_number }}">
+        <a id="pageprev" class="nodecor" href="{% if album %}{% url 'my.views.list_photos' id_album=photo.id %}{% else %}{% url 'my.views.list_photos' %}{% endif %}?page={{ photos.previous_page_number }}">
           <img src='{{ MEDIA_URL }}img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
       {% endif %}</td>
     {% endif %}
@@ -145,7 +167,7 @@ function viewchange(counter) {
       {% endif %}        
     {% if photos.has_next %}
       <td>{% if forloop.revcounter == 1 %}
-        <a class="nodecor" href="{% if album %}{% url 'my.views.list_photos' id_album=photo.id %}{% else %}{% url 'my.views.list_photos' %}{% endif %}?page={{ photos.next_page_number }}">
+        <a id="pagenext" class="nodecor" href="{% if album %}{% url 'my.views.list_photos' id_album=photo.id %}{% else %}{% url 'my.views.list_photos' %}{% endif %}?page={{ photos.next_page_number }}">
           <img src='{{ MEDIA_URL }}img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
       {% endif %}</td>
     {% endif %}
@@ -160,31 +182,44 @@ function viewchange(counter) {
   <p class="smaller">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
 <!-- viewphoto -->
-<table id="viewtab">
+<table id="viewtab" class="pan">
 <tr>
 <td id="viewcol">
-<div id="viewdiv"></div>
+  <div id="viewdiv"></div>
 </td>
 <td width="1%">
-<a id="viewprev" class="nodecor" href="#"><span>&lsaquo;</span></a>
-</td>
-<td id="viewcont"></td>
-<td width="1%">
-<a id="viewnext" class="nodecor" href="#"><span>&rsaquo;</span></a>
-</td>
-<td id="viewpan" width="1%">
-  <a id="viewclose" class="nodecor" href="#" onclick="document.getElementById('viewtab').style.visibility='hidden';" title="{% trans 'Close' %}">
-    <span>&#x2715;</span>
-  </a><br/>
-  <a id="viewfull" class="nodecor" href="" title="{% trans 'Click to view full size' %}" target="_blank">
-    <span>&#x2750;</span>
-  </a><br/>
+<table class="pan">
+<tr height="1%"><td>
   {% if request.user.is_authenticated %}
     <a id="viewedit" class="nodecor" href="" title="{% trans 'Edit' %}"><span>&#x2710;</span></a><br/>
+  {% endif %}
+<tr><td>
+  <a id="viewprev" class="nodecor" href="#"><span>&lsaquo;</span></a>
+</td></tr>
+<tr height="1%"><td>
+  {% if request.user.is_authenticated %}
     <a id="viewdelete" class="nodecor" href="" title="{% trans 'Delete' %}"><span>&#x2672;</span></a>
   {% endif %}
-</td>
-</tr>
+</td></tr>
+</table>
+<td id="viewcont"></td>
+<td width="1%">
+<table class="pan">
+<tr height="1%"><td>
+  <a id="viewclose" class="nodecor" href="#" onclick="document.getElementById('viewtab').style.visibility='hidden';" title="{% trans 'Close' %}">
+    <span>&#x2715;</span>
+  </a>
+</td></tr>
+<tr><td>
+  <a id="viewnext" class="nodecor" href="#"><span>&rsaquo;</span></a>
+</td></tr>
+<tr height="1%"><td>
+  <a id="viewfull" class="nodecor" href="" title="{% trans 'Click to view full size' %}" target="_blank">
+    <span>&#x2922;</span>
+  </a>
+</td></tr>
+</table>
+</td></tr>
 </table>
 <!-- /viewphoto -->
 {% endblock %}
