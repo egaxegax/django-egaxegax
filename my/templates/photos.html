@@ -168,18 +168,18 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 }
 function cl(){ document.getElementById("viewtab").style.visibility="hidden"; }
 function viewchange(counter) {
-    var nref = document.getElementById('thumb' + String(Math.abs(counter)));
+    var nref = document.getElementById('thumbref' + String(Math.abs(counter)));
     if (nref) {
-    	nref.click();
+    	eval(nref.href.replace('javascript:',''));
     } else if (counter<=0 && {% if photos.has_previous %}1{% else %}0{% endif %}){
     	var nref = document.getElementById('pageprev');
-    	if (nref) nref.click();    	
+    	if (nref) location.href = nref.href;    	
     } else if (counter>0 && {% if photos.has_next %}1{% else %}0{% endif %}){
     	var nref = document.getElementById('pagenext');
-    	if (nref) nref.click();    	
+    	if (nref) location.href = nref.href;    	
     } else {
-    	var nref = document.getElementById('thumb1');
-    	if (nref) nref.click();    	
+    	var nref = document.getElementById('thumbref1');
+    	if (nref) eval(nref.href.replace('javascript:',''));
     };
 }
 </script>
@@ -203,7 +203,7 @@ function viewchange(counter) {
     {% endif %}
       {% if album %}
         <td class="photocont" align="center">
-          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }}, {{ photo.id }}, '{{ photo.title }}', '{{ photo.author.id }}');">
+          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.title }}','{{ photo.author.id }}');">
             <img id="thumb{{ forloop.counter }}" src="{{ photo.thumb_url }}=s128" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
             <span class="gray smaller">{{ photo.title }}</span></a>
         </td>
