@@ -106,10 +106,9 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		    });
 		    text.appendChild(document.createTextNode('\u203A'));
             // viewfull
-            var link = dw.append(dw.root, 'a', {});
-		    link.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/view/' + photo_id);
-		    link.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Click to view full size' %}");
-		    var text = dw.append(link, 'text', {
+            dw.viewfull = dw.append(dw.root, 'a', {});
+            dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Click to view full size' %}");
+		    var text = dw.append(dw.viewfull, 'text', {
 		    	class: 'nav',
 		    	x:dw.root.getAttribute('width'), y:dw.root.getAttribute('height'),
 		    	'text-anchor': 'end'
@@ -117,18 +116,16 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		    text.appendChild(document.createTextNode('\u2922'));
 		    if ('{{ request.user.id }}' == photo_user_id || '{{ request.user.is_superuser }}'=='True') {
 			    // viewedit
-			    var link = dw.append(dw.root, 'a', {});
-			    link.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
-			    var text = dw.append(link, 'text', {
+			    dw.viewedit = dw.append(dw.root, 'a', {});
+			    var text = dw.append(dw.viewedit, 'text', {
 			    	class: 'nav',
 			    	x:0, y:0, dy:'0.8em', 
 			    	'text-anchor': 'start'
 			    });
 			    text.appendChild(document.createTextNode('\u2710'));
 			    // viewdel
-			    var link = dw.append(dw.root, 'a', {});
-			    link.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
-			    var text = dw.append(link, 'text', {
+			    dw.viewdel = dw.append(dw.root, 'a', {});
+			    var text = dw.append(dw.viewdel, 'text', {
 			    	class: 'nav',
 			    	x:0, y:dw.root.getAttribute('height'),
 			    	'text-anchor': 'start'
@@ -141,6 +138,9 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		}
 		dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:viewchange(' + (-(Number(this.id.substr(7))-1)) + ')');
 		dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:viewchange(' + (Number(this.id.substr(7))+1) + ')');
+		dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/view/' + photo_id);
+		if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
+		if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
 	    var ratio = this.width/this.height;
 	    var crds = [[-90*ratio,90],[90*ratio,-90]],
 	        pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
