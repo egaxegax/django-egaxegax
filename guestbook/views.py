@@ -123,7 +123,7 @@ def list_posts(request, **kw):
     elif kw.get('id_subj'):
         subj_id = kw.get('id_subj', '') 
         if not cache.has_key('posts:' + subj_id):
-            posts_list = Greeting.objects.filter(subject=ZI(subj_id)).order_by('-date')
+            posts_list = Greeting.objects.filter(subject=ZI(subj_id)) #.order_by('-date')
             AddPostListCache(subj_id, posts_list)
         posts_list = eval(cache.get('posts:' + subj_id) or [])
         if len(posts_list) and posts_list[0]['subject']:
@@ -131,7 +131,7 @@ def list_posts(request, **kw):
     else:
         subj_id = '.full_list' 
         if not cache.has_key('posts:' + subj_id):
-            posts_list = Greeting.objects.all().order_by('-date')
+            posts_list = Greeting.objects.all() #.order_by('-date')
             AddPostListCache(subj_id, posts_list)
         posts_list = eval(cache.get('posts:' + subj_id) or [])
     return render_to_response('posts.html', 

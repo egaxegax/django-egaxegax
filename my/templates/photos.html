@@ -7,6 +7,7 @@
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.photomenu { border-bottom: 1px solid #3855c0; }
+table.cont { padding: 10px 2px; }
 #viewtab { visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
 #viewtab td div { color: rgba(255,255,255,0.8); text-align: center; font-size: 40pt; }
 #viewcol { vertical-align: center; padding:0; width: 120px; }
@@ -192,7 +193,7 @@ function viewchange(counter) {
   {% endif %}
 {% endif %}
 {% if photos.object_list %}
-    <table>
+    <table class="cont">
   {% for photo in photos.object_list %}
     {% if forloop.counter in rows_count %}<tr>{% endif %}
     {% if photos.has_previous %}

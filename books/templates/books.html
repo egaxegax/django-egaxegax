@@ -11,8 +11,8 @@
 {% block pagestyle %}
 #top_menu li.bookmenu { border-bottom: 1px solid #3855c0; }
 .indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; font-size: 70%; }
-.messageitem { background-color: #f0f0f0; min-height: 2em; padding: 0 10px; margin: 2px; }
-.messageitem dt { padding-top: 5px; }
+.messageitem { background-color: #ffffff; min-height: 2em; padding: 0 10px; margin: 0px; }
+.messageitem dt { padding: 5px 0; }
 .messageitem dd { padding-bottom: 5px; color: gray; }
 #id_search { height: 12px; margin-left: 10px; }
 input.submit { height: 26px; margin-left: 5px;}
@@ -54,7 +54,7 @@ input.submit { height: 26px; margin-left: 5px;}
   {% if book.count %}
     <span class="smaller">[{{ book.count }}]</span>
   {% else %}
-    <a class="nodecor" href="{% url 'books.views.get_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
+    <a href="{% url 'books.views.get_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
   {% endif %}
   </dt>
   {% if last_count %}

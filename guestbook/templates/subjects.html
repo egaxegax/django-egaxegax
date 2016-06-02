@@ -7,12 +7,14 @@
 {% block title %}{% trans 'Guestbook' %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.guestmenu { border-bottom: 1px solid #3855c0; }
-.messageitem { background-color: #f0f0f0; min-height: 2em; padding: 2px 10px; margin: 2px; }
-.messageitem dd { color: gray; }
+.messageitem { background-color: #ffffff; min-height: 1em; padding: 0px 10px; margin: 0px; }
+.messageitem dt { padding: 5px 0; }
+.messageitem dd { padding-bottom: 5px; color: gray; }
 {% endblock %}
 {% block pageheader %}{% trans 'Guestbook' %}{% endblock %}
 {% block content %}
-<p>Читайте, пишите статьи и заметки, оставляйте комментарии на темы:</p>
+<p>Читайте, пишите статьи и заметки, оставляйте комментарии.</p>
+<p>Темы статей:</p>
 {% for subj in subjects.object_list %}
   {% if subj.subject %}
     <dl class="messageitem">
