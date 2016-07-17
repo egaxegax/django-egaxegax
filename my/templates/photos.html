@@ -6,7 +6,7 @@
 {% block title %}
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.photomenu { border-bottom: 1px solid #3855c0; }
+#top_menu li.photomenu { background-color: rgb(200,220,230); }
 table.cont { padding: 10px 2px; }
 #viewtab { visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
 #viewtab td div { color: rgba(255,255,255,0.8); text-align: center; font-size: 40pt; }
@@ -15,7 +15,7 @@ table.cont { padding: 10px 2px; }
 #viewcol img:hover {border:2px yellow solid}
 #viewdiv { overflow: auto; }
 .pan { padding:0 margin: 0; width: 100%; height: 100%; }
-.albcont { border: 1px dotted lightgray; }
+.albcont { padding: 10px; }
 .photocont { max-width: 150px; }
 .nav { fill: rgba(255,255,255,0.8); }
 {% endblock %}
@@ -120,7 +120,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		    // caption
 		    dw.caption = dw.append(dw.root, 'text', {
 		    	class: 'nav',
-		    	x:dw.root.getAttribute('width')/2, y:dw.root.getAttribute('height'), dy:'-1em',
+		    	x:dw.root.getAttribute('width')/2, y:dw.root.getAttribute('height'), dy:'-0.2em',
 		    	'font-size': '10pt',
 		    	'text-anchor': 'middle'
 		    });
@@ -153,7 +153,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
 		dw.caption.appendChild(document.createTextNode(this.title));
 	    var ratio = this.width/this.height;
-	    var crds = [[-100*ratio,100],[100*ratio,-100]],
+	    var crds = [[-90*ratio,90],[90*ratio,-90]],
 	        pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
 	    dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
 	    dw.attr(dw.img, {
@@ -161,7 +161,6 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		    height: pts[0][1]-pts[1][1],
 		    x: pts[1][0],
 	    	y: pts[1][1],
-	    	preserveAspectRatio:'none',
 	      	title: photo_title,
 	      	cursor: 'pointer'
 	    });

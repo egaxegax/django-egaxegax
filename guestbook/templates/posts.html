@@ -6,12 +6,19 @@
 {% block keywords %}, {% if subject.title %}{{ subject.title }}{% endif %}, {% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.title %}{{ subject.title }}{% else %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.guestmenu { border-bottom: 1px solid #3855c0; }
+#top_menu li.guestmenu { background-color: rgb(200,220,230); }
 .messagetext { padding: 0 10px; }
 .messagebox { border: 1px solid #cccccc; border-radius: 4px; margin-bottom: 5px; }
 .messageblock { font-size: 70%; padding: 2px 8px; text-align: right; }
 .messagecred { color: gray; }
 {% endblock %}
+{% block pagescript %}
+{% if subject.title %}
+<!--google+ comments-->
+<script src="https://apis.google.com/js/plusone.js"></script>
+<!--/google+ comments-->
+{% endif %}
+{% endblock %}	
 {% block pagestylelink %}
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/syntax.css" />
 {% endblock %}
@@ -76,5 +83,18 @@
   </p>
 {% else %}
   <p class="smaller">{% trans 'Please authorize to post messages' %}.</p>
+{% endif %}
+{% if subject.title %}
+<!--google+ comments-->
+<div id="comments"></div>
+<script>
+gapi.comments.render('comments', {
+    href: window.location,
+    width: '640',
+    first_party_property: 'BLOGGER',
+    view_type: 'FILTERED_POSTMOD'
+});
+</script>
+<!--/google+ comments-->
 {% endif %}
 {% endblock %}
