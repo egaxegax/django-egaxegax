@@ -19,7 +19,7 @@
 <p>Кто на новенького? Новости, изменения, обновления на сайте, сообщения от пользователей.</p>
 {% for msg in news.object_list %}
   <div class="msgbox">
-    <div class="msgtext">{{ msg.content|markdown:"codehilite" }}</div>
+    <div class="msgtext">{{ msg.content|markdown:"codehilite,extra" }}</div>
     <div class="msgfooter">
       <a class="nodecor" href="{% url 'mynews.views.get_user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>
       {% trans 'added' %} <acronym title="{{ msg.date }}">{{ msg.date|time_since }}</acronym> {% trans 'ago' %}

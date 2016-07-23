@@ -2,9 +2,9 @@
 {% load i18n %}
 {% load markup %}
 {% load myfilter %}
-{% block description %}. {% if subject.title %}{{ subject.title }}{% endif %}, {% if subject.subject %}{{ subject.subject }}{% endif %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
-{% block keywords %}, {% if subject.title %}{{ subject.title }}{% endif %}, {% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
-{% block title %}{% if subject.title %}{{ subject.title }}{% else %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
+{% block description %}. {% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
+{% block keywords %}, {% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
+{% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.guestmenu { background-color: rgb(200,220,230); }
 .messagetext { padding: 0 10px; }
@@ -29,7 +29,7 @@
     <a id="id{{ post.id }}" name="id{{ post.id }}"></a>
     <div class="messagetext">
       {% if post.title %}<h3><a class="nodecor" href="{% url 'guestbook.views.list_posts' id=post.id %}">{{ post.title }}</a></h3>{% endif %}
-      {{ post.content|markdown:"codehilite" }}
+      {{ post.content|markdown:"codehilite,extra" }}
     </div>
     <div class="messageblock">
       {% if post.subject %}
