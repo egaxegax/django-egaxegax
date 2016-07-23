@@ -21,7 +21,7 @@
       <dt><a href="{% url 'guestbook.views.list_posts' id_subj=subj.id %}">{{ subj.subject|escape }}</a>
       <span class="smaller">[{{ subj.count }}]</span></dt>
       <dd class="smaller">
-        <acronym title="{{ subj.date|date:"Y-m-d H:i" }}">{{ subj.date|time_since }}</acronym> {% trans 'ago' %} {% trans 'ago' %}
+        <acronym title="{{ subj.date }}">{{ subj.date|time_since }}</acronym> {% trans 'ago' %} {% trans 'ago' %}
       </dd>
     </dl>
   {% endif %}

@@ -41,7 +41,7 @@
         {% else %}
           {% trans 'An anonymous person' %} {% trans 'wrote' %}
         {% endif %}
-        <acronym title="{{ post.date|date:"Y-m-d H:i" }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
+        <acronym title="{{ post.date }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
         {% if request.user.is_authenticated and request.user.id == post.author.id or request.user.is_superuser %}
           <a class="nodecor" href="{% url 'guestbook.views.edit_post' id=post.id %}">{% trans 'Edit' %}</a>
           <a class="nodecor" href="{% url 'guestbook.views.delete_post' id=post.id %}{% if subject.subject %}?id_subj={{ post.subject.id }}{% endif %}">{% trans 'Delete' %}</a>
