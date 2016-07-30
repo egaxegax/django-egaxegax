@@ -1,7 +1,7 @@
 django-egaxegax
 ===============
 
-[http://egaxegax.appspot.com] full source code. Google Appengine Python Django-nonrel website project.
+[egaxegax.appspot.com](http://egaxegax.appspot.com) full source code. Google Appengine Python Django-nonrel website project.
 
 Contains apps:
 
