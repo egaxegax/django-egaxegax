@@ -1,9 +1,15 @@
 django-egaxegax
 ===============
 
-**egaxegax.appspot.com** full source code. Appengine Python Django-nonrel website project.
+[http://egaxegax.appspot.com] full source code. Google Appengine Python Django-nonrel website project.
 
-Содержит блог с поддержкой синтаксиса Markdown.
+Contains apps:
+
+* Blog with Markdown syntax support
+* Foto view, upload, download images
+* Songs, Books read, add texts
+
+RU: Содержит блог с поддержкой синтаксиса Markdown, хранилище фотографий.
 
 ## Install
 
