@@ -3,7 +3,6 @@ from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib import admin
 from django.views.generic import RedirectView
-import my.urls
 
 admin.autodiscover()
 
@@ -14,10 +13,10 @@ urlpatterns = patterns('',
     (r'^about/', 'my.views.index'),
     (r'^av/(?P<id>[0-9]*)/?$', 'my.views.get_avatar'),
     (r'^news/', include('mynews.urls')),
-    (r'^guestbook$', RedirectView.as_view(url='/posts/')),
+    (r'^guestbook$', RedirectView.as_view(url='/posts/')), # old name
     (r'^guestbook/(?P<p>.*)', RedirectView.as_view(url='/posts/%(p)s')),
-    (r'^posts/', include('guestbook.urls')),
-    (r'^photos/', include(my.urls.photos)),
+    (r'^posts/', include('posts.urls')),
+    (r'^photos/', include('my.urls')),
     (r'^songs/', include('songs.urls')),
     (r'^books/', include('books.urls')),
     (r'^upload/', include('upload.urls')),

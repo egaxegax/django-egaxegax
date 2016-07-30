@@ -22,7 +22,7 @@ INSTALLED_APPS = (
     'upload',
     'my',
     'mynews',
-    'guestbook',
+    'posts',
     'songs',
     'books',
 )

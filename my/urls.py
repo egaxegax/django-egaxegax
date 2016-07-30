@@ -1,6 +1,6 @@
 from django.conf.urls import *
 
-photos = patterns('my.views',
+urlpatterns = patterns('my.views',
     (r'^$', 'list_photos'),
     (r'^album/(?P<id_album>[0-9]*)/?$', 'list_photos'),
     (r'^orig/(?P<id>[0-9]*)/?$', 'get_photo'),

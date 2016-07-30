@@ -1,6 +1,6 @@
 from django.conf.urls import *
 
-urlpatterns = patterns('guestbook.views',
+urlpatterns = patterns('posts.views',
     (r'^$', 'list_posts'),
     (r'^(?P<id>[0-9]*)/?$', 'list_posts'),
     (r'^subj/?$', 'list_subjects'),

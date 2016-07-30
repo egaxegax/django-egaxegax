@@ -2,16 +2,16 @@
 {% load i18n %}
 {% load markup %}
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
-{% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
+{% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.guestmenu { background-color: rgb(200,220,230); }
 {% endblock %}
-{% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endblock %}
+{% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts' %}{% endif %}{% endblock %}
 {% block content %}
 <p>Читайте, пишите заметки, оставляйте комментарии.<p>
 {% if request.user.is_authenticated %}
   <p>
-    <form action="{% url 'guestbook.views.edit_post' id=form.initial.id %}" method="post">{% csrf_token %}
+    <form action="{% url 'posts.views.edit_post' id=form.initial.id %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form }}
        <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />

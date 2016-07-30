@@ -7,8 +7,8 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.context import RequestContext
-from guestbook.forms import *
-from guestbook.models import *
+from posts.forms import *
+from posts.models import *
 import time, sys
 
 def ZI(s):
@@ -141,7 +141,7 @@ def list_posts(request, **kw):
                                'subject': initial,
                                'form': AddPostForm(),
                                'form_subject': AddSubjForm(initial=initial),
-                               'logback': reverse('guestbook.views.list_posts')}))
+                               'logback': reverse('posts.views.list_posts')}))
 
 def list_subjects(request):
     per_page = 100
@@ -156,7 +156,7 @@ def list_subjects(request):
                                'subjects': PageList(request, subj_list, per_page),
                                'form': AddPostForm(),
                                'form_subject': AddSubjForm(),
-                               'logback': reverse('guestbook.views.list_subjects')}))
+                               'logback': reverse('posts.views.list_subjects')}))
 
 # Form actions
 
@@ -175,8 +175,8 @@ def add_post(request):
             ClearPostListCache('')
             post.save()
     if 'subject' in locals():
-        return HttpResponseRedirect(reverse('guestbook.views.list_posts', kwargs={'id_subj': subject.id}))
-    return HttpResponseRedirect(reverse('guestbook.views.list_posts'))
+        return HttpResponseRedirect(reverse('posts.views.list_posts', kwargs={'id_subj': subject.id}))
+    return HttpResponseRedirect(reverse('posts.views.list_posts'))
 
 def edit_post(request, **kw):
     post_id = ZI(kw.get('id'))
@@ -195,9 +195,9 @@ def edit_post(request, **kw):
             ClearPostListCache('')
             ClearPostCache(post)
             if post.subject is None:
-                return HttpResponseRedirect(reverse('guestbook.views.list_posts'))
+                return HttpResponseRedirect(reverse('posts.views.list_posts'))
             else:
-                return HttpResponseRedirect(reverse('guestbook.views.list_posts', kwargs={'id_subj': post.subject.id}))
+                return HttpResponseRedirect(reverse('posts.views.list_posts', kwargs={'id_subj': post.subject.id}))
     else:
         form = AddPostForm(initial={
                           'id': post.id,
@@ -224,8 +224,8 @@ def delete_post(request, **kw):
             ClearPostCache(post)
             post.delete()
     if 'id_subj' in request.GET:
-        return HttpResponseRedirect(reverse('guestbook.views.list_posts', kwargs={'id_subj': ZI(request.GET.get('id_subj'))}))
-    return HttpResponseRedirect(reverse('guestbook.views.list_posts'))
+        return HttpResponseRedirect(reverse('posts.views.list_posts', kwargs={'id_subj': ZI(request.GET.get('id_subj'))}))
+    return HttpResponseRedirect(reverse('posts.views.list_posts'))
 
 def get_user_profile(request, **kw):
     if request.method == 'GET':
@@ -236,4 +236,4 @@ def get_user_profile(request, **kw):
                                   {'request': request,
                                    'record': m[0],
                                    'record_count': m.count(),
-                                   'logback': reverse('guestbook.views.list_posts')}))
+                                   'logback': reverse('posts.views.list_posts')}))

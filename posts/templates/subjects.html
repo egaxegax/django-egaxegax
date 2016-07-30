@@ -4,21 +4,21 @@
 {% load myfilter %}
 {% block description %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
-{% block title %}{% trans 'Guestbook' %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
+{% block title %}{% trans 'Posts' %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.guestmenu { background-color: rgb(200,220,230); }
 .messageitem { background-color: #ffffff; min-height: 1em; padding: 0px 10px; margin: 0px; }
 .messageitem dt { padding: 5px 0; }
 .messageitem dd { padding-bottom: 5px; color: gray; }
 {% endblock %}
-{% block pageheader %}{% trans 'Guestbook' %}{% endblock %}
+{% block pageheader %}{% trans 'Posts' %}{% endblock %}
 {% block content %}
 <p>Читайте, пишите статьи и заметки, оставляйте комментарии.</p>
 <p>Темы статей:</p>
 {% for subj in subjects.object_list %}
   {% if subj.subject %}
     <dl class="messageitem">
-      <dt><a href="{% url 'guestbook.views.list_posts' id_subj=subj.id %}">{{ subj.subject|escape }}</a>
+      <dt><a href="{% url 'posts.views.list_posts' id_subj=subj.id %}">{{ subj.subject|escape }}</a>
       <span class="smaller">[{{ subj.count }}]</span></dt>
       <dd class="smaller">
         <acronym title="{{ subj.date }}">{{ subj.date|time_since }}</acronym> {% trans 'ago' %} {% trans 'ago' %}
@@ -26,7 +26,7 @@
     </dl>
   {% endif %}
 {% endfor %}
-<p class="smaller"><a href="{% url 'guestbook.views.list_posts' %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
+<p class="smaller"><a href="{% url 'posts.views.list_posts' %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
 {% if subjects.object_list %}
   <p class="smaller">
     {% if subjects.has_previous %}
@@ -46,7 +46,7 @@
 {% endif %}
 {% if request.user.is_authenticated %}
   <p>
-    <form action="{% url 'guestbook.views.add_post' %}" method="post">{% csrf_token %}
+    <form action="{% url 'posts.views.add_post' %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form_subject }}{{ form }}     
       <tr><th></th><td>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from guestbook.models import *
+from posts.models import *
 
 class GreetingAdmin(admin.ModelAdmin):
     #fieldsets = [

@@ -22,7 +22,7 @@ msgstr "Тема"
 
 #: templates/base.html
 
-msgid "Guestbook"
+msgid "Posts"
 msgstr "Статьи"
 
 #: templates/subjects.html
@@ -30,7 +30,7 @@ msgstr "Статьи"
 msgid "Profile"
 msgstr "Профайл"
 
-#: templates/guestbook.html
+#: templates/posts.html
 
 msgid "notes"
 msgstr "заметки, посты"
@@ -81,9 +81,6 @@ msgstr "Нет записей"
 
 msgid "Topics"
 msgstr "Темы"
-
-msgid "Posts"
-msgstr "Постов"
 
 msgid "Updated"
 msgstr "Обновлена"

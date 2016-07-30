@@ -1,5 +1,5 @@
 from django.test import TestCase
-from guestbook.models import Greeting
+from posts.models import Greeting
 
 class SimpleTest(TestCase):
     def setUp(self):

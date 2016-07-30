@@ -4,7 +4,7 @@
 {% load myfilter %}
 {% block description %}. {% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block keywords %}, {% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
-{% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
+{% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.guestmenu { background-color: rgb(200,220,230); }
 .messagetext { padding: 0 10px; }
@@ -22,29 +22,29 @@
 {% block pagestylelink %}
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/syntax.css" />
 {% endblock %}
-{% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Guestbook' %}{% endif %}{% endblock %}
+{% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts' %}{% endif %}{% endblock %}
 {% block content %}
 {% for post in posts.object_list %}
   <div class="messagebox">
     <a id="id{{ post.id }}" name="id{{ post.id }}"></a>
     <div class="messagetext">
-      {% if post.title %}<h3><a class="nodecor" href="{% url 'guestbook.views.list_posts' id=post.id %}">{{ post.title }}</a></h3>{% endif %}
+      {% if post.title %}<h3><a class="nodecor" href="{% url 'posts.views.list_posts' id=post.id %}">{{ post.title }}</a></h3>{% endif %}
       {{ post.content|markdown:"codehilite,extra" }}
     </div>
     <div class="messageblock">
       {% if post.subject %}
-        <div><a class="nodecor" href="{% url 'guestbook.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a></div>
+        <div><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a></div>
       {% endif %}
       <div class="messagecred">
         {% if post.author %}
-          <a class="nodecor" href="{% url 'guestbook.views.get_user_profile' id=post.author.id %}">{{ post.author.username }}</a> {% trans 'wrote' %}
+          <a class="nodecor" href="{% url 'posts.views.get_user_profile' id=post.author.id %}">{{ post.author.username }}</a> {% trans 'wrote' %}
         {% else %}
           {% trans 'An anonymous person' %} {% trans 'wrote' %}
         {% endif %}
         <acronym title="{{ post.date }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
         {% if request.user.is_authenticated and request.user.id == post.author.id or request.user.is_superuser %}
-          <a class="nodecor" href="{% url 'guestbook.views.edit_post' id=post.id %}">{% trans 'Edit' %}</a>
-          <a class="nodecor" href="{% url 'guestbook.views.delete_post' id=post.id %}{% if subject.subject %}?id_subj={{ post.subject.id }}{% endif %}">{% trans 'Delete' %}</a>
+          <a class="nodecor" href="{% url 'posts.views.edit_post' id=post.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor" href="{% url 'posts.views.delete_post' id=post.id %}{% if subject.subject %}?id_subj={{ post.subject.id }}{% endif %}">{% trans 'Delete' %}</a>
         {% endif %}
       </div>
     </div>
@@ -69,7 +69,7 @@
 {% endif %}
 {% if request.user.is_authenticated %}
   <p>
-    <form action="{% url 'guestbook.views.add_post' %}" method="post">{% csrf_token %}
+    <form action="{% url 'posts.views.add_post' %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form_subject }}{{ form }}
       <tr><th></th><td>

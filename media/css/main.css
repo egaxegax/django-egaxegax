@@ -8,7 +8,7 @@ body { font-family: Verdana,Helvetica,sans-serif;
 #top_logo { width: 240px; margin-top: 20px; text-align: center; }
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
 #top_menu ul { display: table; width: 100%; max-width: 100%; padding: 10px 0; }
-#top_menu ul li { display: table-cell; text-align: center; width: 17%; }
+#top_menu ul li { display: table-cell; text-align: center; width: 17%; border-radius: 2px 2px 2px 2px; }
 #top_menu ul li a { height: 40px; display: table; width: 100%; }
 #top_menu ul li span { display: table-cell; vertical-align: middle; }
 #page_header { padding: 12px; }
@@ -22,6 +22,8 @@ h3 { font-weight: normal; }
 .wrap_header { background-color: #f5f5f5; border-bottom: 1px solid #e5e5e5; }
 .gray { color: gray; }
 .white { color: #f0f0f0; }
+input[type=text], input[type=password], input[type=number]  { height: 24px; }
+.formpost input[type=text] { width: 90%; }
 .formpost { width: 100%; }
 .formpost th { width: 8%; }
 .formpost textarea { width: 100%; }
