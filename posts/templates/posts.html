@@ -6,7 +6,7 @@
 {% block keywords %}, {% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.guestmenu { background-color: rgb(200,220,230); }
+#top_menu li.guestmenu { border: 1px solid rgb(200,220,230); }
 .messagetext { padding: 0 10px; }
 .messagebox { border: 1px solid #cccccc; border-radius: 4px; margin-bottom: 5px; }
 .messageblock { font-size: 70%; padding: 2px 8px; text-align: right; }

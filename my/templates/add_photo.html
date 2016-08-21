@@ -4,7 +4,7 @@
 {% block keywords %}, {% trans 'photos' %}{% endblock %}
 {% block title %}{% trans 'Add photo' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.photomenu { background-color: rgb(200,220,230); }
+#top_menu li.photomenu { border: 1px solid rgb(200,220,230); }
 {% endblock %}
 {% block pageheader %}{% trans 'Add photo' %}{% endblock %}
 {% block content %}
@@ -27,16 +27,16 @@ function toTranslit(text) {
 }
 </script>
 <p>Добавляйте свои фото и картинки.</p>
-{% if request.user.is_authenticated %}
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
     {% render_upload_data upload_data %}
+{% if request.user.is_authenticated %}
     <table class="formpost">
       {{ form.as_table }}
       <tr><th></th><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
     </table>
-    {{ form.title_hid }}{{ form.album_hid }}
-  </form>
 {% else %}
   <p>{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
+    {{ form.title_hid }}{{ form.album_hid }}
+  </form>
 {% endblock %}

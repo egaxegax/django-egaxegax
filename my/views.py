@@ -210,7 +210,8 @@ def add_photo(request):
                 photo.width = img.width
                 photo.height = img.height
                 photo.thumb_url = images.get_serving_url(blob_key)
-                photo.author = request.user
+                if isinstance(request.user, User):
+                    photo.author = request.user
                 photo = form.save()
                 ClearPhotosListCache(photo.album)
                 UpdateFullListCache(photo)
