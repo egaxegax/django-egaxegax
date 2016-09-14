@@ -20,7 +20,7 @@ msgstr "Текст"
 #: templates/base.html
 
 msgid "News"
-msgstr "Новости"
+msgstr "НОВОСТИ"
 
 #: templates/mynews.html
 

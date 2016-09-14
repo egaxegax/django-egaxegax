@@ -14,6 +14,8 @@
 .messageitem { background-color: #ffffff; min-height: 2em; padding: 0 10px; margin: 0px; }
 .messageitem dt { padding: 5px 0; }
 .messageitem dd { padding-bottom: 5px; color: gray; }
+table.cont { width: 100%; border-collapse: collapse; }
+table.cont td { text-align: left; vertical-align: top; }
 #id_search { height: 12px; margin-left: 10px; }
 input.submit { height: 26px; margin-left: 5px;}
 {% endblock %}
@@ -34,19 +36,62 @@ input.submit { height: 26px; margin-left: 5px;}
   </form>
 </div>
 <p>
-Коллекция книг различных жанров отечественных и зарубежных авторов. 
+Коллекция электронных книг различных жанров отечественных и зарубежных авторов. 
 Все тексты взяты из свободных источников и представлены исключительно для ознакомления.
 </p>
-{% if book_count %}
-  <p>Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей и {% endif %}<b>{{ book_count }}</b> книг.</p>
+{% if wrt_count %}
+  <p>Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %} и <b>{{ book_count }}</b> книг{% endif %}.</p>
 {% endif %}
+
+{% if books.object_list %}
+
+  <table class="cont">
+{% if book_count and not wrt_count %}
+  {% for book in books.object_list %}
+    {% if forloop.counter in rows_count %}<tr>{% endif %}
+    {% if books.has_previous %}
+      <td>{% if forloop.counter == 1 %}
+        <a id="pageprev" class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}?page={{ books.previous_page_number }}">
+          <img src='{{ MEDIA_URL }}img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
+      {% endif %}</td>
+    {% endif %}
+  	  <td class="bookcont" align="center" width="25%">
+	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.get_book' ind=book.index part=book.part %}">
+	      <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s128" title="{{ book.title }}" alt="{{ book.title }}"/><br/>
+	      <div class="pink smaller">{{ book.writer.writer }}</div></a>
+	      <div class="gray smaller">{{ book.title }}</div></a>
+	      <div>{% if book.file and request.user.is_authenticated %}<a class="gray smaller" href="{% url 'books.views.get_file' id=book.id %}">Скачать</a>{% else %}<br/>{% endif %}</div>
+	  </td>        
+    {% if books.has_next %}
+      <td>{% if forloop.revcounter == 1 %}
+        <a id="pagenext" class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}?page={{ books.next_page_number }}">
+          <img src='{{ MEDIA_URL }}img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
+      {% endif %}</td>
+    {% endif %}
+  {% endfor %}
+
+{% else %}
+
+  <tr>
+{% if subjects.object_list %}
+  <td valign="top" width="30%">
+  Жанры:
+    <dl class="messageitem">
+{% for subj in subjects.object_list %}
+    <dt><a href="{% url 'books.views.list_books' id_subj=subj.id %}">{{ subj.subject }}</a>
+      <span class="smaller">[{{ subj.count }}]</span></dt>
+{% endfor %}
+    </dl>
+  </td>
+{% endif %}
+  <td valign="top">
 {% if last_count %}
-  <p>Последние добавления:</p>
+  Последние добавления:
 {% endif %}
 {% for book in books.object_list %}
   <dl class="messageitem"><dt>
   {% if wrt_count %}
-    <a href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer }}</a>
+    <a href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer }}</a>
   {% endif %}
   {% if last_count or search_count%}
     <a href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>
@@ -62,6 +107,7 @@ input.submit { height: 26px; margin-left: 5px;}
   {% endif %}
   </dl>
 {% endfor %}
+  </td>
 {% if books.object_list %}
   <p class="smaller">
     {% if books.has_previous %}
@@ -76,12 +122,17 @@ input.submit { height: 26px; margin-left: 5px;}
       <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">{% trans 'next' %} ›</a>
     {% endif %}
   </p>
+{% endif %} 
+{% endif %}
+  </tr>
+  </table>
 {% else %}
   <p>{% trans 'No books' %}.</p>
 {% endif %}
+
 {% if request.user.is_authenticated %}
   <p class="smaller"><a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a></p>
 {% else %}
-  <p class="smaller">{% trans 'Please authorize to add books' %}.</p>
+  <p class="smaller">{% trans 'Please authorize to add and download books' %}.</p>
 {% endif %}
 {% endblock %}

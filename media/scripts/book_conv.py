@@ -8,7 +8,7 @@ import sys, os, re, datetime
 import zlib, zipfile as zip
 
 __help__ = u"""
-Usage: bconv.py <dir with .epub>
+Usage: book_conv.py <dir with .epub>
 """
 
 def E_OS(text):
@@ -53,6 +53,10 @@ for root, dirs, files in os.walk(path, topdown=False):
             fbook = file(fname, 'w')
             if os.stat(fname).st_size == 0:
               print >> fbook, 'index,title,writer_id,content,part,key,date,author_id'
+
+        if (f == 'cover_image.jpg'):
+          za.extract(f, './')
+          os.rename(f, name.encode('utf-8') + '.jpg')
 
         if (f[:5] == 'index' and os.path.splitext(f)[1] == '.xhtml'):
           book_id = abs(zlib.crc32(title + ' ' + str(part)))

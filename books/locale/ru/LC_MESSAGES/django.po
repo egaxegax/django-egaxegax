@@ -29,10 +29,10 @@ msgstr "Часть"
 #: templates/base.html
 
 msgid "Books"
-msgstr "Книги"
+msgstr "КНИГИ"
 
 msgid "books"
-msgstr "проза, книги, библиотека, собрание сочинений"
+msgstr "проза, книги, библиотека, собрание сочинений, читать, скачать"
 
 #: templates/books.html
 
@@ -59,8 +59,8 @@ msgstr "назад"
 msgid "No books"
 msgstr "Нет книг"
 
-msgid "Please authorize to add books"
-msgstr "Войдите, чтобы добавлять книги"
+msgid "Please authorize to add and download books"
+msgstr "Войдите, чтобы добавлять и скачивать книги"
 
 msgid "Add book"
 msgstr "Добавить книгу"
@@ -84,4 +84,4 @@ msgid "Search by title"
 msgstr "Найти по названию"
 
 msgid "Search result"
-msgstr "Найдено"
+msgstr "Список найденого"

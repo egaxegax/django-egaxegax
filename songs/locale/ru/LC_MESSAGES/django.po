@@ -38,7 +38,7 @@ msgid "chords"
 msgstr "аккорды, подборы"
 
 msgid "Chords"
-msgstr "Аккорды"
+msgstr "АККОРДЫ"
 
 msgid "Chords, lyrics"
 msgstr "Аккорды и тексты песен"

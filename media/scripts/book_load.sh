@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Load to Datastore
 
 for x in $1/books*; do
   echo "$x"

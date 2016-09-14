@@ -24,7 +24,7 @@ datagen, headers = multipart_encode({
   "album":sys.argv[3],
   "album1":sys.argv[3] })
 
-request = urllib2.Request("http://localhost:8080/photos/add")
+request = urllib2.Request("http://localhost:8801/photos/add")
 uri = re.findall(r'form action="([^\"]*)"',urllib2.urlopen(request).read())
 if uri:
     print uri

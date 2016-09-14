@@ -1,5 +1,6 @@
 ﻿{% extends 'base.html' %}
 {% load i18n %}
+{% load filetransfers %}
 {% block keywords %}, {% trans 'books' %}{% endblock %}
 {% block title %}{% trans 'Add book' %} - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
@@ -9,14 +10,15 @@
 {% block pageheader %}{% trans 'Add book' %}{% endblock %}
 {% block content %}
 <p>Добавляйте свои тексты книг по главам или частям. </p>
+  <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
+  {% render_upload_data upload_data %}
 {% if request.user.is_authenticated %}
-  <form action="{% url 'books.views.add_book' %}" method="post">{% csrf_token %}
     <table class="formpost">
-      {{ form_wrt }}{{ form }}
+      {{ form_wrt }}{{ form }}{{ form_subj }}
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
-  </form>
 {% else %}
   <p>{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
+  </form>
 {% endblock %}

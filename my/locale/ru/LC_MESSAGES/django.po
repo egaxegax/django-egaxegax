@@ -45,11 +45,14 @@ msgstr "Добавить пользователя"
 msgid "Register"
 msgstr "Регистрация"
 
+msgid "About"
+msgstr "О САЙТЕ"
+
 msgid "Main"
 msgstr "О сайте"
 
 msgid "Photos"
-msgstr "Фото"
+msgstr "ФОТО"
 
 msgid "Write to"
 msgstr "Написать"

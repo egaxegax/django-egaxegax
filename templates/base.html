@@ -46,25 +46,20 @@
       <!--/Banner-->
     </div>
     <div id="top_nav" class="rfloat smaller">
-      <ul class="inl">
+      <ul class="nolist">
       {% if request.user.is_authenticated %}
         <li>{% trans 'Welcome,' %} <b>{{ request.user.username }}</b></li>
-      {% else %}
-        <li><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>      
-      {% endif %}
-      </ul>
-      <ul class="inl">
-      {% if request.user.is_authenticated %}
         <li><a class="nodecor" href="{% url 'django.contrib.auth.views.logout' %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
       {% else %}
-        <li><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>      
+        <li><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
+        <li><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
       {% endif %}
       </ul>
     </div>
   </div>
 </div>
 <div id="top_menu" class="main wrap2 smaller">
-  <ul class="inl nomarg nopad"><li class="mainmenu"><a class="nodecor" href="{% url 'my.views.index' %}"><span>{% trans 'Main' %}</span></a></li>
+  <ul class="inl nomarg nopad"><li class="mainmenu"><a class="nodecor" href="{% url 'my.views.index' %}"><span>{% trans 'About' %}</span></a></li>
     <li class="newsmenu"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><span>{% trans 'News' %}</span></a></li>
     <li class="guestmenu"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><span>{% trans 'Posts' %}</span></a></li>
     <li class="photomenu"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><span>{% trans 'Photos' %}</span></a></li>
