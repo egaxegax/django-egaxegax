@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>{% load i18n %}
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
@@ -24,7 +24,7 @@
 {% block pagescript %}{% endblock %}
 </head>
 <body class="nomarg">
-  <div class="wrap_header">
+  <div class="bg wrap_header">
   <div id="main_header" class="main">
     <div id="top_logo" class="lfloat">
       <a class="nodecor" href="/">
@@ -46,7 +46,7 @@
       <!--/Banner-->
     </div>
     <div id="top_nav" class="rfloat smaller">
-      <ul class="nolist">
+      <ul class="nomarg nopad nolist">
       {% if request.user.is_authenticated %}
         <li>{% trans 'Welcome,' %} <b>{{ request.user.username }}</b></li>
         <li><a class="nodecor" href="{% url 'django.contrib.auth.views.logout' %}?b={{ logback }}">{% trans 'Log out' %}</a></li>

@@ -1,25 +1,23 @@
 /* main stylesheets here */
 body { font-family: Verdana,Helvetica,sans-serif;
   background-color: white; color: #405050; }
-#main_header { height: 70px; }
-#my_content { background-color: #f9f9f9; }
+#main_header { height: 60px; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
-#top_logo { width: 240px; margin-top: 20px; text-align: center; }
+#top_logo { width: 240px; margin-top: 15px; text-align: center; }
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
-#top_menu ul { display: table; width: 100%; max-width: 100%; padding-top: 10px; }
+#top_menu ul { display: table; width: 100%; max-width: 100%; padding-top: 5px; }
 #top_menu ul li { display: table-cell; text-align: center; width: 17%; border-radius: 2px 2px 2px 2px; }
 #top_menu ul li a { height: 40px; display: table; width: 100%; }
 #top_menu ul li span { display: table-cell; vertical-align: middle; }
-#page_header { padding: 12px; }
-/*#page_content { padding: 0px 15px; }*/
+#page_header { padding: 8px; }
 h2 { line-height: 30px; font-size: 24px; font-family: Arial,Helvetica,sans-serif; font-weight: normal; }
 h3 { font-weight: normal; }
 .main { width: 960px; margin: 0 auto; }
-.bg { background-color: #ce994d; }
+.bg { background-color: rgb(230,240,242); }
 .wrap { background-color: #f9f9f9; }
 .wrap2 { background-color: white; }
-.wrap_header { background-color: #f5f5f5; border-bottom: 1px solid #e5e5e5; }
+.wrap_header { border-bottom: 1px solid #e5e5e5; }
 .gray { color: gray; }
 .pink { color: #900020; }
 .white { color: #f0f0f0; }
@@ -35,9 +33,10 @@ a.nodecor img { border: 0 none; }
 .inl table { display: inline; }
 .inl li { display: inline; vertical-align: top; }
 ul.nolist { list-style-type: none; }
-ul.nolist li { padding: 0 0 5px 0; }
+ul.nolist li { padding: 8px 0 0 0; }
 .nomarg { margin: 0 0 0 0; }
 .nopad { padding: 0 0 0 0; }
+.hspace { padding: 0 12px; }
 .lfloat { float: left; text-align: left; }
 .rfloat { float: right; text-align: right; }
 .smaller { font-size: smaller; }

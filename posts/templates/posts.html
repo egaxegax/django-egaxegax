@@ -10,7 +10,6 @@
 .messagetext { padding: 0 10px; }
 .messagebox { border: 1px solid #cccccc; border-radius: 4px; margin-bottom: 5px; }
 .messageblock { font-size: 70%; padding: 2px 8px; text-align: right; }
-.messagecred { color: gray; }
 {% endblock %}
 {% block pagescript %}
 {% if subject.title %}
@@ -35,7 +34,7 @@
       {% if post.subject %}
         <div><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a></div>
       {% endif %}
-      <div class="messagecred">
+      <div class="gray">
         {% if post.author %}
           <a class="nodecor" href="{% url 'posts.views.get_user_profile' id=post.author.id %}">{{ post.author.username }}</a> {% trans 'wrote' %}
         {% else %}

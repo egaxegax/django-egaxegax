@@ -2,8 +2,8 @@ from django.conf.urls import *
 
 urlpatterns = patterns('books.views',
     (r'^$', 'list_books'),
-    (r'^(?P<ind>[0-9]*)/(?P<part>[0-9]*)/?$', 'get_book'),
-    (r'^save/(?P<id>[0-9]*)/?$', 'get_file'),
+    (r'^read/(?P<ind>[0-9]*)/(?P<part>[0-9]*)/?$', 'read_book'),
+    (r'^get_file/(?P<ind>[0-9]*)/?$', 'get_file'),
     (r'^wrt/i/(?P<ind_wrt>[0-9]*)/?$', 'list_wrt'),
     (r'^wrt/?$', 'list_wrt'),
     (r'^wrt/(?P<id_wrt>[0-9]*)/?$', 'list_books'),

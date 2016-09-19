@@ -14,17 +14,17 @@
 {% block pagescript %}
 {% endblock %}
 {% block pageheader %}
-  <a href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a><br>{{ book.title }}
+  <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a><span class="hspace white">&#x1F4D6</span>{{ book.title }}
 {% endblock %}
 {% block content %}
   <div class="calibre">{{ book.content|safe }}</div>  
   <p class="smaller">
     {% if book.prev_part >= 0 %}
-      <a href="{% url 'books.views.get_book' ind=book.index part=book.prev_part %}">‹ {% trans 'previous' %}</a>
+      <a href="{% url 'books.views.read_book' ind=book.index part=book.prev_part %}">‹ {% trans 'previous' %}</a>
     {% endif %}
-      {% trans 'part' %} {{ book.part }} 
+      <span class="hspace">{% trans 'part' %} {{ book.part }}</span> 
     {% if book.next_part >= 0 %}
-      <a href="{% url 'books.views.get_book' ind=book.index part=book.next_part %}">{% trans 'next' %} ›</a>
+      <a href="{% url 'books.views.read_book' ind=book.index part=book.next_part %}">{% trans 'next' %} ›</a>
     {% endif %}
   </p>
   <p class="smaller">{% trans 'Added' %} <a href="{% url 'books.views.get_user_profile' id=book.author.id %}">{{ book.author.username }}</a> 
@@ -32,7 +32,7 @@
 {% if request.user.is_authenticated and request.user.id == book.author.id or request.user.is_superuser %}
   <p class="smaller">
     <a href="{% url 'books.views.edit_book' id=book.id %}">{% trans 'Edit' %}</a>
-    <a href="{% url 'books.views.delete_book' id=book.id %}">{% trans 'Delete' %}</a>
+    <a class="hspace" href="{% url 'books.views.delete_book' id=book.id %}">{% trans 'Delete' %}</a>
   </p>
 {% endif %}
 {% endblock %}

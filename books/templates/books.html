@@ -12,10 +12,13 @@
 #top_menu li.bookmenu { border: 1px solid rgb(200,220,230); }
 .indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; font-size: 70%; }
 .messageitem { background-color: #ffffff; min-height: 2em; padding: 0 10px; margin: 0px; }
-.messageitem dt { padding: 5px 0; }
+.messageitem dt { padding: 5px 0 5px 0; }
 .messageitem dd { padding-bottom: 5px; color: gray; }
 table.cont { width: 100%; border-collapse: collapse; }
-table.cont td { text-align: left; vertical-align: top; }
+table.cont td.cont { text-align: left; vertical-align: top; }
+table.cont td.cont .bbar { padding: 10px 20px; }
+table.cont td.prev { text-align: left; }
+table.cont td.next { text-align: right; }
 #id_search { height: 12px; margin-left: 10px; }
 input.submit { height: 26px; margin-left: 5px;}
 {% endblock %}
@@ -39,8 +42,8 @@ input.submit { height: 26px; margin-left: 5px;}
 Коллекция электронных книг различных жанров отечественных и зарубежных авторов. 
 Все тексты взяты из свободных источников и представлены исключительно для ознакомления.
 </p>
-{% if wrt_count %}
-  <p>Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %} и <b>{{ book_count }}</b> книг{% endif %}.</p>
+{% if book_count or wrt_count %}
+  <p>Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}.</p>
 {% endif %}
 
 {% if books.object_list %}
@@ -50,24 +53,38 @@ input.submit { height: 26px; margin-left: 5px;}
   {% for book in books.object_list %}
     {% if forloop.counter in rows_count %}<tr>{% endif %}
     {% if books.has_previous %}
-      <td>{% if forloop.counter == 1 %}
+      <td class="prev">{% if forloop.counter == 1 %}
         <a id="pageprev" class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}?page={{ books.previous_page_number }}">
           <img src='{{ MEDIA_URL }}img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
       {% endif %}</td>
     {% endif %}
-  	  <td class="bookcont" align="center" width="25%">
-	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.get_book' ind=book.index part=book.part %}">
-	      <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s128" title="{{ book.title }}" alt="{{ book.title }}"/><br/>
-	      <div class="pink smaller">{{ book.writer.writer }}</div></a>
+  	  <td class="bookcont" align="center" width="20%">
+	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
+	      <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s160" title="{{ book.title }}" alt="{{ book.title }}"/><br/>
 	      <div class="gray smaller">{{ book.title }}</div></a>
-	      <div>{% if book.file and request.user.is_authenticated %}<a class="gray smaller" href="{% url 'books.views.get_file' id=book.id %}">Скачать</a>{% else %}<br/>{% endif %}</div>
-	  </td>        
+	   </td>
+	   <td class="cont" width="60%">
+	     <div class="smaller">{{ book.content }}</div>
+	     <div class="bbar smaller">
+	    {% if book.file %}
+	       <a class="hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
+      {% endif %}
+	       <a class="hspace" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
+	     </div>
+	   </td>        
     {% if books.has_next %}
-      <td>{% if forloop.revcounter == 1 %}
+      <td class="next">{% if forloop.revcounter == 1 %}
         <a id="pagenext" class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}?page={{ books.next_page_number }}">
           <img src='{{ MEDIA_URL }}img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
       {% endif %}</td>
     {% endif %}
+  {% if forloop.revcounter == 1 %}  
+    {% if books.paginator.num_pages > 1 %}
+      <tr><td class="smaller" align="center" colspan="10">
+        {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
+      </td></tr>
+    {% endif %}
+  {% endif %}
   {% endfor %}
 
 {% else %}
@@ -79,7 +96,7 @@ input.submit { height: 26px; margin-left: 5px;}
     <dl class="messageitem">
 {% for subj in subjects.object_list %}
     <dt><a href="{% url 'books.views.list_books' id_subj=subj.id %}">{{ subj.subject }}</a>
-      <span class="smaller">[{{ subj.count }}]</span></dt>
+      <!--span class="smaller">[{{ subj.count }}]</span--></dt>
 {% endfor %}
     </dl>
   </td>
@@ -99,7 +116,7 @@ input.submit { height: 26px; margin-left: 5px;}
   {% if book.count %}
     <span class="smaller">[{{ book.count }}]</span>
   {% else %}
-    <a href="{% url 'books.views.get_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
+    <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
   {% endif %}
   </dt>
   {% if last_count %}

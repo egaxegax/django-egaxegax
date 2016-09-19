@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.context import RequestContext
+from django.template.defaultfilters import truncatewords, striptags, slugify
 from django.db.models import Q
 from google.appengine.api import images
 from google.appengine.ext import blobstore
@@ -68,13 +69,14 @@ def AddBookCache(book):
         'part': book.part,
         'prev_part': book.part - 1,
         'next_part': book.part + 1,
+        'file': {'name': book.file.name.rsplit('/')[-1]},
         'content': book.content,
         'author': ((hasattr(book, 'author') and book.author) and {'id': book.author.id, 'username': book.author.username}) or {},
         'date': book.date.strftime('%Y-%m-%d %H:%M:%S') }
     cache.add('book:' + str(book.index) + '.' + str(book.part), str(cache_book))
     return cache_book
 
-def AddBookListCache(wrt_id, book_list):
+def AddBookListCache(mkey, book_list):
     cache_list = []
     dlist = []
     for book in book_list:
@@ -88,12 +90,14 @@ def AddBookListCache(wrt_id, book_list):
             cache_list.append({
                'id': book.id,
                'writer': {'id': book.writer.id, 'writer': book.writer.writer, 'count': book.writer.count},
+               'subject': {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count},
                'title': book.title,
+               'content': truncatewords(striptags(book.content).strip('Annotation'), 80),
                'index': book.index,
                'thumb_url': book.thumb_url,
                'file': book.file.name,
                'date': book.date.strftime('%Y-%m-%d %H:%M:%S') })
-    cache.add('books:' + str(wrt_id), str(cache_list))
+    cache.add('books:' + str(mkey), str(cache_list))
 
 def ClearWrtListCache(wrt_key):
     cache.delete_many(['wrts:.full_list', 'wrts:' + wrt_key])
@@ -190,12 +194,12 @@ def list_books(request, **kw):
     per_page = 100
     book_list = []
     subj_list = []
-    rows = 5
-    cols = 4
+    rows = 10
+    cols = 1
     if kw.get('id_wrt'): # filter by wrt
         wrt_id = ZI(kw.get('id_wrt'))
         if not cache.has_key('books:' + str(wrt_id)):
-            book_list = Book.objects.defer('content').filter(Q(writer=wrt_id)&Q(part=0)).order_by('title')
+            book_list = Book.objects.filter(Q(writer=wrt_id)&Q(part=0)).order_by('title')
             AddBookListCache(wrt_id, book_list)
         book_list = eval(cache.get('books:' + str(wrt_id)))
         book_count = len(book_list)
@@ -204,20 +208,20 @@ def list_books(request, **kw):
         subj_id = ZI(kw.get('id_subj'))
         subj_key = '.subj' + str(subj_id)
         if not cache.has_key('books:' + subj_key):
-            book_list = Book.objects.defer('content').filter(Q(subject=subj_id)&Q(part=0))
+            book_list = Book.objects.filter(Q(subject=subj_id)&Q(part=0))
             AddBookListCache(subj_key, book_list)
         book_list = eval(cache.get('books:' + subj_key))
         book_count = len(book_list)
         per_page = rows * cols
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
-        book_list = Book.objects.defer('content').filter(Q(title__startswith=st)&Q(part=0))
+        book_list = Book.objects.filter(Q(title__startswith=st)&Q(part=0))
         book_count = len(book_list)
         search_count = book_count
     else:  # last update
         wrt_id = '.last_update'
         if not cache.has_key('books:' + wrt_id):
-            book_list = Book.objects.defer('content').filter(Q(part=0)).order_by('-date')[:7]
+            book_list = Book.objects.filter(Q(part=0)).order_by('-date')[:7]
             AddBookListCache(wrt_id, book_list)
         book_list = eval(cache.get('books:' + wrt_id))
         book_last_count = len(book_list)
@@ -248,19 +252,24 @@ def get_book(request, **kw):
             book = get_object_or_404(Book, Q(index=ZI(book_ind))&Q(part=part))
             AddBookCache(book)
         book = eval(cache.get('book:' + book_ind + '.' + str(part)))
-        return render_to_response('book.html', 
-                                  context_instance=RequestContext(request,
-                                  {'request': request,
-                                   'book': book,
-                                   'logback': reverse('books.views.get_book', kwargs={'ind': book_ind, 'part': part}) }))
+        return book
+
+def read_book(request, **kw):
+    book = get_book(request, **kw)    
+    return render_to_response('book.html', 
+                              context_instance=RequestContext(request,
+                              {'request': request,
+                               'book': book,
+                               'logback': reverse('books.views.read_book', kwargs={'ind': book['index'], 'part': book['part']}) }))
 
 def get_file(request, **kw):
-    if request.method == 'GET':
-        book = get_object_or_404(Book, id=ZI(kw.get('id')))
-        response = serve_file(request, book.file, 
-                              save_as='"'+os.path.basename(book.file.name)+'"',
-                              content_type='application/zip')
-        return response 
+    book = get_book(request, **kw)
+    name = book['file']['name'].replace("'","''")
+    for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name,)):
+        response = HttpResponse(blob.open(), content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="' + name + '"'
+        return response
+    raise Http404
 
 # Form actions
 
@@ -286,16 +295,21 @@ def add_book(request):
                         book.img = None
             if isinstance(request.user, User):
                 book.author = request.user
-            # uniques
+            # writer + title uniques
             book.index = abs(zlib.crc32(writer.writer.encode('utf-8') + ' ' + book.title.encode('utf-8')))
-            # writer
-            book_list = Book.objects.filter(index=book.index)
+            # 
+            mkey = '.ind' + str(book.index)
+            if not cache.has_key('books:' + mkey):
+                book_list = Book.objects.filter(index=book.index)[:1]
+                AddBookListCache(mkey, book_list)
+            book_list = eval(cache.get('books:' + mkey))
             if len(book_list): # check writer once
-                wrt = book_list[0].writer
-                subj = book_list[0].subject
+                wrt = IncWrtCount(writer=book_list[0]['writer']['writer'], count=0)
+                subj = IncSubjCount(subject=book_list[0]['subject']['subject'], count=0)
             else:
                 wrt = IncWrtCount(writer=writer.writer)
                 subj = IncSubjCount(subject=subject.subject)
+                ClearBookListCache(mkey, subj.id)
             book.writer = wrt
             book.subject = subj
             # if unique
@@ -337,7 +351,7 @@ def edit_book(request, **kw):
             mbook.save(force_update=True)
             ClearBookListCache(mbook.writer.id, mbook.subject.id)
             ClearBookCache(mbook.index, mbook.part)
-            return HttpResponseRedirect(reverse('books.views.get_book', kwargs={'ind': mbook.index, 'part': mbook.part}))
+            return HttpResponseRedirect(reverse('books.views.read_book', kwargs={'ind': mbook.index, 'part': mbook.part}))
     else:
         form = AddBookForm(initial={
                            'id': book.id,
