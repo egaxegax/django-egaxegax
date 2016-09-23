@@ -1,7 +1,7 @@
 #!python
 # -*- coding: utf-8 -*-
 #
-# Upload books with cover image and .epub file
+# Upload books from text files with cover image and .epub file
 #
 # book_upload.py <path_to_files>
 
@@ -10,11 +10,13 @@ from poster.streaminghttp import register_openers
 import urllib2, re, sys, os, time, zlib
 
 def E_OS(text):
+  if os.name == 'nt':
+    return text.decode('cp1251')
   return text
 
 path = u'.'
 if (len(sys.argv) > 1):
-  path = os.path.abspath(E_OS(sys.argv[1]))
+  path = os.path.abspath(sys.argv[1])
 
 flog = file('mylog.html', 'w')
 
@@ -47,9 +49,9 @@ for root, dirs, files in os.walk(path, topdown=False):
           except:
             pass
  
-      param += [("title", title.decode('cp1251'))]
-      param += [("writer", writer.decode('cp1251'))]
-      param += [("subject", subject.decode('cp1251'))]
+      param += [("title", E_OS(title))]
+      param += [("writer", E_OS(writer))]
+      param += [("subject", E_OS(subject))]
       param += [("content", file(name).read())]
       param += [("part", part)]
  

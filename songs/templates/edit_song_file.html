@@ -1,4 +1,4 @@
-п»ї{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 {% load filetransfers %}
 {% block keywords %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
@@ -9,7 +9,7 @@
 {% endblock %}
 {% block pageheader %}{% trans 'Edit' %} {% trans 'audio' %}{% endblock %}
 {% block content %}
-<p>Р”РѕР±Р°РІР»СЏР№С‚Рµ СЃРІРѕРё С„Р°Р№Р»С‹ РІ С„РѕСЂРјР°С‚Рµ mp3 Рє С‚РµРєСЃС‚Р°Рј РїРµСЃРµРЅ.</p>
+<p>Добавляйте свои файлы в формате mp3 к текстам песен.</p>
 {% if request.user.is_authenticated %}
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
     {% render_upload_data upload_data %}

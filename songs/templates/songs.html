@@ -38,15 +38,15 @@ input.submit { height: 26px; margin-left: 5px;}
   <p>Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов.</p>
 {% endif %}
 {% if last_count %}
-  <p>Последние обновления:</p>
+  <p class="lightgray">Последние обновления</p>
 {% endif %}
 {% for song in songs.object_list %}
   <dl class="messageitem"><dt>
   {% if art_count %}
-    <a href="{% url 'songs.views.list_songs' id_art=song.ref_id %}">{{ song.artist }}</a>
+    <a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.ref_id %}">{{ song.artist }}</a>
   {% endif %}
   {% if last_count or search_count%}
-    <a href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a>
+    <a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a>
   {% endif %}
   {% if song.count %}
     <span class="smaller">[{{ song.count }}]</span>

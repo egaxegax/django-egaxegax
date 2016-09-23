@@ -209,7 +209,7 @@ function viewchange(counter) {
         </td>
       {% else %}
         <td class="albcont" align="center" valign="bottom">
-          <a class="" href="{% url 'my.views.list_photos' id_album=photo.id %}">
+          <a class="nodecor" href="{% url 'my.views.list_photos' id_album=photo.id %}">
             <img id="thumb{{ forloop.counter }}" src="{{ photo.thumb_url }}=s256" title="" alt="{{ photo.album }}"/><br/>
           {{ photo.album }}</a><span class="smaller"> [{{ photo.album_count }}]</span><br/>
             <span class="gray smaller">{{ photo.date|time_since }}</span>

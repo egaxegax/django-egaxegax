@@ -19,6 +19,7 @@ h3 { font-weight: normal; }
 .wrap2 { background-color: white; }
 .wrap_header { border-bottom: 1px solid #e5e5e5; }
 .gray { color: gray; }
+.lightgray { color: #aaa; }
 .pink { color: #900020; }
 .white { color: #f0f0f0; }
 input[type=text], input[type=password], input[type=number]  { height: 24px; }
@@ -26,8 +27,7 @@ input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .formpost { width: 100%; }
 .formpost th { width: 8%; }
 .formpost textarea { width: 100%; }
-a { color: #2845a0; }
-.gray a { color: #91949c; }
+a { color: #0645ad; }
 a.nodecor { text-decoration:none; }
 a.nodecor img { border: 0 none; }
 .inl table { display: inline; }

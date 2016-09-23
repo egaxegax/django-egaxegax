@@ -69,7 +69,7 @@ def AddBookCache(book):
         'part': book.part,
         'prev_part': book.part - 1,
         'next_part': book.part + 1,
-        'file': {'name': book.file.name.rsplit('/')[-1]},
+        'file': ((hasattr(book, 'file') and book.file) and {'name': book.file.name.rsplit('/')[-1]}) or {},
         'content': book.content,
         'author': ((hasattr(book, 'author') and book.author) and {'id': book.author.id, 'username': book.author.username}) or {},
         'date': book.date.strftime('%Y-%m-%d %H:%M:%S') }
@@ -95,7 +95,6 @@ def AddBookListCache(mkey, book_list):
                'content': truncatewords(striptags(book.content).strip('Annotation'), 80),
                'index': book.index,
                'thumb_url': book.thumb_url,
-               'file': book.file.name,
                'date': book.date.strftime('%Y-%m-%d %H:%M:%S') })
     cache.add('books:' + str(mkey), str(cache_list))
 
@@ -264,11 +263,12 @@ def read_book(request, **kw):
 
 def get_file(request, **kw):
     book = get_book(request, **kw)
-    name = book['file']['name'].replace("'","''")
-    for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name,)):
-        response = HttpResponse(blob.open(), content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename="' + name + '"'
-        return response
+    if 'file' in book:
+        name = book['file']['name'].replace("'","''")
+        for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name,)):
+            response = HttpResponse(blob.open(), content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename="' + name + '"'
+            return response
     raise Http404
 
 # Form actions
@@ -295,21 +295,16 @@ def add_book(request):
                         book.img = None
             if isinstance(request.user, User):
                 book.author = request.user
-            # writer + title uniques
+            # uniques
             book.index = abs(zlib.crc32(writer.writer.encode('utf-8') + ' ' + book.title.encode('utf-8')))
-            # 
-            mkey = '.ind' + str(book.index)
-            if not cache.has_key('books:' + mkey):
-                book_list = Book.objects.filter(index=book.index)[:1]
-                AddBookListCache(mkey, book_list)
-            book_list = eval(cache.get('books:' + mkey))
+            # writer
+            book_list = Book.objects.filter(index=book.index)
             if len(book_list): # check writer once
-                wrt = IncWrtCount(writer=book_list[0]['writer']['writer'], count=0)
-                subj = IncSubjCount(subject=book_list[0]['subject']['subject'], count=0)
+                wrt = book_list[0].writer
+                subj = book_list[0].subject
             else:
                 wrt = IncWrtCount(writer=writer.writer)
                 subj = IncSubjCount(subject=subject.subject)
-                ClearBookListCache(mkey, subj.id)
             book.writer = wrt
             book.subject = subj
             # if unique
@@ -374,6 +369,7 @@ def delete_book(request, **kw):
             book_list = Book.objects.filter(index=book.index)
             if len(book_list) == 1:
                 IncWrtCount(writer=book.writer.writer, count=-1)
+                IncSubjCount(subject=book.subject.subject, count=-1)
                 ClearWrtListCache(book.writer.writer[0].capitalize())
                 ClearBookListCache(book.writer.id, book.subject.id)
             ClearBookCache(book.index, book.part)

@@ -11,7 +11,7 @@
 {% block pagestyle %}
 #top_menu li.bookmenu { border: 1px solid rgb(200,220,230); }
 .indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; font-size: 70%; }
-.messageitem { background-color: #ffffff; min-height: 2em; padding: 0 10px; margin: 0px; }
+.messageitem { min-height: 2em; padding: 0 10px; margin: 0px; }
 .messageitem dt { padding: 5px 0 5px 0; }
 .messageitem dd { padding-bottom: 5px; color: gray; }
 table.cont { width: 100%; border-collapse: collapse; }
@@ -66,10 +66,8 @@ input.submit { height: 26px; margin-left: 5px;}
 	   <td class="cont" width="60%">
 	     <div class="smaller">{{ book.content }}</div>
 	     <div class="bbar smaller">
-	    {% if book.file %}
-	       <a class="hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
-      {% endif %}
-	       <a class="hspace" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
+	       <a class="nodecor hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
+	       <a class="nodecor hspace" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
 	     </div>
 	   </td>        
     {% if books.has_next %}
@@ -92,26 +90,26 @@ input.submit { height: 26px; margin-left: 5px;}
   <tr>
 {% if subjects.object_list %}
   <td valign="top" width="30%">
-  Жанры:
+  <span class="lightgray">Жанры</span>
     <dl class="messageitem">
 {% for subj in subjects.object_list %}
-    <dt><a href="{% url 'books.views.list_books' id_subj=subj.id %}">{{ subj.subject }}</a>
-      <!--span class="smaller">[{{ subj.count }}]</span--></dt>
+    <dt><a class="nodecor" href="{% url 'books.views.list_books' id_subj=subj.id %}">{{ subj.subject }}</a>
+      <span class="smaller">[{{ subj.count }}]</span></dt>
 {% endfor %}
     </dl>
   </td>
 {% endif %}
   <td valign="top">
 {% if last_count %}
-  Последние добавления:
+  <span class="lightgray">Последние добавления</span>
 {% endif %}
 {% for book in books.object_list %}
   <dl class="messageitem"><dt>
   {% if wrt_count %}
-    <a href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer }}</a>
+    <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer }}</a>
   {% endif %}
   {% if last_count or search_count%}
-    <a href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>
+    <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>
   {% endif %}
   {% if book.count %}
     <span class="smaller">[{{ book.count }}]</span>

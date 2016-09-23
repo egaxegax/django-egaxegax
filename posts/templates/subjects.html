@@ -14,11 +14,11 @@
 {% block pageheader %}{% trans 'Posts and notes' %}{% endblock %}
 {% block content %}
 <p>Читайте, пишите статьи и заметки, оставляйте комментарии.</p>
-<p>Темы статей:</p>
+<p class="lightgray">Темы статей</p>
 {% for subj in subjects.object_list %}
   {% if subj.subject %}
     <dl class="messageitem">
-      <dt><a href="{% url 'posts.views.list_posts' id_subj=subj.id %}">{{ subj.subject|escape }}</a>
+      <dt><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subj.id %}">{{ subj.subject|escape }}</a>
       <span class="smaller">[{{ subj.count }}]</span></dt>
       <dd class="smaller">
         <acronym title="{{ subj.date }}">{{ subj.date|time_since }}</acronym> {% trans 'ago' %} {% trans 'ago' %}

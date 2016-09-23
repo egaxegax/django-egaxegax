@@ -8,7 +8,7 @@ import sys, os, re, datetime
 import zlib, zipfile as zip
 
 __help__ = u"""
-Usage: book_conv.py <dir with .epub>
+Usage: book_conv.py <dir with .epub> (extract to current dir)
 """
 
 def E_OS(text):
@@ -54,14 +54,15 @@ for root, dirs, files in os.walk(path, topdown=False):
             if os.stat(fname).st_size == 0:
               print >> fbook, 'index,title,writer_id,content,part,key,date,author_id'
 
-        if (f == 'cover_image.jpg'):
-          za.extract(f, './')
-          os.rename(f, name.encode('utf-8') + '.jpg')
+#         if (f == 'cover_image.jpg'):
+#           za.extract(f, './')
+#           os.rename(f, name.encode('utf-8') + '.jpg')
 
         if (f[:5] == 'index' and os.path.splitext(f)[1] == '.xhtml'):
           book_id = abs(zlib.crc32(title + ' ' + str(part)))
           content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]
-          print >> fbook, str(index) + ',"' + E_OS(title) + '",' + str(writer_id) + ',"' + E_OS(content.replace('"','""')) + '",' + str(part) + ',' + str(book_id) + ',"' + dt + '",' + str(author_id)
+          if part > 0:
+              print >> fbook, str(index) + ',"' + E_OS(title) + '",' + str(writer_id) + ',"' + E_OS(content.replace('"','""')) + '",' + str(part) + ',' + str(book_id) + ',"' + dt + '",' + str(author_id)
           part += 1
           if not writer in wrt:
             wrt[writer] = [writer_id]
