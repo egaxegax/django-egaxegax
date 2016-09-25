@@ -86,6 +86,11 @@ def AddBookListCache(mkey, book_list):
             continue
         dkey = book.writer.writer + ' ' + book.title
         if not dkey in dlist: 
+            thumb_url = ''
+            if hasattr(book, 'img') and book.img:
+                name = book.img.name.rsplit('/')[-1]
+                for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name.replace("'","''"),)):
+                    thumb_url = images.get_serving_url(blob.key())
             dlist.append(dkey)
             cache_list.append({
                'id': book.id,
@@ -94,7 +99,7 @@ def AddBookListCache(mkey, book_list):
                'title': book.title,
                'content': truncatewords(striptags(book.content).strip('Annotation'), 80),
                'index': book.index,
-               'thumb_url': book.thumb_url,
+               'thumb_url': thumb_url,
                'date': book.date.strftime('%Y-%m-%d %H:%M:%S') })
     cache.add('books:' + str(mkey), str(cache_list))
 
@@ -193,6 +198,7 @@ def list_books(request, **kw):
     per_page = 100
     book_list = []
     subj_list = []
+    subject = '' 
     rows = 10
     cols = 1
     if kw.get('id_wrt'): # filter by wrt
@@ -211,6 +217,8 @@ def list_books(request, **kw):
             AddBookListCache(subj_key, book_list)
         book_list = eval(cache.get('books:' + subj_key))
         book_count = len(book_list)
+        if len(book_list):
+            subject = book_list[0]['subject']['subject']
         per_page = rows * cols
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
@@ -240,6 +248,7 @@ def list_books(request, **kw):
                                'last_count': book_last_count,
                                'search_count': search_count,
                                'books': PageList(request, book_list, per_page),
+                               'subject': subject,
                                'subjects': PageList(request, subj_list, 1000),                            
                                'logback': reverse('books.views.list_books')}))
 
@@ -288,8 +297,6 @@ def add_book(request):
                         o = request.FILES[f]
                         for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (o.name.replace("'","''"),)):
                             if blob.key() != o.blobstore_info.key(): blob.delete()
-                        if f == 'img': # image url
-                            book.thumb_url = images.get_serving_url(o.blobstore_info.key())
                     else:
                         book.file = None
                         book.img = None
@@ -337,9 +344,6 @@ def edit_book(request, **kw):
         form = AddBookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             mbook = form.save(commit=False)
-            if 'img' in request.FILES:
-                blob_key = request.FILES['img'].blobstore_info.key()
-                mbook.thumb_url = images.get_serving_url(blob_key)
             if isinstance(request.user, User):
                 mbook.author = request.user
             mbook.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) 

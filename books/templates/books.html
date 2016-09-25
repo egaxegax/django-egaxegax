@@ -17,14 +17,15 @@
 table.cont { width: 100%; border-collapse: collapse; }
 table.cont td.cont { text-align: left; vertical-align: top; }
 table.cont td.cont .bbar { padding: 10px 20px; }
-table.cont td.prev { text-align: left; }
-table.cont td.next { text-align: right; }
+table.cont td.prev { text-align: left; width: 32px; }
+table.cont td.next { text-align: right; width: 32px; }
+table.cont td.cover { text-align: center; width: 140px; }
 #id_search { height: 12px; margin-left: 10px; }
 input.submit { height: 26px; margin-left: 5px;}
 {% endblock %}
 {% block pageheader %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if book_count and not search_count %}{% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}
+{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}{% endif %}
 {% if not book_count and not search_count %}{% trans 'Library' %}{% endif %}
 {% endblock %}
 {% block content %}
@@ -54,16 +55,16 @@ input.submit { height: 26px; margin-left: 5px;}
     {% if forloop.counter in rows_count %}<tr>{% endif %}
     {% if books.has_previous %}
       <td class="prev">{% if forloop.counter == 1 %}
-        <a id="pageprev" class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}?page={{ books.previous_page_number }}">
+        <a id="pageprev" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.previous_page_number }}">
           <img src='{{ MEDIA_URL }}img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
       {% endif %}</td>
     {% endif %}
-  	  <td class="bookcont" align="center" width="20%">
+  	  <td class="cover">
 	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
 	      <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s160" title="{{ book.title }}" alt="{{ book.title }}"/><br/>
 	      <div class="gray smaller">{{ book.title }}</div></a>
 	   </td>
-	   <td class="cont" width="60%">
+	   <td class="cont">
 	     <div class="smaller">{{ book.content }}</div>
 	     <div class="bbar smaller">
 	       <a class="nodecor hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
@@ -72,7 +73,7 @@ input.submit { height: 26px; margin-left: 5px;}
 	   </td>        
     {% if books.has_next %}
       <td class="next">{% if forloop.revcounter == 1 %}
-        <a id="pagenext" class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}?page={{ books.next_page_number }}">
+        <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.next_page_number }}">
           <img src='{{ MEDIA_URL }}img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
       {% endif %}</td>
     {% endif %}
@@ -89,8 +90,7 @@ input.submit { height: 26px; margin-left: 5px;}
 
   <tr>
 {% if subjects.object_list %}
-  <td valign="top" width="30%">
-  <span class="lightgray">Жанры</span>
+  <td valign="top" width="30%">Жанры:
     <dl class="messageitem">
 {% for subj in subjects.object_list %}
     <dt><a class="nodecor" href="{% url 'books.views.list_books' id_subj=subj.id %}">{{ subj.subject }}</a>
@@ -101,7 +101,7 @@ input.submit { height: 26px; margin-left: 5px;}
 {% endif %}
   <td valign="top">
 {% if last_count %}
-  <span class="lightgray">Последние добавления</span>
+  Последние добавления:
 {% endif %}
 {% for book in books.object_list %}
   <dl class="messageitem"><dt>
