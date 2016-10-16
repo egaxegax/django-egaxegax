@@ -26,7 +26,7 @@ for root, dirs, files in os.walk(path, topdown=False):
     curname = os.path.normpath(os.path.join(root, name))
     absname = os.path.join(os.getcwd(), curname)
     fname, ext = os.path.splitext(name)
-    if (ext == '.epub'):
+    if (ext == '.epub'):       
       print fname
       if not zip.is_zipfile(absname):
         print name, ' not a valid ZIP'
@@ -47,7 +47,7 @@ for root, dirs, files in os.walk(path, topdown=False):
 
         if (f == 'cover_image.jpg' or f == 'cover.jpeg'):
           za.extract(f, './')
-          os.rename(f, name.encode('utf-8') + '.jpg')
+          os.rename(f, name.replace(" ","_").replace("'","").encode('utf-8') + '.jpg')
 
         if (f[:5] == 'index' and os.path.splitext(f)[1] == '.xhtml' and part == 0):
           content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]

@@ -1,6 +1,6 @@
 /* main stylesheets here */
-body { font-family: Verdana,Helvetica,sans-serif;
-  background-color: white; color: #405050; }
+body { font-family: Arial,"Trebuchet MS",Helvetica,sans-serif;
+  background-color: #fefefe; color: #000; }
 #main_header { height: 60px; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
@@ -16,12 +16,12 @@ h3 { font-weight: normal; }
 .main { width: 960px; margin: 0 auto; }
 .bg { background-color: rgb(230,240,242); }
 .wrap { background-color: #f9f9f9; }
-.wrap2 { background-color: white; }
+.wrap2 { background-color: #fefefe; }
 .wrap_header { border-bottom: 1px solid #e5e5e5; }
 .gray { color: gray; }
 .lightgray { color: #aaa; }
 .pink { color: #900020; }
-.white { color: #f0f0f0; }
+.white { color: #eee; }
 input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .formpost input[type=text] { width: 90%; }
 .formpost { width: 100%; }
