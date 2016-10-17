@@ -223,6 +223,9 @@ def list_books(request, **kw):
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
         book_list = Book.objects.filter(Q(title__startswith=st)&Q(part=0))
+        search_key = '.search'
+        AddBookListCache(search_key, book_list)
+        book_list = eval(cache.get('books:' + search_key))
         book_count = len(book_list)
         search_count = book_count
     else:  # last update
