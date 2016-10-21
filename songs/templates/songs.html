@@ -10,12 +10,11 @@
  - {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.songmenu { border: 1px solid rgb(200,220,230); }
-.indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; font-size: 70%; }
+.indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; border-radius: 2px; font-size: 70%; }
 .messageitem { background-color: #ffffff; min-height: 2em; padding: 0 10px; margin: 0px; }
-.messageitem dt { padding: 5px 0 5px 0; }
+.messageitem dt { padding: 5px 0 5px 0; border-bottom: 1px solid #ddd; }
 .messageitem dd { padding-bottom: 5px; color: gray; }
 #id_search { height: 12px; margin-left: 10px; }
-input.submit { height: 26px; margin-left: 5px;}
 {% endblock %}
 {% block pageheader %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
@@ -51,7 +50,7 @@ input.submit { height: 26px; margin-left: 5px;}
   {% if song.count %}
     <span class="smaller">[{{ song.count }}]</span>
   {% else %}
-    <a href="{% url 'songs.views.get_song' id=song.id %}">{{ song.title|escape }}</a>
+    <a class="nodecor" href="{% url 'songs.views.get_song' id=song.id %}">{{ song.title|escape }}</a>
   {% endif %}
   {% if not art_count and song.audio %}
     <span class="smaller">[<a class="nodecor" title="{% trans 'Listen' %}" href="{% url 'songs.views.get_song' id=song.id %}?a=1">{% trans 'Listen' %}</a>]</span>

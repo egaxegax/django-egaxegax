@@ -313,6 +313,8 @@ def get_song(request, **kw):
         return render_to_response('song.html', 
                                   context_instance=RequestContext(request,
                                   {'request': request,
+                                   'art_index': art_index,
+                                   'form': SearchForm(initial={'search':request.GET.get('search')}),
                                    'song': song,
                                    'autoplay': request.GET.get('a', 0),
                                    'logback': reverse('songs.views.get_song', kwargs={'id': song_id}) }))

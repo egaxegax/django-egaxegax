@@ -22,6 +22,7 @@ h3 { font-weight: normal; }
 .lightgray { color: #aaa; }
 .pink { color: #900020; }
 .white { color: #eee; }
+.yellow { color: #f7be81; }
 input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .formpost input[type=text] { width: 90%; }
 .formpost { width: 100%; }
@@ -40,3 +41,4 @@ ul.nolist li { padding: 8px 0 0 0; }
 .lfloat { float: left; text-align: left; }
 .rfloat { float: right; text-align: right; }
 .smaller { font-size: smaller; }
+.bigger { font-size: 150%; }

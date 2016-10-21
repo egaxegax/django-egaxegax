@@ -6,7 +6,9 @@
 {% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.songmenu { border: 1px solid rgb(200,220,230); }
-.songitem { border: 1px solid #ddd; border-radius: 4px; padding: 18px 10px; }
+.indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; border-radius: 2px; font-size: 70%; }
+.songitem {padding: 18px 20px; }
+#id_search { height: 12px; margin-left: 10px; }
 {% endblock %}
 {% block pagescript %}
 <!--google+ comments-->
@@ -14,9 +16,19 @@
 <!--/google+ comments-->
 {% endblock %}
 {% block pageheader %}
-<a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a><span class="hspace white">&#x1F3B8</span>{{ song.title }}
+<a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a><span class="bigger hspace yellow">&#x1F3B8</span>{{ song.title }}
 {% endblock %}
 {% block content %}
+<div class="indexlist">
+  <a href="{% url 'songs.views.list_art' %}">{% trans 'Full list' %}</a>
+  {% for i, v in art_index.items %}
+    <a class="nodecor" href="{% url 'songs.views.list_art' ind_art=i %}">{{ v|capfirst }}</a>
+  {% endfor %}
+  <form class="search" action="{% url 'songs.views.list_songs' %}" method="get">{% csrf_token %}
+    {{ form }}
+    <input class="submit" type="submit" value="{% trans 'Search' %}" />
+  </form>
+</div>
 {% if song.audio %}
 <p>
   <table>
@@ -29,6 +41,15 @@
 </p>
 {% endif %}
 <p class="nomarg songitem">{{ song.content|safe }}</p>
+{% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
+  <p class="smaller">
+    <a href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
+    <a class="hspace" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
+    <a href="{% url 'songs.views.edit_song_file' id=song.id %}">{% trans 'Audio' %}</a>
+  </p>
+{% endif %}
+<p class="smaller">{% trans 'Added' %} <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> 
+<acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}</p>
 <!--google+ comments-->
 <div id="comments"></div>
 <script>
@@ -40,13 +61,4 @@ gapi.comments.render('comments', {
 });
 </script>
 <!--/google+ comments-->
-<p class="smaller">{% trans 'Added' %} <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> 
-<acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}</p>
-{% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
-  <p class="smaller">
-    <a href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
-    <a class="hspace" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
-    <a href="{% url 'songs.views.edit_song_file' id=song.id %}">{% trans 'Audio' %}</a>
-  </p>
-{% endif %}
 {% endblock %}

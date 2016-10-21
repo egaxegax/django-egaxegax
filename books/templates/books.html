@@ -10,9 +10,9 @@
  - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
 #top_menu li.bookmenu { border: 1px solid rgb(200,220,230); }
-.indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; font-size: 70%; }
+.indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; border-radius: 2px; font-size: 70%; }
 .messageitem { min-height: 2em; padding: 0 10px; margin: 0px; }
-.messageitem dt { padding: 5px 0 5px 0; }
+.messageitem dt { padding: 5px 0 5px 0; border-bottom: 1px solid #ddd; }
 .messageitem dd { padding-bottom: 5px; color: gray; }
 table.cont { width: 100%; border-collapse: collapse; }
 table.cont td.cont { text-align: left; vertical-align: top; }
@@ -21,7 +21,6 @@ table.cont td.prev { text-align: left; width: 32px; }
 table.cont td.next { text-align: right; width: 32px; }
 table.cont td.cover { text-align: center; width: 140px; }
 #id_search { height: 12px; margin-left: 10px; }
-input.submit { height: 26px; margin-left: 5px;}
 {% endblock %}
 {% block pageheader %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
