@@ -24,7 +24,7 @@ table.cont td.cover { text-align: center; width: 140px; }
 {% endblock %}
 {% block pageheader %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}{% endif %}
+{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% with books.object_list|first as f %}<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=f.writer.id %}">{{ f.writer.writer }}</a>{% endwith %}{% endif %}{% endif %}
 {% if not book_count and not search_count %}{% trans 'Library' %}{% endif %}
 {% endblock %}
 {% block content %}

@@ -18,7 +18,7 @@
 {% endblock %}
 {% block pageheader %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if song_count and not search_count %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}
+{% if song_count and not search_count %}{% with songs.object_list|first as f %}<a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}">{{ f.artist }}</a>{% endwith %}{% endif %}
 {% if not song_count and not search_count %}{% trans 'Chords, lyrics' %}{% endif %}
 {% endblock %}
 {% block content %}
