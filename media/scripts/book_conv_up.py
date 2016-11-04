@@ -23,16 +23,18 @@ index = part = pindex = 0
 
 for root, dirs, files in os.walk(path, topdown=False):
   for name in files:
+    oldname = os.path.normpath(os.path.join(root, name))
+    name = name.replace("'","").replace(" ","_")
     curname = os.path.normpath(os.path.join(root, name))
-    absname = os.path.join(os.getcwd(), curname)
     fname, ext = os.path.splitext(name)
-    if (ext == '.epub'):       
-      print fname
-      if not zip.is_zipfile(absname):
+    if (ext == '.epub'):
+      os.rename(oldname, curname)
+      print name
+      if not zip.is_zipfile(curname):
         print name, ' not a valid ZIP'
         continue
 
-      za = zip.ZipFile(absname)
+      za = zip.ZipFile(curname)
       for f in za.namelist():
 
         ft = za.read(f)

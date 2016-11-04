@@ -29,9 +29,9 @@ table.cont td.cover { text-align: center; width: 140px; }
 {% endblock %}
 {% block content %}
 <div class="indexlist">
-  <a href="{% url 'books.views.list_wrt' %}">{% trans 'Full list' %}</a>
+  <a class="hspaced" href="{% url 'books.views.list_wrt' %}">{% trans 'Full list' %}</a>
   {% for i, v in wrt_index.items %}
-    <a class="nodecor" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
+    <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
   {% endfor %}
   <form class="search" action="{% url 'books.views.list_books' %}" method="get">{% csrf_token %}
     {{ form }}
