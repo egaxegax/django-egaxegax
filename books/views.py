@@ -16,6 +16,7 @@ from books.models import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 import time, os.path, sys, zlib
+from math import ceil
 
 wrt_index = {
     20:'a',21:'b',22:'c',23:'d',24:'e',25:'f',26:'g',27:'h',28:'i',29:'j',30:'k',31:'l',32:'m',33:'n',34:'o',35:'p',36:'q',37:'r',38:'s',39:'t',40:'u',41:'v',42:'w',43:'x',44:'y',45:'z',
@@ -64,6 +65,7 @@ def AddBookCache(book):
     cache_book = {
         'id': book.id,
         'writer': {'id': book.writer.id, 'writer': book.writer.writer, 'count': book.writer.count},
+        'subject': {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count},
         'title': book.title,
         'index': book.index,
         'part': book.part,
@@ -113,8 +115,16 @@ def ClearSubjListCache():
 def ClearBookCache(book_ind, book_part):
     cache.delete_many(['book:' + str(book_ind) + '.' + str(book_part)])
 
-def ClearBookListCache(wrt_id, subj_id):
-    cache.delete_many(['books:.last_update', 'books:' + str(wrt_id), 'books:.subj' + str(subj_id)])
+def ClearBookListWrtCache(wrt_id, num_pages):
+    for page_num in range(num_pages):
+        cache.delete_many(['books:' + str(wrt_id) + '.' + str(page_num)])
+    cache.delete_many(['books:.last_update'])
+    ClearSubjListCache()
+
+def ClearBookListSubjCache(subj_id, num_pages):
+    for page_num in range(num_pages):
+        cache.delete_many(['books:.subj' + str(subj_id) + '.' + str(page_num)])
+    cache.delete_many(['books:.last_update'])
     ClearSubjListCache()
 
 # increment wrt book count
@@ -172,8 +182,6 @@ def list_wrt(request, **kw):
         else:
             wrt_list = Writer.objects.none()
         wrt_count = len(wrt_list)
-        for wrt in wrt_list:  # sum book by wrt
-            book_count += wrt['count']
     else:  # full list
         wrt_key = '.full_list'
         if not cache.has_key('wrts:' + wrt_key):
@@ -181,6 +189,8 @@ def list_wrt(request, **kw):
             AddWrtListCache(wrt_key, wrt_list)
         wrt_list = eval(cache.get('wrts:' + wrt_key))
         wrt_count = len(wrt_list)
+    for wrt in wrt_list:  # sum book by wrt
+        book_count += wrt['count']
     return render_to_response('books.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
@@ -195,31 +205,34 @@ def list_books(request, **kw):
     book_count = 0
     book_last_count = 0
     search_count = 0
-    per_page = 100
     book_list = []
     subj_list = []
-    subject = '' 
+    subject = ''
     rows = 10
     cols = 1
+    per_page = rows * cols
+    page_num = ZI(request.GET.get('page', '1'))
+    page_bottom = (page_num-1)*per_page
+    page_top = page_bottom+per_page 
     if kw.get('id_wrt'): # filter by wrt
         wrt_id = ZI(kw.get('id_wrt'))
-        if not cache.has_key('books:' + str(wrt_id)):
-            book_list = Book.objects.filter(Q(writer=wrt_id)&Q(part=0)).order_by('title')
-            AddBookListCache(wrt_id, book_list)
-        book_list = eval(cache.get('books:' + str(wrt_id)))
-        book_count = len(book_list)
-        per_page = rows * cols
+        wrt_key = str(wrt_id) + '.' + str(page_num)
+        if not cache.has_key('books:' + wrt_key):
+            book_list = Book.objects.filter(Q(writer=wrt_id)&Q(part=0)).order_by('title')[page_bottom:page_top]
+            AddBookListCache(wrt_key, book_list)
+        book_list = eval(cache.get('books:' + wrt_key))
+        if len(book_list):
+            book_count = book_list[0]['writer']['count']                        
     elif kw.get('id_subj'): # filter by subj
         subj_id = ZI(kw.get('id_subj'))
-        subj_key = '.subj' + str(subj_id)
+        subj_key = '.subj' + str(subj_id) + '.' + str(page_num)
         if not cache.has_key('books:' + subj_key):
-            book_list = Book.objects.filter(Q(subject=subj_id)&Q(part=0))
+            book_list = Book.objects.filter(Q(subject=subj_id)&Q(part=0))[page_bottom:page_top]
             AddBookListCache(subj_key, book_list)
         book_list = eval(cache.get('books:' + subj_key))
-        book_count = len(book_list)
         if len(book_list):
+            book_count = book_list[0]['subject']['count']
             subject = book_list[0]['subject']['subject']
-        per_page = rows * cols
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
         book_list = Book.objects.filter(Q(title__startswith=st)&Q(part=0))
@@ -231,7 +244,7 @@ def list_books(request, **kw):
     else:  # last update
         wrt_id = '.last_update'
         if not cache.has_key('books:' + wrt_id):
-            book_list = Book.objects.filter(Q(part=0)).order_by('-date')[:7]
+            book_list = Book.objects.filter(Q(part=0)).order_by('-date')[:16]
             AddBookListCache(wrt_id, book_list)
         book_list = eval(cache.get('books:' + wrt_id))
         book_last_count = len(book_list)
@@ -241,6 +254,7 @@ def list_books(request, **kw):
             subj_list = Subject.objects.order_by('subject')
             AddSubjListCache(subj_key, subj_list)
         subj_list = eval(cache.get('subj:' + subj_key))
+    num_pages = int(ceil(book_count / float(per_page)))
     return render_to_response('books.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
@@ -250,7 +264,15 @@ def list_books(request, **kw):
                                'book_count': book_count,
                                'last_count': book_last_count,
                                'search_count': search_count,
-                               'books': PageList(request, book_list, per_page),
+                               'books': { # Paginator imitate
+                                   'has_previous': page_num > 1,
+                                   'has_next': page_num < num_pages,
+                                   'previous_page_number': page_num - 1,
+                                   'next_page_number': page_num + 1,
+                                   'number': page_num,
+                                   'paginator': { 'num_pages': num_pages },
+                                   'object_list': book_list
+                               },
                                'subject': subject,
                                'subjects': PageList(request, subj_list, 1000),                            
                                'logback': reverse('books.views.list_books')}))
@@ -322,7 +344,8 @@ def add_book(request):
             if len(book_list) == 0:
                 book.save()
                 ClearWrtListCache(wrt.writer[0].capitalize())
-                ClearBookListCache(wrt.id, subj.id)
+                ClearBookListWrtCache(wrt.id, wrt.count)
+                ClearBookListSubjCache(subj.id, subj.count)
                 ClearBookCache(book.index, book.part)
                 return HttpResponseRedirect(reverse('books.views.list_books'))
     else:
@@ -351,7 +374,8 @@ def edit_book(request, **kw):
                 mbook.author = request.user
             mbook.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) 
             mbook.save(force_update=True)
-            ClearBookListCache(mbook.writer.id, mbook.subject.id)
+            ClearBookListWrtCache(mbook.writer.id, mbook.writer.count)
+            ClearBookListSubjCache(mbook.subject.id, mbook.subject.count)
             ClearBookCache(mbook.index, mbook.part)
             return HttpResponseRedirect(reverse('books.views.read_book', kwargs={'ind': mbook.index, 'part': mbook.part}))
     else:
@@ -378,7 +402,8 @@ def delete_book(request, **kw):
                 IncWrtCount(writer=book.writer.writer, count=-1)
                 IncSubjCount(subject=book.subject.subject, count=-1)
                 ClearWrtListCache(book.writer.writer[0].capitalize())
-                ClearBookListCache(book.writer.id, book.subject.id)
+                ClearBookListWrtCache(book.writer.id, book.writer.count)
+                ClearBookListSubjCache(book.subject.id, book.subject.count)
             ClearBookCache(book.index, book.part)
             book.delete()
     return HttpResponseRedirect(reverse('books.views.list_books'))

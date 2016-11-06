@@ -41,7 +41,12 @@ for root, dirs, files in os.walk(path, topdown=False):
         if (f == 'content.opf'):
           title = re.findall('>(.*)</dc:title>', ft)[0]
           writer = re.findall('dc:creator opf:file-as="([^"]*)', ft)[0].replace(' &amp', '')
-          subj = re.findall('>(.*)</dc:subject>', ft)[0]
+          subj = re.findall('>(.*)</dc:subject>', ft)
+          if subj:
+              subj = subj[0]
+          else:
+              print "!! Subj is not defined !!"
+              subj = 'prose_classic'
           index = abs(zlib.crc32(name))
           if (pindex != index):
             pindex = index
@@ -49,7 +54,10 @@ for root, dirs, files in os.walk(path, topdown=False):
 
         if (f == 'cover_image.jpg' or f == 'cover.jpeg'):
           za.extract(f, './')
-          os.rename(f, name.replace(" ","_").replace("'","").encode('utf-8') + '.jpg')
+          newname = name.replace(" ","_").replace("'","").encode('utf-8') + '.jpg'
+          if os.path.isfile(newname):
+            os.remove(newname)
+          os.rename(f, newname)
 
         if (f[:5] == 'index' and os.path.splitext(f)[1] == '.xhtml' and part == 0):
           content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]

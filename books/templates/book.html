@@ -14,7 +14,7 @@
 {% block pagescript %}
 {% endblock %}
 {% block pageheader %}
-  <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a><span class="bigger hspace yellow">&#128218;</span>{{ book.title }}
+  <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a><span class="bigger hspace yellow">&#128218;</span>{{ book.title }} <span class="gray smaller hspace2">{{ book.subject.subject }}</span>
 {% endblock %}
 {% block content %}
   <div class="calibre">{{ book.content|safe }}</div>  
