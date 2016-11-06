@@ -61,7 +61,7 @@ for root, dirs, files in os.walk(path, topdown=False):
         if (f[:5] == 'index' and os.path.splitext(f)[1] == '.xhtml'):
           book_id = abs(zlib.crc32(title + ' ' + str(part)))
           content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]
-          if part > 0:
+          if part > 0: # skip uploaded part 0
               print >> fbook, str(index) + ',"' + E_OS(title) + '",' + str(writer_id) + ',"' + E_OS(content.replace('"','""')) + '",' + str(part) + ',' + str(book_id) + ',"' + dt + '",' + str(author_id)
           part += 1
           if not writer in wrt:

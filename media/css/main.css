@@ -1,6 +1,6 @@
 /* main stylesheets here */
 body { font-family: Arial,"Trebuchet MS",Helvetica,sans-serif;
-  background-color: #fefefe; color: #000; }
+  background-color: #fefefe; color: #444; }
 #main_header { height: 60px; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }

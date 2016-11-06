@@ -65,7 +65,7 @@ def AddBookCache(book):
     cache_book = {
         'id': book.id,
         'writer': {'id': book.writer.id, 'writer': book.writer.writer, 'count': book.writer.count},
-        'subject': {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count},
+        'subject': ((hasattr(book, 'subject') and book.subject) and {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count}) or {},
         'title': book.title,
         'index': book.index,
         'part': book.part,
