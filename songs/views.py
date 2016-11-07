@@ -158,8 +158,6 @@ def list_art(request, **kw):
         else:
             art_list = Art.objects.none()
         art_count = len(art_list)
-        for art in art_list:  # sum song by art
-            song_count += art['count']
     else:  # full list
         artkey = '.full_list'
         if not cache.has_key('arts:' + artkey):
@@ -167,6 +165,8 @@ def list_art(request, **kw):
             AddArtListCache(artkey, art_list)
         art_list = eval(cache.get('arts:' + artkey))
         art_count = len(art_list)
+    for art in art_list:  # sum song by art
+        song_count += art['count']
     return render_to_response('songs.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
