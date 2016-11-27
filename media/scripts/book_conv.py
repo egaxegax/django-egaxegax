@@ -42,7 +42,7 @@ for root, dirs, files in os.walk(path, topdown=False):
         ft = za.read(f)
         if (f == 'content.opf'):
           title = re.findall('>(.*)</dc:title>', ft)[0]
-          writer = re.findall('dc:creator opf:file-as="([^"]*)', ft)[0].replace(' &amp', '')
+          writer = re.findall('dc:creator .*="([^"]*)', ft)[0].replace(' &amp', '')
           writer_id = abs(zlib.crc32(writer))
           index = abs(zlib.crc32(writer + ' ' + title))
           if (pindex != index):

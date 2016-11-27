@@ -49,9 +49,11 @@ table.cont td.cover { text-align: center; width: 140px; }
 {% if books.object_list %}
 
   <table class="cont">
+
 {% if book_count and not wrt_count %}
+
   {% for book in books.object_list %}
-    {% if forloop.counter in rows_count %}<tr>{% endif %}
+    {% if forloop.counter in rows_count %}<tr class="bline">{% endif %}
     {% if books.has_previous %}
       <td class="prev">{% if forloop.counter == 1 %}
         <a id="pageprev" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.previous_page_number }}">
@@ -69,7 +71,7 @@ table.cont td.cover { text-align: center; width: 140px; }
 	       <a class="nodecor hspace2" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
 	       <a class="nodecor hspace2" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
 	     </div>
-	   </td>        
+	   </td>      
     {% if books.has_next %}
       <td class="next">{% if forloop.revcounter == 1 %}
         <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.next_page_number }}">
@@ -107,15 +109,25 @@ table.cont td.cover { text-align: center; width: 140px; }
   {% if wrt_count %}
     <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer }}</a>
   {% endif %}
-  {% if last_count or search_count%}
-  <ul class="inl nopad nomarg">
-    <li class="gray"><img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s80" title="{{ book.title }}" alt="{{ book.title }}"/></li>
-    <li>&nbsp;<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a></li>
-  {% endif %}
   {% if book.count %}
     <span class="smaller">[{{ book.count }}]</span>
-  {% else %}
-    <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
+  {% endif %}
+  {% if last_count or search_count%}
+    <div style="display: table">
+    <div  class="lfloat">
+      <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s80" title="{{ book.title }}" alt="{{ book.title }}"/>
+    </div>
+    <div class="lfloat">
+      <a class="nodecor hspace" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>
+        &nbsp;
+      <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
+    </div>
+    <div class="smaller">
+    <br/><br/><br/>
+      <a class="nodecor hspace2" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
+      <a class="nodecor hspace" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
+    </div>
+    </div>
   {% endif %}
   </dt>
   {% if last_count %}
@@ -125,7 +137,9 @@ table.cont td.cover { text-align: center; width: 140px; }
 {% endfor %}
   </td>
 {% if books.object_list %}
-  <p class="smaller">
+  <tr>
+  <td class="smaller">
+      <br/>
     {% if books.has_previous %}
       <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">‹ {% trans 'previous' %}</a>
     {% endif %}
@@ -137,13 +151,18 @@ table.cont td.cover { text-align: center; width: 140px; }
     {% if books.has_next %}
       <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">{% trans 'next' %} ›</a>
     {% endif %}
-  </p>
+  </td>
+  </tr>
 {% endif %} 
+
 {% endif %}
   </tr>
   </table>
+
 {% else %}
+
   <p>{% trans 'No books' %}.</p>
+
 {% endif %}
 
 {% if request.user.is_authenticated %}

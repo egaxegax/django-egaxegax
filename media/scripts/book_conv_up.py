@@ -7,6 +7,13 @@
 import sys, os, re, datetime
 import zlib, zipfile as zip
 
+pth = os.path.abspath(sys.argv[0] + '../../../../')
+
+sys.path.insert(0, pth)
+sys.path.insert(0, pth + '/django/utils')
+
+from transliterate import *
+
 __help__ = u"""
 Usage: book_conv_up.py <dir with .epub>
 """
@@ -24,7 +31,7 @@ index = part = pindex = 0
 for root, dirs, files in os.walk(path, topdown=False):
   for name in files:
     oldname = os.path.normpath(os.path.join(root, name))
-    name = name.replace("'","").replace(" ","_")
+    name = translit(name.decode('cp1251'), 'ru', reversed=True).encode('utf-8').replace("'","").replace(" ","_").replace('«','').replace('»','')
     curname = os.path.normpath(os.path.join(root, name))
     fname, ext = os.path.splitext(name)
     if (ext == '.epub'):
@@ -40,7 +47,7 @@ for root, dirs, files in os.walk(path, topdown=False):
         ft = za.read(f)
         if (f == 'content.opf'):
           title = re.findall('>(.*)</dc:title>', ft)[0]
-          writer = re.findall('dc:creator opf:file-as="([^"]*)', ft)[0].replace(' &amp', '')
+          writer = re.findall('dc:creator .*="([^"]*)', ft)[0].replace(' &amp', '')
           subj = re.findall('>(.*)</dc:subject>', ft)
           if subj:
               subj = subj[0]
@@ -54,7 +61,7 @@ for root, dirs, files in os.walk(path, topdown=False):
 
         if (f == 'cover_image.jpg' or f == 'cover.jpeg'):
           za.extract(f, './')
-          newname = name.replace(" ","_").replace("'","").encode('utf-8') + '.jpg'
+          newname = name + '.jpg'
           if os.path.isfile(newname):
             os.remove(newname)
           os.rename(f, newname)
