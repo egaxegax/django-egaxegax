@@ -115,7 +115,7 @@ table.cont td.cover { text-align: center; width: 140px; }
   {% if last_count or search_count%}
     <div style="display: table">
     <div  class="lfloat">
-      <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s80" title="{{ book.title }}" alt="{{ book.title }}"/>
+      <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s100" title="{{ book.title }}" alt="{{ book.title }}"/>
     </div>
     <div class="lfloat">
       &nbsp;<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>

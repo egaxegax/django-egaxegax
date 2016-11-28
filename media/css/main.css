@@ -1,7 +1,7 @@
 /* main stylesheets here */
 body { font-family: Arial,"Trebuchet MS",Helvetica,sans-serif;
   background-color: #fefefe; color: #444; }
-#main_header { height: 60px; }
+#main_header { height: 60px; border-bottom: 1px solid #e5e5e5; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
 #top_logo { width: 240px; margin-top: 15px; text-align: center; }
@@ -17,7 +17,6 @@ h3 { font-weight: normal; }
 .bg { background-color: rgb(230,240,242); }
 .wrap { background-color: #f9f9f9; }
 .wrap2 { background-color: #fefefe; }
-.wrap_header { border-bottom: 1px solid #e5e5e5; }
 .gray { color: gray; }
 .lightgray { color: #aaa; }
 .pink { color: #900020; }
