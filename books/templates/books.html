@@ -11,8 +11,8 @@
 {% block pagestyle %}
 #top_menu li.bookmenu { border: 1px solid rgb(200,220,230); }
 .indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; border-radius: 2px; font-size: 70%; }
-.messageitem { min-height: 2em; padding: 0 10px; margin: 0px; }
-.messageitem dt { padding: 5px 0 5px 0; border-bottom: 1px solid #ddd; }
+.messageitem { min-height: 1em; padding: 10px; margin: 0px; }
+.messageitem dt { padding: 0; border-bottom: 1px solid #ddd; }
 .messageitem dd { padding-bottom: 5px; color: gray; }
 table.cont { width: 100%; border-collapse: collapse; }
 table.cont td.cont { text-align: left; vertical-align: top; }
@@ -68,8 +68,8 @@ table.cont td.cover { text-align: center; width: 140px; }
 	   <td class="cont">
 	     <div class="smaller">{{ book.content }}</div>
 	     <div class="bbar smaller">
-	       <a class="nodecor hspace2" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
-	       <a class="nodecor hspace2" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
+	       <a class="gray nodecor hspace2" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
+	       <a class="gray nodecor hspace2" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
 	     </div>
 	   </td>      
     {% if books.has_next %}
@@ -92,12 +92,12 @@ table.cont td.cover { text-align: center; width: 140px; }
   <tr>
 {% if subjects.object_list %}
   <td valign="top" width="30%">Жанры:
-    <dl class="messageitem">
 {% for subj in subjects.object_list %}
+  <dl class="messageitem">
     <dt><a class="nodecor" href="{% url 'books.views.list_books' id_subj=subj.id %}">{{ subj.subject }}</a>
       <span class="smaller">[{{ subj.count }}]</span></dt>
+  </dl>
 {% endfor %}
-    </dl>
   </td>
 {% endif %}
   <td valign="top">
@@ -118,14 +118,13 @@ table.cont td.cover { text-align: center; width: 140px; }
       <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s80" title="{{ book.title }}" alt="{{ book.title }}"/>
     </div>
     <div class="lfloat">
-      <a class="nodecor hspace" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>
-        &nbsp;
-      <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
+      &nbsp;<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>
+      &nbsp;<a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
     </div>
     <div class="smaller">
     <br/><br/><br/>
-      <a class="nodecor hspace2" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
-      <a class="nodecor hspace" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
+      &nbsp;<a class="gray nodecor hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
+      <a class="gray nodecor hspace" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
     </div>
     </div>
   {% endif %}

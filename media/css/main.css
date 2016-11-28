@@ -6,12 +6,12 @@ body { font-family: Arial,"Trebuchet MS",Helvetica,sans-serif;
 #main_footer { height: 40px; text-align: center; }
 #top_logo { width: 240px; margin-top: 15px; text-align: center; }
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
-#top_menu ul { display: table; width: 100%; max-width: 100%; padding-top: 5px; }
+#top_menu ul { display: table; width: 100%; max-width: 100%; padding-top: 5px; font-size: 1.2em; }
 #top_menu ul li { display: table-cell; text-align: center; width: 17%; border-radius: 2px 2px 2px 2px; }
 #top_menu ul li a { height: 40px; display: table; width: 100%; }
 #top_menu ul li span { display: table-cell; vertical-align: middle; }
 #page_header { padding: 8px; }
-h2 { line-height: 30px; font-size: 24px; font-family: Arial,Helvetica,sans-serif; font-weight: normal; }
+h2 { padding: 0px 0 10px; font-size: 24px; font-family: Arial,Helvetica,sans-serif; font-weight: normal; }
 h3 { font-weight: normal; }
 .main { width: 960px; margin: 0 auto; }
 .bg { background-color: rgb(230,240,242); }
@@ -28,7 +28,7 @@ input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .formpost { width: 100%; }
 .formpost th { width: 8%; }
 .formpost textarea { width: 100%; }
-a { color: #0645ad; }
+a { color: #5645ad; }
 a.nodecor { text-decoration:none; }
 a.nodecor img { border: 0 none; }
 .inl table { display: inline; }
