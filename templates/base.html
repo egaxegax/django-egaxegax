@@ -11,10 +11,11 @@
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css" type="text/css" />
 {% block pagestylelink %}{% endblock %}
 <style type="text/css">
-#main_header { height: 60px; }
+#main_header { background-color: rgb(230,240,242); height: 60px; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
 #top_logo { width: 240px; margin-top: 15px; text-align: center; }
+#top_nav .vspace { margin-top: 20px; }
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
 #top_menu ul { display: table; width: 100%; max-width: 100%; margin-top: 5px; }
 #top_menu ul li { display: table-cell; text-align: center; width: 17%; padding-top: 5px; border-radius: 2px 2px 2px 2px; }
@@ -57,16 +58,18 @@
       </script>
       <!--/Banner-->
     </div>
-    <div id="top_nav" class="rfloat smaller">
-      <ul class="nomarg nopad nolist">
+    <div id="top_nav" class="rfloat smaller">      
       {% if request.user.is_authenticated %}
+      <ul class="nomarg nopad nolist">
         <li>{% trans 'Welcome,' %} <b>{{ request.user.username }}</b></li>
         <li><a class="nodecor" href="{% url 'django.contrib.auth.views.logout' %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
+        </ul>
       {% else %}
-        <li><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
-        <li><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
-      {% endif %}
+      <ul class="inl vspace">
+        <li class="hspace"><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
+        <li class="hspace"><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
       </ul>
+      {% endif %}
     </div>
   </div>
 </div>
