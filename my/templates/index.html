@@ -4,9 +4,9 @@
 {% block keywords %}, {% trans 'info, contacts' %}{% endblock %}
 {% block title %}{% trans 'Main' %} - {% trans 'info, contacts' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.mainmenu { border: 1px solid rgb(200,220,230); }
 #myview { background: url({{ MEDIA_URL }}img/egaxegax.png) no-repeat; height: 170px; padding: 20px 0 0 250px; }
 {% endblock %}
+{% block aboutsclass %}wrap{% endblock %}
 {% block pageheader %}{% trans 'Main' %}{% endblock %}
 {% block content %}
 <p>
@@ -15,11 +15,13 @@
 <p class="smaller">
   P.S. Делай что можешь, с тем что имеешь, там где ты есть. <i>Теодор Рузвельт</i>. 
 </p>
-<dl id="myview" class="nomarg">
-  <dt>Контакты:</dt>
-  <dd>Блог: <a class="smaller" href="http://egaxegax.blogspot.com">http://egaxegax.blogspot.com</a></dd>
-  <dd>Проекты: <a class="smaller" href="http://github.com/egaxegax">https://github.com/egaxegax</a></dd>
-  <dd>Почта: <a class="smaller" href="mailto:egax@bk.ru?subject=О%20сайте%20egaxegax.appspot.com&body=Хочу%20написать" target="_blank">egax@bk.ru</a>, 
-    <a class="smaller" href="mailto:egaxegax@gmail.com?subject=About%20egaxegax.appspot.com&body=Good%20site" target="_blank">egaxegax@gmail.com</a></dd>
-</dl>
+<div class="wrap">
+  <dl id="myview" class="nomarg">
+    <dt>Контакты:</dt>
+    <dd>Личная: <a class="smaller" href="http://vk.com/egaxegax">http://vk.com/egaxegax</a></dd>
+    <dd>Проекты: <a class="smaller" href="http://github.com/egaxegax">https://github.com/egaxegax</a></dd>
+    <dd>Почта: <a class="smaller" href="mailto:egax@bk.ru?subject=О%20сайте%20egaxegax.appspot.com&body=Хочу%20написать" target="_blank">egax@bk.ru</a>, 
+      <a class="smaller" href="mailto:egaxegax@gmail.com?subject=About%20egaxegax.appspot.com&body=Good%20site" target="_blank">egaxegax@gmail.com</a></dd>
+  </dl>
+</div>
 {% endblock %}

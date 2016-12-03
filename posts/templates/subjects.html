@@ -5,16 +5,12 @@
 {% block description %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% trans 'Posts and notes' %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
-{% block pagestyle %}
-#top_menu li.guestmenu { border: 1px solid rgb(200,220,230); }
-.messageitem { background-color: #ffffff; min-height: 1em; padding: 0px 10px; margin: 0px; }
-.messageitem dt { padding: 5px 0; border-bottom: 1px solid #ddd; }
-.messageitem dd { padding-bottom: 5px; color: gray; }
-{% endblock %}
+{% block postsclass %}wrap{% endblock %}
 {% block pageheader %}{% trans 'Posts and notes' %}{% endblock %}
 {% block content %}
 <p>Читайте, пишите статьи и заметки, оставляйте комментарии.</p>
 <p>Темы статей:</p>
+<div class="wrap">
 {% for subj in subjects.object_list %}
   {% if subj.subject %}
     <dl class="messageitem">
@@ -26,6 +22,7 @@
     </dl>
   {% endif %}
 {% endfor %}
+</div>
 <p class="smaller"><a href="{% url 'posts.views.list_posts' %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
 {% if subjects.object_list %}
   <p class="smaller">

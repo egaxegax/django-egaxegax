@@ -4,12 +4,12 @@
 {% block keywords %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}{% trans 'Edit' %} {% trans 'audio' %} - {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.songmenu { border: 1px solid rgb(200,220,230); }
 #id_title { width:100%; }
 {% endblock %}
+{% block songsclass %}wrap{% endblock %}
 {% block pageheader %}{% trans 'Edit' %} {% trans 'audio' %}{% endblock %}
 {% block content %}
-<p>Добавляйте свои файлы в формате mp3 к текстам песен.</p>
+<p>Р—Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р» <i>mp3</i>.</p>
 {% if request.user.is_authenticated %}
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
     {% render_upload_data upload_data %}

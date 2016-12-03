@@ -3,9 +3,7 @@
 {% load markup %}
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
-{% block pagestyle %}
-#top_menu li.guestmenu { border: 1px solid rgb(200,220,230); }
-{% endblock %}
+{% block postsclass %}wrap{% endblock %}
 {% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %}{% endblock %}
 {% block content %}
 <p>Читайте, пишите заметки, оставляйте комментарии.<p>

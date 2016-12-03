@@ -6,7 +6,6 @@
 {% block title %}
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.photomenu { border: 1px solid rgb(200,220,230); }
 table.cont { padding: 10px 2px; }
 #viewtab { visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
 #viewtab td div { color: rgba(255,255,255,0.8); text-align: center; font-size: 40pt; }
@@ -19,6 +18,7 @@ table.cont { padding: 10px 2px; }
 .photocont { max-width: 150px; }
 .nav { fill: rgba(255,255,255,0.8); }
 {% endblock %}
+{% block myclass %}wrap{% endblock %}
 {% block pageheader %}{% trans 'Photogallery' %}{% endblock %}
 {% block content %}
 <script src="/media/js/dbcartasvg.js"></script>
@@ -191,6 +191,7 @@ function viewchange(counter) {
     <p>Найдено <b>{{ photos_count }}</b> альбомов.</p>
   {% endif %}
 {% endif %}
+  <div class="wrap">
 {% if photos.object_list %}
     <table class="cont">
   {% for photo in photos.object_list %}
@@ -226,6 +227,7 @@ function viewchange(counter) {
 {% else %}
   <p>{% trans 'No photos' %}.</p>
 {% endif %}
+  </div>
 {% if request.user.is_authenticated %}
   <p class="smaller"><a href="{% url 'my.views.add_photo' %}">{% trans 'Add photo' %}</a></p>
 {% else %}

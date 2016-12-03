@@ -6,11 +6,9 @@
 {% block keywords %}, {% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.guestmenu { border: 1px solid rgb(200,220,230); }
-.messagetext { padding: 0 10px; }
-.messagebox { border: 1px solid #ddd; border-radius: 4px; margin-bottom: 5px; }
-.messageblock { font-size: 70%; padding: 2px 8px; text-align: right; }
+.messageblock { font-size: 70%; text-align: right; }
 {% endblock %}
+{% block postsclass %}wrap{% endblock %}
 {% block pagescript %}
 {% if subject.title %}
 <!--google+ comments-->
@@ -21,10 +19,11 @@
 {% block pagestylelink %}
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/syntax.css" />
 {% endblock %}
+{% block postsclass %}wrap{% endblock %}
 {% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %}{% endblock %}
 {% block content %}
 {% for post in posts.object_list %}
-  <div class="messagebox">
+  <div class="wrap messagebox">
     <a id="id{{ post.id }}" name="id{{ post.id }}"></a>
     <div class="messagetext">
       {% if post.title %}<h3><a class="nodecor" href="{% url 'posts.views.list_posts' id=post.id %}">{{ post.title }}</a></h3>{% endif %}

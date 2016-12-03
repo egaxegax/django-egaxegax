@@ -10,7 +10,19 @@
 <link rel='shortcut icon' href='{{ MEDIA_URL }}img/favicon.ico?1322400151' />
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css" type="text/css" />
 {% block pagestylelink %}{% endblock %}
-<style type="text/css">{% block pagestyle %}{% endblock %}</style>
+<style type="text/css">
+#main_header { height: 60px; }
+#main_content .view { min-height: 450px; }
+#main_footer { height: 40px; text-align: center; }
+#top_logo { width: 240px; margin-top: 15px; text-align: center; }
+#top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
+#top_menu ul { display: table; width: 100%; max-width: 100%; margin-top: 5px; }
+#top_menu ul li { display: table-cell; text-align: center; width: 17%; padding-top: 5px; border-radius: 2px 2px 2px 2px; }
+#top_menu ul li a { height: 40px; display: table; width: 100%; }
+#top_menu ul li span { display: table-cell; vertical-align: middle; }
+#page_header { padding: 12px; }
+{% block pagestyle %}{% endblock %}
+</style>
 <!--Google counter-->
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -24,8 +36,8 @@
 {% block pagescript %}{% endblock %}
 </head>
 <body class="nomarg">
-  <div class="bg wrap_header">
-  <div id="main_header" class="bg main">
+  <div class="wrap_header">
+  <div id="main_header" class="main">
     <div id="top_logo" class="lfloat">
       <a class="nodecor" href="/">
         <img src="{{ MEDIA_URL }}img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
@@ -58,15 +70,16 @@
     </div>
   </div>
 </div>
-<div id="top_menu" class="main wrap2 smaller">
-  <ul class="inl nomarg nopad"><li class="mainmenu"><a class="nodecor" href="{% url 'my.views.index' %}"><span>{% trans 'About' %}</span></a></li>
-    <li class="newsmenu"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><span>{% trans 'News' %}</span></a></li>
-    <li class="guestmenu"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><span>{% trans 'Posts' %}</span></a></li>
-    <li class="photomenu"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><span>{% trans 'Photos' %}</span></a></li>
-    <li class="songmenu"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><span>{% trans 'Chords' %}</span></a></li>
-    <li class="bookmenu"><a class="nodecor" href="{% url 'books.views.list_books' %}"><span>{% trans 'Books' %}</span></a></li></ul>
+<div id="top_menu" class="main">
+  <ul class="inl nomarg nopad">
+    <li class="{% block aboutsclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.index' %}"><span>{% trans 'About' %}</span></a></li>
+    <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><span>{% trans 'News' %}</span></a></li>
+    <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><span>{% trans 'Posts' %}</span></a></li>
+    <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><span>{% trans 'Photos' %}</span></a></li>
+    <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><span>{% trans 'Chords' %}</span></a></li>
+    <li class="{% block booksclass %}{% endblock %}"><a class="nodecor" href="{% url 'books.views.list_books' %}"><span>{% trans 'Books' %}</span></a></li></ul>
 </div>
-<div id="main_content" class="wrap2 main">
+<div id="main_content" class="main">
   <div class="view">
     <div id="page_header"><h2 class="nomarg">{% block pageheader %}{% endblock %}</h2></div>
     <div id="page_content">{% block content %}{% endblock %}</div>

@@ -9,13 +9,9 @@
 {% if not song_count and not search_count %}{% trans 'Chords, lyrics' %}{% endif %}
  - {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.songmenu { border: 1px solid rgb(200,220,230); }
-.indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; border-radius: 2px; font-size: 70%; }
-.messageitem { min-height: 1em; padding: 10px; margin: 0px; }
-.messageitem dt { padding: 0; border-bottom: 1px solid #ddd; }
-.messageitem dd { padding-bottom: 5px; color: gray; }
-#id_search { height: 12px; margin-left: 10px; }
+#id_search { height: 12px; margin-left: 12px; }
 {% endblock %}
+{% block songsclass %}wrap{% endblock %}
 {% block pageheader %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
 {% if song_count and not search_count %}{% with songs.object_list|first as f %}<a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}">{{ f.artist }}</a>{% endwith %}{% endif %}
@@ -39,6 +35,8 @@
 {% if last_count %}
   <p>Последние обновления:</p>
 {% endif %}
+{% if songs.object_list %}
+  <div class="wrap">
 {% for song in songs.object_list %}
   <dl class="messageitem"><dt>
   {% if art_count %}
@@ -61,22 +59,24 @@
   {% endif %}
   </dl>
 {% endfor %}
-{% if songs.object_list %}
+  </div>
   <p class="smaller">
-    {% if songs.has_previous %}
-      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
-    {% endif %}
-    {% if songs.paginator.num_pages > 1 %}
-      <span class="current">
-        {% trans 'Page' %} {{ songs.number }} {% trans 'of' %} {{ songs.paginator.num_pages }}
-      </span>
-    {% endif %}
-    {% if songs.has_next %}
-      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
-    {% endif %}
+  {% if songs.has_previous %}
+    <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
+  {% endif %}
+  {% if songs.paginator.num_pages > 1 %}
+    <span class="current">
+      {% trans 'Page' %} {{ songs.number }} {% trans 'of' %} {{ songs.paginator.num_pages }}
+    </span>
+  {% endif %}
+  {% if songs.has_next %}
+    <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
+  {% endif %}
   </p>
 {% else %}
-  <p>{% trans 'No songs' %}.</p>
+  <div class="wrap">
+    <p>{% trans 'No songs' %}.</p>
+  </div>
 {% endif %}
 {% if request.user.is_authenticated %}
   <p class="smaller"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>

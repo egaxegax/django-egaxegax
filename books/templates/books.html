@@ -9,19 +9,15 @@
 {% if not book_count and not search_count %}{% trans 'Books' %}{% endif %}
  - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
-#top_menu li.bookmenu { border: 1px solid rgb(200,220,230); }
-.indexlist { text-align: center; background-color: #f0f0f0; padding: 2px 8px; border-radius: 2px; font-size: 70%; }
-.messageitem { min-height: 1em; padding: 10px; margin: 0px; }
-.messageitem dt { padding: 0; border-bottom: 1px solid #ddd; }
-.messageitem dd { padding-bottom: 5px; color: gray; }
-table.cont { width: 100%; border-collapse: collapse; }
+table.cont { width: 100%; border-collapse: collapse;  }
 table.cont td.cont { text-align: left; vertical-align: top; }
 table.cont td.cont .bbar { padding: 10px 20px; }
 table.cont td.prev { text-align: left; width: 32px; }
 table.cont td.next { text-align: right; width: 32px; }
 table.cont td.cover { text-align: center; width: 140px; }
-#id_search { height: 12px; margin-left: 10px; }
+#id_search { height: 12px; margin-left: 12px; }
 {% endblock %}
+{% block booksclass %}wrap{% endblock %}
 {% block pageheader %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
 {% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% with books.object_list|first as f %}<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=f.writer.id %}">{{ f.writer.writer }}</a>{% endwith %}{% endif %}{% endif %}
@@ -53,19 +49,19 @@ table.cont td.cover { text-align: center; width: 140px; }
 {% if book_count and not wrt_count %}
 
   {% for book in books.object_list %}
-    {% if forloop.counter in rows_count %}<tr class="bline">{% endif %}
+    {% if forloop.counter in rows_count %}<tr class="wrap">{% endif %}
     {% if books.has_previous %}
       <td class="prev">{% if forloop.counter == 1 %}
         <a id="pageprev" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.previous_page_number }}">
           <img src='{{ MEDIA_URL }}img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
       {% endif %}</td>
     {% endif %}
-  	  <td class="cover">
+  	  <td class="cover messageitem">
 	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
 	      <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s160" title="{{ book.title }}" alt="{{ book.title }}"/><br/>
 	      <div class="gray smaller">{{ book.title }}</div></a>
 	   </td>
-	   <td class="cont">
+	   <td class="cont messageitem">
 	     <div class="smaller">{{ book.content }}</div>
 	     <div class="bbar smaller">
 	       <a class="gray nodecor hspace2" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
@@ -81,7 +77,9 @@ table.cont td.cover { text-align: center; width: 140px; }
   {% if forloop.revcounter == 1 %}  
     {% if books.paginator.num_pages > 1 %}
       <tr><td class="smaller" align="center" colspan="10">
-        {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
+        <p>
+          {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
+        </p>
       </td></tr>
     {% endif %}
   {% endif %}
@@ -92,18 +90,21 @@ table.cont td.cover { text-align: center; width: 140px; }
   <tr>
 {% if subjects.object_list %}
   <td valign="top" width="30%">Жанры:
+  <div class="wrap">
 {% for subj in subjects.object_list %}
   <dl class="messageitem">
     <dt><a class="nodecor" href="{% url 'books.views.list_books' id_subj=subj.id %}">{{ subj.subject }}</a>
       <span class="smaller">[{{ subj.count }}]</span></dt>
   </dl>
 {% endfor %}
+  </div>
   </td>
-{% endif %}
+  <td class="hspace1"></td>
   <td valign="top">
 {% if last_count %}
   Последние добавления:
 {% endif %}
+  <div class="wrap">
 {% for book in books.object_list %}
   <dl class="messageitem"><dt>
   {% if wrt_count %}
@@ -134,33 +135,19 @@ table.cont td.cover { text-align: center; width: 140px; }
   {% endif %}
   </dl>
 {% endfor %}
-  </td>
-{% if books.object_list %}
-  <tr>
-  <td class="smaller">
-      <br/>
-    {% if books.has_previous %}
-      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">‹ {% trans 'previous' %}</a>
-    {% endif %}
-    {% if books.paginator.num_pages > 1 %}
-      <span class="current">
-        {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
-      </span>
-    {% endif %}
-    {% if books.has_next %}
-      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">{% trans 'next' %} ›</a>
-    {% endif %}
+  </div>
   </td>
   </tr>
 {% endif %} 
 
 {% endif %}
-  </tr>
   </table>
 
 {% else %}
 
-  <p>{% trans 'No books' %}.</p>
+  <div class="wrap">
+    <p>{% trans 'No books' %}.</p>
+  </div>
 
 {% endif %}
 

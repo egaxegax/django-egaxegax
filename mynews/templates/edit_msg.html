@@ -3,9 +3,7 @@
 {% load markup %}
 {% block keywords %}, {% trans 'updates, comments, news' %}{% endblock %}
 {% block title %}{% trans 'News' %} - {% trans 'updates, comments, news' %} - {% endblock %}
-{% block pagestyle %}
-#top_menu li.newsmenu { border: 1px solid rgb(200,220,230); }
-{% endblock %}
+{% block newsclass %}wrap{% endblock %}
 {% block pageheader %}{% trans 'News' %}{% endblock %}
 {% block content %}
 <p>Что нового? Новости, изменения, обновления на сайте и не только.<p>
