@@ -19,7 +19,6 @@
 {% block pagestylelink %}
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/syntax.css" />
 {% endblock %}
-{% block postsclass %}wrap{% endblock %}
 {% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %}{% endblock %}
 {% block content %}
 {% for post in posts.object_list %}
