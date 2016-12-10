@@ -46,8 +46,8 @@ for root, dirs, files in os.walk(path, topdown=False):
 
         ft = za.read(f)
         if (f == 'content.opf'):
-          title = re.findall('>(.*)</dc:title>', ft)[0]
-          writer = re.findall('dc:creator .*="([^"]*)', ft)[0].replace(' &amp', '')
+          title = re.findall('>(.*)</dc:title>', ft)[0].replace('?','')
+          writer = re.findall('dc:creator .*opf:file-as="([^"]*)', ft)[0].replace(' &amp', '')
           subj = re.findall('>(.*)</dc:subject>', ft)
           if subj:
               subj = subj[0]
@@ -68,7 +68,7 @@ for root, dirs, files in os.walk(path, topdown=False):
 
         if (f[:5] == 'index' and os.path.splitext(f)[1] == '.xhtml' and part == 0):
           content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]
-          fn = name + '@' + writer.decode('utf-8') + '@' + title.decode('utf-8').replace('?','') + '@' + subj.decode('utf-8') + '@' + str(part) + '.txt'
+          fn = name + '@' + writer.decode('utf-8') + '@' + title.decode('utf-8') + '@' + subj.decode('utf-8') + '@' + str(part) + '.txt'
           fbook = file(fn, 'w')
           fbook.write(E_OS(content))
           fbook.close()

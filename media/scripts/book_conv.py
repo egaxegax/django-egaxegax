@@ -41,8 +41,8 @@ for root, dirs, files in os.walk(path, topdown=False):
 
         ft = za.read(f)
         if (f == 'content.opf'):
-          title = re.findall('>(.*)</dc:title>', ft)[0]
-          writer = re.findall('dc:creator .*="([^"]*)', ft)[0].replace(' &amp', '')
+          title = re.findall('>(.*)</dc:title>', ft)[0].replace('?','')
+          writer = re.findall('dc:creator .*opf:file-as="([^"]*)', ft)[0].replace(' &amp', '')
           writer_id = abs(zlib.crc32(writer))
           index = abs(zlib.crc32(writer + ' ' + title))
           if (pindex != index):
@@ -74,3 +74,5 @@ print >> fwriter, 'count,writer,key'
 for writer in wrt:
   writer_id = wrt[writer][0]
   print >> fwriter, str(len(wrt[writer])-1) + ',"' + E_OS(writer) + '",' + str(writer_id)
+
+print '\nChange writer_id to real id in database !!!'

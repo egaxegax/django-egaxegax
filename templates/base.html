@@ -19,6 +19,7 @@
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
 #top_menu ul { display: table; width: 100%; max-width: 100%; margin-top: 5px; }
 #top_menu ul li { display: table-cell; text-align: center; width: 17%; padding-top: 5px; border-radius: 2px 2px 2px 2px; }
+li.login { border-right: 1px solid gray; }
 #top_menu ul li a { height: 40px; display: table; width: 100%; }
 #top_menu ul li span { display: table-cell; vertical-align: middle; }
 #page_header { padding: 12px; }
@@ -66,7 +67,7 @@
         </ul>
       {% else %}
       <ul class="inl vspace">
-        <li class="hspace"><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
+        <li class="login hspace"><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
         <li class="hspace"><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
       </ul>
       {% endif %}

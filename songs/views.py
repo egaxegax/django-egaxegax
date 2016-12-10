@@ -147,23 +147,24 @@ def list_art(request, **kw):
     song_count = 0
     per_page = 1000
     art_list = []
+    art_key = ''
     if kw.get('ind_art'):  # by index
         i = ZI(kw.get('ind_art'))
         if art_index.has_key(i):
-            artkey = art_index.get(i).capitalize()
-            if not cache.has_key('arts:' + artkey):
-                art_list = Art.objects.filter(artist__startswith=artkey).order_by('artist')
-                AddArtListCache(artkey, art_list)
-            art_list = eval(cache.get('arts:' + artkey))
+            art_key = art_index.get(i).capitalize()
+            if not cache.has_key('arts:' + art_key):
+                art_list = Art.objects.filter(artist__startswith=art_key).order_by('artist')
+                AddArtListCache(art_key, art_list)
+            art_list = eval(cache.get('arts:' + art_key))
         else:
             art_list = Art.objects.none()
         art_count = len(art_list)
     else:  # full list
-        artkey = '.full_list'
-        if not cache.has_key('arts:' + artkey):
+        art_key = '.full_list'
+        if not cache.has_key('arts:' + art_key):
             art_list = Art.objects.order_by('artist')
-            AddArtListCache(artkey, art_list)
-        art_list = eval(cache.get('arts:' + artkey))
+            AddArtListCache(art_key, art_list)
+        art_list = eval(cache.get('arts:' + art_key))
         art_count = len(art_list)
     for art in art_list:  # sum song by art
         song_count += art['count']
@@ -171,6 +172,7 @@ def list_art(request, **kw):
                               context_instance=RequestContext(request,
                               {'request': request,
                                'art_index': art_index,
+                               'art_key': art_key,
                                'form': SearchForm(initial={'search':request.GET.get('search')}),
                                'song_count': song_count,
                                'art_count': art_count,

@@ -171,6 +171,7 @@ def list_wrt(request, **kw):
     book_count = 0
     per_page = 100
     wrt_list = []
+    wrt_key= ''
     if kw.get('ind_wrt'):  # by index
         i = ZI(kw.get('ind_wrt'))
         if wrt_index.has_key(i):
@@ -195,6 +196,7 @@ def list_wrt(request, **kw):
                               context_instance=RequestContext(request,
                               {'request': request,
                                'wrt_index': wrt_index,
+                               'wrt_key': wrt_key,
                                'form': SearchForm(initial={'search':request.GET.get('search')}),
                                'book_count': book_count,
                                'wrt_count': wrt_count,

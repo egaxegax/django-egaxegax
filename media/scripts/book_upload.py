@@ -18,7 +18,8 @@ path = u'.'
 if (len(sys.argv) > 1):
   path = os.path.abspath(sys.argv[1])
 
-flog = file('mylog.html', 'w')
+uplog = file('up.log', 'w')
+mcount = 0 # files uploaded counter
 
 for root, dirs, files in os.walk(path, topdown=False):
   for name in files:
@@ -28,6 +29,7 @@ for root, dirs, files in os.walk(path, topdown=False):
     if ext == '.txt':
       ss = fname.split('@')
       mname, writer, title, subject, part = ss
+      
       print mname, writer, title, subject, part
 
       # Register the streaming http handlers with urllib2
@@ -60,7 +62,8 @@ for root, dirs, files in os.walk(path, topdown=False):
       request = urllib2.Request("http://egaxegax.appspot.com/books/add")
       uri = re.findall(r'form action="([^\"]*)"', urllib2.urlopen(request).read())
       if uri:
-          print uri
+          print mcount + 1, uri
           request = urllib2.Request(uri[0], datagen, headers)
-          print >> flog, urllib2.urlopen(request).read()
+          print >> uplog, urllib2.urlopen(request).read()
           time.sleep(3)
+          mcount += 1

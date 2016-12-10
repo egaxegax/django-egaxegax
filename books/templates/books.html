@@ -5,7 +5,7 @@
 {% block keywords %}{% if book_count %}, {% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}, {% trans 'books' %}{% endblock %}
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}{% endif %}
+{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}{% endif %}{% endif %}
 {% if not book_count and not search_count %}{% trans 'Books' %}{% endif %}
  - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
@@ -20,7 +20,7 @@ table.cont td.cover { text-align: center; width: 140px; }
 {% block booksclass %}wrap{% endblock %}
 {% block pageheader %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% with books.object_list|first as f %}<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=f.writer.id %}">{{ f.writer.writer }}</a>{% endwith %}{% endif %}{% endif %}
+{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=f.writer.id %}">{{ f.writer.writer }}</a>{% endwith %}{% endif %}{% endif %}{% endif %}
 {% if not book_count and not search_count %}{% trans 'Library' %}{% endif %}
 {% endblock %}
 {% block content %}
@@ -100,6 +100,7 @@ table.cont td.cover { text-align: center; width: 140px; }
   </div>
   </td>
   <td class="hspace1"></td>
+{% endif %}
   <td valign="top">
 {% if last_count %}
   Последние добавления:
@@ -136,9 +137,23 @@ table.cont td.cover { text-align: center; width: 140px; }
   </dl>
 {% endfor %}
   </div>
+{% if books.object_list and wrt_count %}
+  <p class="smaller">
+    {% if books.has_previous %}
+      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">‹ {% trans 'previous' %}</a>
+    {% endif %}
+    {% if books.paginator.num_pages > 1 %}
+      <span class="current">
+        {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
+      </span>
+    {% endif %}
+    {% if books.has_next %}
+      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">{% trans 'next' %} ›</a>
+    {% endif %}
+  </p>
+{% endif %}
   </td>
   </tr>
-{% endif %} 
 
 {% endif %}
   </table>
