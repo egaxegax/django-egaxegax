@@ -18,6 +18,7 @@ from filetransfers.api import serve_file
 from math import ceil
 import re, time, sys, os.path
 import zlib, zipfile, base64, mimetypes
+import transliterate
 
 wrt_index = {
     20:'a',21:'b',22:'c',23:'d',24:'e',25:'f',26:'g',27:'h',28:'i',29:'j',30:'k',31:'l',32:'m',33:'n',34:'o',35:'p',36:'q',37:'r',38:'s',39:'t',40:'u',41:'v',42:'w',43:'x',44:'y',45:'z',
@@ -247,7 +248,7 @@ def list_books(request, **kw):
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
         book_list = Book.objects.filter(Q(title__startswith=st)&Q(part=0))
-        search_key = '.search'
+        search_key = '.search' + transliterate.translit(st, 'ru', reversed=True)
         AddBookListCache(search_key, book_list)
         book_list = eval(cache.get('books:' + search_key))
         book_count = len(book_list)
