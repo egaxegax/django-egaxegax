@@ -21,12 +21,12 @@
     </div>
   </div>  
   <p class="smaller">
-    {% if book.prev_part >= 0 %}
-      <a href="{% url 'books.views.read_book' ind=book.index part=book.prev_part %}">‹ {% trans 'previous' %}</a>
+    {% if book.prev_npart >= 0 %}
+      <a href="{% url 'books.views.read_book' ind=book.index part=book.prev_npart %}">‹ {% trans 'previous' %}</a>
     {% endif %}
-      <span class="hspace">{% trans 'part' %} {{ book.part }}</span> 
-    {% if book.next_part >= 0 %}
-      <a href="{% url 'books.views.read_book' ind=book.index part=book.next_part %}">{% trans 'next' %} ›</a>
+      <span class="hspace2">{% trans 'part' %} {{ book.npart }}</span> 
+    {% if book.next_npart >= 0 %}
+      <a href="{% url 'books.views.read_book' ind=book.index part=book.next_npart %}">{% trans 'next' %} ›</a>
     {% endif %}
   </p>
   <p class="smaller">{% trans 'Added' %} <a href="{% url 'books.views.get_user_profile' id=book.author.id %}">{{ book.author.username }}</a> 

@@ -15,13 +15,18 @@ from books.forms import *
 from books.models import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
-import time, os.path, sys, zlib
 from math import ceil
+import re, time, sys, os.path
+import zlib, zipfile, base64, mimetypes
 
 wrt_index = {
     20:'a',21:'b',22:'c',23:'d',24:'e',25:'f',26:'g',27:'h',28:'i',29:'j',30:'k',31:'l',32:'m',33:'n',34:'o',35:'p',36:'q',37:'r',38:'s',39:'t',40:'u',41:'v',42:'w',43:'x',44:'y',45:'z',
     50:u'а',51:u'б',52:u'в',53:u'г',54:u'д',55:u'е',56:u'ё',57:u'ж',58:u'з',59:u'и',60:u'к',61:u'л',62:u'м',63:u'н',64:u'о',65:u'п',66:u'р',67:u'с',68:u'т',69:u'у',70:u'ф',71:u'х',72:u'ц',73:u'ч',74:u'ш',75:u'щ',76:u'э',77:u'ю',78:u'я'
 }
+
+def E_OS(text):
+    "Convert To Unicode"
+    return text.decode('utf-8')
 
 def ZI(s):
     try:
@@ -61,21 +66,25 @@ def AddSubjListCache(subj_key, subj_list):
            'count': subj.count })
     cache.add('subj:' + subj_key, str(cache_list))
 
-def AddBookCache(book):
+def AddBookCache(book, part, content):
+    st = re.findall('(\d+)', part)
+    if st: npart = int(st[0])
+    else : npart = 0
     cache_book = {
         'id': book.id,
         'writer': {'id': book.writer.id, 'writer': book.writer.writer, 'count': book.writer.count},
         'subject': ((hasattr(book, 'subject') and book.subject) and {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count}) or {},
         'title': book.title,
         'index': book.index,
-        'part': book.part,
-        'prev_part': book.part - 1,
-        'next_part': book.part + 1,
+        'part': part,
+        'npart': npart,
+        'prev_npart': npart - 1,
+        'next_npart': npart + 1,
         'file': ((hasattr(book, 'file') and book.file) and {'name': book.file.name.rsplit('/')[-1]}) or {},
-        'content': book.content,
+        'content': E_OS(content),
         'author': ((hasattr(book, 'author') and book.author) and {'id': book.author.id, 'username': book.author.username}) or {},
         'date': book.date.strftime('%Y-%m-%d %H:%M:%S') }
-    cache.add('book:' + str(book.index) + '.' + str(book.part), str(cache_book))
+    cache.add('book:' + str(book.index) + '.' + str(part), str(cache_book))
     return cache_book
 
 def AddBookListCache(mkey, book_list):
@@ -282,15 +291,40 @@ def list_books(request, **kw):
 def get_book(request, **kw):
     if request.method == 'GET':
         book_ind = kw.get('ind', '')
-        part = kw.get('part', '') or 0
+        part = kw.get('part', '') or '0'
         if not cache.has_key('book:' + book_ind + '.' + str(part)):
-            book = get_object_or_404(Book, Q(index=ZI(book_ind))&Q(part=part))
-            AddBookCache(book)
+            content = ''
+            book = get_object_or_404(Book, Q(index=ZI(book_ind))&Q(part=0))            
+            if ((hasattr(book, 'file') and book.file)):
+                name = book.file.name.replace("'","''").rsplit('/')[-1]
+                for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name,)):
+                    za = zipfile.ZipFile(blob.open())
+                    # get content from zip archive by name or num part
+                    for f in za.namelist():
+                        mpart = re.findall('(\d+)', f)
+                        if (part.isdigit() and f.endswith('.xhtml') and len(mpart) and int(part) == int(mpart[0])) or (part == f) or (part == '0' and f == 'index.xhtml'):
+                            try:
+                                ft = za.read(f)
+                                if f.startswith('index') and f.endswith('.xhtml'):
+                                    content = re.findall('<body[^>]*>(.*)</body>', ft, re.M | re.S)[0]
+                                elif f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png'):                                
+                                    content = base64.b64encode(ft)
+                            except:
+                                continue
+                            break
+            if not content:
+                raise Http404
+            book = AddBookCache(book, part, content)
         book = eval(cache.get('book:' + book_ind + '.' + str(part)))
         return book
 
 def read_book(request, **kw):
-    book = get_book(request, **kw)    
+    book = get_book(request, **kw)
+    f = book['part']
+    if f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png'):
+        content_type = mimetypes.guess_type(book['part'])[0]
+        response = HttpResponse(base64.b64decode(book['content']), content_type)
+        return response         
     return render_to_response('book.html', 
                               context_instance=RequestContext(request,
                               {'request': request,

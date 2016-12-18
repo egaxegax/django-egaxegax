@@ -4,7 +4,7 @@
     padding-left: 0;
     padding-right: 0;
     text-align: justify;
-    margin: 0
+    margin: 0 0 0.2em 0
     }
 .calibre1 {
     display: block
@@ -18,7 +18,7 @@
     /*line-height: 1*/;
     text-align: left;
     /*border: Silver solid 1px;*/
-    margin: 0.5em 0
+    margin: 0 0 0.5em 0
     }
 .calibre3 {
     color: Black;
@@ -28,14 +28,14 @@
     margin: 0.5em auto
     }
 .calibre4 {
-/*    background-color: #F4F4F4;
+/*    background-color: #F4F4F4;*/
     display: block;
-    font-size: 1em;
+    font-size: 1.33em;
     font-style: normal;
     font-weight: bold;
-    text-align: center;
-    border: Gray solid 1px;
-    margin: 1.33em 0 */
+    text-align: left;
+/*    border: Gray solid 1px;*/
+    margin: 0 0 0.5em 0
     }
 .calibre5 {
     /*background-color: #E7E7E7;*/
@@ -46,7 +46,7 @@
     /*line-height: 1;*/
     text-align: left;
     /*border: Black solid 1px;*/
-    margin: 0.1em 0
+    margin: 0 0 0.5em 0
     }
 .calibre6 {
     display: block;
@@ -68,15 +68,9 @@
     /*line-height: 1*/
     }
 .calibre11 {
-    background-color: #EEE;
-    display: block;
-    font-size: 1.1em;
-    font-style: normal;
-    font-weight: bold;
-    /*line-height: 1*/;
-    text-align: left;
-    border: Gray solid 1px;
-    margin: 0 0 0.15em 0
+    font-size: 0.75em;
+    line-height: normal;
+    vertical-align: sub
     }
 .calibre12 {
     font-size: 0.75em;
@@ -90,6 +84,12 @@
 .calibre14 {
     font-style: italic
     }
+.epigraph {
+    display: block;
+    font-style: italic;
+    width: 75%;
+/*    margin: 1em 0.2em 1em 25%*/
+    }
 .paragraph {
     display: block;
     text-indent: 2em
@@ -102,5 +102,5 @@
     font-weight: bold;
     text-align: center;
     border: Gray solid 1px;
-    margin: 0.67em 0
+    margin: 0 0 0.5em 0
     }

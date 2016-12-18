@@ -59,8 +59,8 @@ msgstr "назад"
 msgid "No books"
 msgstr "Нет книг"
 
-msgid "Please authorize to add and download books"
-msgstr "Войдите, чтобы добавлять и скачивать книги"
+msgid "Please authorize to add books"
+msgstr "Войдите, чтобы добавлять книги"
 
 msgid "Add book"
 msgstr "Добавить книгу"

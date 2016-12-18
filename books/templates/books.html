@@ -169,6 +169,6 @@ table.cont td.cover { text-align: center; width: 140px; }
 {% if request.user.is_authenticated %}
   <p class="smaller"><a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a></p>
 {% else %}
-  <p class="smaller">{% trans 'Please authorize to add and download books' %}.</p>
+  <p class="smaller">{% trans 'Please authorize to add books' %}.</p>
 {% endif %}
 {% endblock %}

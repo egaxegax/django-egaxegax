@@ -5,7 +5,7 @@
 #
 
 import sys, os, re, datetime
-import zlib, zipfile as zip
+import zlib, zipfile
 
 pth = os.path.abspath(sys.argv[0] + '../../../../')
 
@@ -37,11 +37,11 @@ for root, dirs, files in os.walk(path, topdown=False):
     if (ext == '.epub'):
       os.rename(oldname, curname)
       print name
-      if not zip.is_zipfile(curname):
+      if not zipfile.is_zipfile(curname):
         print name, ' not a valid ZIP'
         continue
 
-      za = zip.ZipFile(curname)
+      za = zipfile.ZipFile(curname)
       for f in za.namelist():
 
         ft = za.read(f)
@@ -59,14 +59,14 @@ for root, dirs, files in os.walk(path, topdown=False):
             pindex = index
             part = 0
 
-        if (f == 'cover_image.jpg' or f == 'cover.jpeg'):
+        if (f.startswith('cover')):
           za.extract(f, './')
           newname = name + '.jpg'
           if os.path.isfile(newname):
             os.remove(newname)
           os.rename(f, newname)
 
-        if (f[:5] == 'index' and os.path.splitext(f)[1] == '.xhtml' and part == 0):
+        if (f.startswith('index') and f.endswith('.xhtml') and part == 0):
           content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]
           fn = name + '@' + writer.decode('utf-8') + '@' + title.decode('utf-8') + '@' + subj.decode('utf-8') + '@' + str(part) + '.txt'
           fbook = file(fn, 'w')

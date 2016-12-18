@@ -5,7 +5,7 @@
 #
 
 import sys, os, re, datetime
-import zlib, zipfile as zip
+import zlib, zipfile
 
 __help__ = u"""
 Usage: book_conv.py <dir with .epub> (extract to current dir)
@@ -32,13 +32,12 @@ for root, dirs, files in os.walk(path, topdown=False):
     fname, ext = os.path.splitext(name)
     if (ext == '.epub'):
       print fname
-      if not zip.is_zipfile(absname):
+      if not zipfile.is_zipfile(absname):
         print name, ' not a valid ZIP'
         continue
 
-      za = zip.ZipFile(absname)
+      za = zipfile.ZipFile(absname)
       for f in za.namelist():
-
         ft = za.read(f)
         if (f == 'content.opf'):
           title = re.findall('>(.*)</dc:title>', ft)[0].replace('?','')
@@ -58,7 +57,7 @@ for root, dirs, files in os.walk(path, topdown=False):
 #           za.extract(f, './')
 #           os.rename(f, name.encode('utf-8') + '.jpg')
 
-        if (f[:5] == 'index' and os.path.splitext(f)[1] == '.xhtml'):
+        if f.startswith('index') and f.endswith('.xhtml'):
           book_id = abs(zlib.crc32(title + ' ' + str(part)))
           content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]
           if part > 0: # skip uploaded part 0

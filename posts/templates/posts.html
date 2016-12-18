@@ -53,7 +53,7 @@
     <a href="?page={{ posts.previous_page_number }}">‹ {% trans 'previous' %}</a>
   {% endif %}
   {% if posts.paginator.num_pages > 1 %}
-    <span class="current">
+    <span class="hspace2">
       {% trans 'Page' %} {{ posts.number }} {% trans 'of' %} {{ posts.paginator.num_pages }}
     </span>
   {% endif %}
