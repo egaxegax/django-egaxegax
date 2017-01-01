@@ -1,6 +1,8 @@
-from django.conf.urls import *
+from django.conf.urls import url
 
-urlpatterns = patterns('upload.views',
-    (r'^$', 'upload_handler'),
-    (r'(?P<pk>\d+)', 'download_handler'),
-)
+from . import views
+
+urlpatterns = [
+    url(r'^$', views.upload_handler),
+    url(r'(?P<pk>\d+)', views.download_handler),
+]

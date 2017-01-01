@@ -1,15 +1,17 @@
-from django.conf.urls import *
+from django.conf.urls import url
 
-urlpatterns = patterns('books.views',
-    (r'^$', 'list_books'),
-    (r'^read/(?P<ind>[0-9]*)/(?P<part>.*)/?$', 'read_book'),
-    (r'^get_file/(?P<ind>[0-9]*)/?$', 'get_file'),
-    (r'^wrt/i/(?P<ind_wrt>[0-9]*)/?$', 'list_wrt'),
-    (r'^wrt/?$', 'list_wrt'),
-    (r'^wrt/(?P<id_wrt>[0-9]*)/?$', 'list_books'),
-    (r'^subj/(?P<id_subj>[0-9]*)/?$', 'list_books'),
-    (r'^add/?$', 'add_book'),
-    (r'^del/(?P<id>[0-9]*)/?$', 'delete_book'),
-    (r'^edit/(?P<id>[0-9]*)/?$', 'edit_book'),
-    (r'^user/(?P<id>[0-9]*)/?$', 'get_user_profile'),
-)
+from . import views
+
+urlpatterns = [
+    url(r'^$', views.list_books),
+    url(r'^read/(?P<ind>[0-9]*)/(?P<part>.*)/?$', views.read_book),
+    url(r'^get_file/(?P<ind>[0-9]*)/?$', views.get_file),
+    url(r'^wrt/i/(?P<ind_wrt>[0-9]*)/?$', views.list_wrt),
+    url(r'^wrt/?$', views.list_wrt),
+    url(r'^wrt/(?P<id_wrt>[0-9]*)/?$', views.list_books),
+    url(r'^subj/(?P<id_subj>[0-9]*)/?$', views.list_books),
+    url(r'^add/?$', views.add_book),
+    url(r'^del/(?P<id>[0-9]*)/?$', views.delete_book),
+    url(r'^edit/(?P<id>[0-9]*)/?$', views.edit_book),
+    url(r'^user/(?P<id>[0-9]*)/?$', views.get_user_profile),
+]

@@ -26,7 +26,7 @@ if (len(sys.argv) > 1):
   path = os.path.abspath(E_OS(sys.argv[1]))
 
 title = writer = pwriter = ''
-index = part = pindex = 0
+index = part = pindex = k = 0
 
 for root, dirs, files in os.walk(path, topdown=False):
   for name in files:
@@ -35,8 +35,9 @@ for root, dirs, files in os.walk(path, topdown=False):
     curname = os.path.normpath(os.path.join(root, name))
     fname, ext = os.path.splitext(name)
     if (ext == '.epub'):
+      k += 1
       os.rename(oldname, curname)
-      print name
+      print k, name
       if not zipfile.is_zipfile(curname):
         print name, ' not a valid ZIP'
         continue
@@ -47,7 +48,7 @@ for root, dirs, files in os.walk(path, topdown=False):
         ft = za.read(f)
         if (f == 'content.opf'):
           title = re.findall('>(.*)</dc:title>', ft)[0].replace('?','')
-          writer = re.findall('dc:creator .*opf:file-as="([^"]*)', ft)[0].replace(' &amp', '')
+          writer = re.findall('dc:creator .*opf:file-as="([^"\&\;]*)', ft)[0].replace(' &amp', '')
           subj = re.findall('>(.*)</dc:subject>', ft)
           if subj:
               subj = subj[0]

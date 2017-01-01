@@ -1,11 +1,10 @@
-try:
-    from django.conf.urls import patterns, url
-except ImportError:
-    from django.conf.urls.defaults import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns('captcha.views',
-    url(r'image/(?P<key>\w+)/$', 'captcha_image', name='captcha-image', kwargs={'scale': 1}),
-    url(r'image/(?P<key>\w+)@2/$', 'captcha_image', name='captcha-image-2x', kwargs={'scale': 2}),
-    url(r'audio/(?P<key>\w+)/$', 'captcha_audio', name='captcha-audio'),
-    url(r'refresh/$', 'captcha_refresh', name='captcha-refresh'),
-)
+from . import views
+
+urlpatterns = [
+    url(r'image/(?P<key>\w+)/$', views.captcha_image, name='captcha-image', kwargs={'scale': 1}),
+    url(r'image/(?P<key>\w+)@2/$', views.captcha_image, name='captcha-image-2x', kwargs={'scale': 2}),
+    url(r'audio/(?P<key>\w+)/$', views.captcha_audio, name='captcha-audio'),
+    url(r'refresh/$', views.captcha_refresh, name='captcha-refresh'),
+]

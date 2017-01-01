@@ -1,16 +1,18 @@
-from django.conf.urls import *
+from django.conf.urls import url
 
-urlpatterns = patterns('songs.views',
-    (r'^$', 'list_songs'),
-    (r'^(?P<id>[0-9]*)/?$', 'get_song'),
-    (r'^artcp/?$', 'copy_art'),
-    (r'^art/i/(?P<ind_art>[0-9]*)/?$', 'list_art'),
-    (r'^art/?$', 'list_art'),
-    (r'^art/(?P<id_art>[0-9]*)/?$', 'list_songs'),
-    (r'^audio/(?P<id>[0-9]*)/?$', 'get_song_file'),
-    (r'^add/?$', 'add_song'),
-    (r'^del/(?P<id>[0-9]*)/?$', 'delete_song'),
-    (r'^edit/(?P<id>[0-9]*)/?$', 'edit_song'),
-    (r'^editaudio/(?P<id>[0-9]*)/?$', 'edit_song_file'),
-    (r'^user/(?P<id>[0-9]*)/?$', 'get_user_profile'),
-)
+from . import views
+
+urlpatterns = [
+    url(r'^$', views.list_songs),
+    url(r'^(?P<id>[0-9]*)/?$', views.get_song),
+    url(r'^artcp/?$', views.copy_art),
+    url(r'^art/i/(?P<ind_art>[0-9]*)/?$', views.list_art),
+    url(r'^art/?$', views.list_art),
+    url(r'^art/(?P<id_art>[0-9]*)/?$', views.list_songs),
+    url(r'^audio/(?P<id>[0-9]*)/?$', views.get_song_file),
+    url(r'^add/?$', views.add_song),
+    url(r'^del/(?P<id>[0-9]*)/?$', views.delete_song),
+    url(r'^edit/(?P<id>[0-9]*)/?$', views.edit_song),
+    url(r'^editaudio/(?P<id>[0-9]*)/?$', views.edit_song_file),
+    url(r'^user/(?P<id>[0-9]*)/?$', views.get_user_profile),
+]

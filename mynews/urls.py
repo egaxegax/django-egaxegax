@@ -1,10 +1,12 @@
-from django.conf.urls import *
+from django.conf.urls import url
 
-urlpatterns = patterns('mynews.views',
-    (r'^$', 'list_msg'),
-    (r'^(?P<all>all)/?$', 'list_msg'),
-    (r'^add/?$', 'add_msg'),
-    (r'^edit/(?P<id>[0-9]*)/?$', 'edit_msg'),
-    (r'^del/(?P<id>[0-9]*)/?$', 'delete_msg'),
-    (r'^user/(?P<id>[0-9]*)/?$', 'get_user_profile'),
-)
+from . import views
+
+urlpatterns = [
+    url(r'^$', views.list_msg),
+    url(r'^(?P<all>all)/?$', views.list_msg),
+    url(r'^add/?$', views.add_msg),
+    url(r'^edit/(?P<id>[0-9]*)/?$', views.edit_msg),
+    url(r'^del/(?P<id>[0-9]*)/?$', views.delete_msg),
+    url(r'^user/(?P<id>[0-9]*)/?$', views.get_user_profile),
+]
