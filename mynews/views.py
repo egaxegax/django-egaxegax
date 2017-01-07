@@ -48,7 +48,9 @@ def ClearMsgListCache():
 # Controllers
 
 def list_msg(request, **kw):
+    per_page = 7
     if kw.has_key('all'):
+        per_page = 11
         allkey = '.full_list'
         if not cache.has_key('news:' + allkey):
             msg_list = News.objects.order_by('-date')
@@ -56,13 +58,13 @@ def list_msg(request, **kw):
     else:
         allkey = '.last_update'
         if not cache.has_key('news:' + allkey):
-            msg_list = News.objects.order_by('-date')[:4]
+            msg_list = News.objects.order_by('-date')
             AddMsgListCache(allkey, msg_list)
     msg_list = eval(cache.get('news:' + allkey))
     return render_to_response('mynews.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
-                               'news': PageList(request, msg_list),
+                               'news': PageList(request, msg_list, per_page),
                                'list_all': kw.has_key('all'),
                                'form': AddMsgForm(),
                                'logback': reverse('mynews.views.list_msg')}))

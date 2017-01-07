@@ -36,8 +36,8 @@ for root, dirs, files in os.walk(path, topdown=False):
     fname, ext = os.path.splitext(name)
     if (ext == '.epub'):
       k += 1
-      os.rename(oldname, curname)
       print k, name
+      os.rename(oldname, curname)
       if not zipfile.is_zipfile(curname):
         print name, ' not a valid ZIP'
         continue
@@ -67,7 +67,7 @@ for root, dirs, files in os.walk(path, topdown=False):
             os.remove(newname)
           os.rename(f, newname)
 
-        if (f.startswith('index') and f.endswith('.xhtml') and part == 0):
+        if (f.startswith('index') and f.endswith('html') and part == 0):
           content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]
           fn = name + '@' + writer.decode('utf-8') + '@' + title.decode('utf-8') + '@' + subj.decode('utf-8') + '@' + str(part) + '.txt'
           fbook = file(fn, 'w')

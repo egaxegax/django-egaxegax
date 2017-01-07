@@ -256,7 +256,7 @@ def list_books(request, **kw):
     else:  # last update
         wrt_id = '.last_update'
         if not cache.has_key('books:' + wrt_id):
-            book_list = Book.objects.filter(Q(part=0)).order_by('-date')[:16]
+            book_list = Book.objects.filter(Q(part=0)).order_by('-date')[:34]
             AddBookListCache(wrt_id, book_list)
         book_list = eval(cache.get('books:' + wrt_id))
         book_last_count = len(book_list)
