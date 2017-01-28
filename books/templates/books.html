@@ -11,11 +11,13 @@
 {% block pagestyle %}
 table.cont { width: 100%; border-collapse: collapse;  }
 table.cont td.cont { text-align: left; vertical-align: top; }
-table.cont td.cont .bbar { padding: 10px 20px; }
 table.cont td.prev { text-align: left; width: 32px; }
 table.cont td.next { text-align: right; width: 32px; }
 table.cont td.cover { text-align: center; width: 140px; }
-#id_search { height: 12px; margin-left: 12px; }
+dt .cont { display: table; width: 100%; }
+.bbar .button { padding: 20px 40px; margin: 10px 20px; border: 1px solid transparent; }
+.bbar .button:hover { border: 1px dashed lightgray; }
+#id_search { height: 16px; margin-left: 12px; }
 {% endblock %}
 {% block booksclass %}wrap{% endblock %}
 {% block pageheader %}
@@ -64,8 +66,8 @@ table.cont td.cover { text-align: center; width: 140px; }
 	   <td class="cont messageitem">
 	     <div class="smaller">{{ book.content }}</div>
 	     <div class="bbar smaller">
-	       <a class="gray nodecor hspace2" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
-	       <a class="gray nodecor hspace2" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
+	       <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="gray button lfloat">Скачать</div></a>&nbsp;
+	       <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="gray button lfloat">Читать</div></a>
 	     </div>
 	   </td>      
     {% if books.has_next %}
@@ -115,18 +117,18 @@ table.cont td.cover { text-align: center; width: 140px; }
     <span class="smaller">[{{ book.count }}]</span>
   {% endif %}
   {% if last_count or search_count%}
-    <div style="display: table">
-    <div  class="lfloat">
+    <div class="cont">
+    <div class="lfloat">
       <img id="thumb{{ forloop.counter }}" src="{{ book.thumb_url }}=s100" title="{{ book.title }}" alt="{{ book.title }}"/>
     </div>
     <div class="lfloat">
       &nbsp;<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>
       &nbsp;<a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
     </div>
-    <div class="smaller">
-    <br/><br/><br/>
-      &nbsp;<a class="gray nodecor hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
-      <a class="gray nodecor hspace" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">Читать</a>
+      <br/>
+    <div class="bbar smaller">
+      <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="gray button lfloat">Скачать</div></a>&nbsp;
+      <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="gray button lfloat">Читать</div></a>
     </div>
     </div>
   {% endif %}

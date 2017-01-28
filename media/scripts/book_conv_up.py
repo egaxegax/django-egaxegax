@@ -69,7 +69,7 @@ for root, dirs, files in os.walk(path, topdown=False):
 
         if (f.startswith('index') and f.endswith('html') and part == 0):
           content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]
-          fn = name + '@' + writer.decode('utf-8') + '@' + title.decode('utf-8') + '@' + subj.decode('utf-8') + '@' + str(part) + '.txt'
+          fn = name + '@' + writer.decode('utf-8').strip() + '@' + title.decode('utf-8').strip() + '@' + subj.decode('utf-8').strip() + '@' + str(part) + '.txt'
           fbook = file(fn, 'w')
           fbook.write(E_OS(content))
           fbook.close()
