@@ -13,7 +13,7 @@
 <div class="wrap">
 {% for subj in subjects.object_list %}
   {% if subj.subject %}
-    <dl class="messageitem">
+    <dl class="msgtext">
       <dt><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subj.id %}">{{ subj.subject|escape }}</a>
       <span class="smaller">[{{ subj.count }}]</span></dt>
       <dd class="smaller">

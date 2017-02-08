@@ -38,7 +38,7 @@
 {% if songs.object_list %}
   <div class="wrap">
 {% for song in songs.object_list %}
-  <dl class="messageitem"><dt>
+  <dl class="msgtext"><dt>
   {% if art_count %}
     <a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.ref_id %}">{{ song.artist }}</a>
   {% endif %}
@@ -75,7 +75,7 @@
   </p>
 {% else %}
   <div class="wrap">
-    <p>{% trans 'No songs' %}.</p>
+    <div class="msgtext">{% trans 'No songs' %}.</div>
   </div>
 {% endif %}
 {% if request.user.is_authenticated %}

@@ -6,8 +6,6 @@
 {% block keywords %}, {% trans 'updates, comments, news' %}{% endblock %}
 {% block title %}{% trans 'My news' %} - {% trans 'updates, comments, news' %} - {% endblock %}
 {% block pagestyle %}
-.msgfooter { font-size: 70%; text-align: right; }
-.msgbox { box-shadow: 0 2px 2px rgba(0, 0, 0, 0.08); margin-bottom: 5px; }
 {% endblock %}
 {% block newsclass %}wrap{% endblock %}
 {% block pagestylelink %}
@@ -17,7 +15,7 @@
 {% block content %}
 <p>Кто на новенького? Новости, изменения, обновления на сайте, сообщения от пользователей.</p>
 {% for msg in news.object_list %}
-  <div class="msgbox wrap">
+  <div class="wrap">
     <div class="msgtext">{{ msg.content|markdown:"codehilite,extra" }}</div>
     <div class="msgfooter">
       <a class="nodecor" href="{% url 'mynews.views.get_user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>

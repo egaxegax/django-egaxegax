@@ -6,6 +6,7 @@
 {% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
 #id_search { height: 16px; margin-left: 10px; }
+.msgcont { line-height: 1.5em; }
 {% endblock %}
 {% block songsclass %}wrap{% endblock %}
 {% block pagescript %}
@@ -39,7 +40,7 @@
 </p>
 {% endif %}
 <div class="wrap">
-  <p class="messageitem">{{ song.content|safe }}</p>
+  <div class="msgtext msgcont">{{ song.content|safe }}</div>
 </div>
 <p class="smaller">{% trans 'Added' %} <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> 
 <acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}</p>

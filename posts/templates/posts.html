@@ -6,7 +6,6 @@
 {% block keywords %}, {% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
-.messageblock { font-size: 70%; text-align: right; }
 {% endblock %}
 {% block postsclass %}wrap{% endblock %}
 {% block pagescript %}
@@ -22,13 +21,13 @@
 {% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %}{% endblock %}
 {% block content %}
 {% for post in posts.object_list %}
-  <div class="wrap messagebox">
+  <div class="wrap">
     <a id="id{{ post.id }}" name="id{{ post.id }}"></a>
-    <div class="messagetext">
+    <div class="msgtext">
       {% if post.title %}<h3><a class="nodecor" href="{% url 'posts.views.list_posts' id=post.id %}">{{ post.title }}</a></h3>{% endif %}
       {{ post.content|markdown:"codehilite,extra" }}
     </div>
-    <div class="messageblock">
+    <div class="msgfooter">
       {% if post.subject %}
         <div><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a></div>
       {% endif %}
