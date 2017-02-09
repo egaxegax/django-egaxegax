@@ -9,7 +9,7 @@
 {% if not book_count and not search_count %}{% trans 'Books' %}{% endif %}
  - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
-table.cont { width: 100%; }
+table.cont { width: 100%; border-collapse: collapse; }
 table.cont td.cont { text-align: left; vertical-align: top; }
 table.cont td.prev { text-align: left; width: 32px; }
 table.cont td.next { text-align: right; width: 32px; }
@@ -43,6 +43,8 @@ dt .cont { display: table; width: 100%; }
 {% if book_count or wrt_count %}
   <p>Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}.</p>
 {% endif %}
+
+<p>Последние добавления:</p>
 
 {% if books.object_list %}
 
@@ -91,7 +93,7 @@ dt .cont { display: table; width: 100%; }
 
   <tr>
 {% if subjects.object_list %}
-  <td valign="top" width="30%">Жанры:
+  <td valign="top" width="30%">
   <div class="wrap">
 {% for subj in subjects.object_list %}
   <dl class="msgtext">
@@ -105,7 +107,6 @@ dt .cont { display: table; width: 100%; }
 {% endif %}
   <td valign="top">
 {% if last_count %}
-  Последние добавления:
 {% endif %}
   <div class="wrap">
 {% for book in books.object_list %}
