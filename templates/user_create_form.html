@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load filetransfers %}
-{% block pageheader %}{% trans 'Add user' %}{% endblock %}
+{% block pageheader %}{# trans 'Add user' #}{% endblock %}
 {% block content %}
+<p>Заполните поля для ввода нового пользователя.</p>
 <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
   {% render_upload_data upload_data %}
 <table>

@@ -11,7 +11,7 @@
 {% block pagestylelink %}
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/syntax.css" />
 {% endblock %}
-{% block pageheader %}{% trans 'My news' %}{% endblock %}
+{% block pageheader %}{# trans 'My news' #}{% endblock %}
 {% block content %}
 <p>Кто на новенького? Новости, изменения, обновления на сайте, сообщения от пользователей.</p>
 {% for msg in news.object_list %}

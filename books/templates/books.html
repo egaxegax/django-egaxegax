@@ -21,9 +21,9 @@ dt .cont { display: table; width: 100%; }
 {% endblock %}
 {% block booksclass %}wrap{% endblock %}
 {% block pageheader %}
-{% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=f.writer.id %}">{{ f.writer.writer }}</a>{% endwith %}{% endif %}{% endif %}{% endif %}
-{% if not book_count and not search_count %}{% trans 'Library' %}{% endif %}
+{% if search_count %}{% trans 'Search result' %} '{{ request.GET.search }}'{% endif %}
+{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% if wrt_key %}Список авторов '{{ wrt_key }}'{% else %}{% with books.object_list|first as f %}<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=f.writer.id %}">{{ f.writer.writer }}</a>{% endwith %}{% endif %}{% endif %}{% endif %}
+{# if not book_count and not search_count #}{# trans 'Library' #}{# endif #}
 {% endblock %}
 {% block content %}
 <div class="indexlist">

@@ -13,9 +13,9 @@
 {% endblock %}
 {% block songsclass %}wrap{% endblock %}
 {% block pageheader %}
-{% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if song_count and not search_count %}{% if art_key %}Список исполнителей{% else %}{% with songs.object_list|first as f %}<a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}">{{ f.artist }}</a>{% endwith %}{% endif %}{% endif %}
-{% if not song_count and not search_count %}{% trans 'Chords, lyrics' %}{% endif %}
+{% if search_count %}{% trans 'Search result' %} '{{ request.GET.search }}'{% endif %}
+{% if song_count and not search_count %}{% if art_key %}Список исполнителей '{{ art_key }}'{% else %}{% with songs.object_list|first as f %}<a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}">{{ f.artist }}</a>{% endwith %}{% endif %}{% endif %}
+{# if not song_count and not search_count #}{# trans 'Chords, lyrics' #}{# endif #}
 {% endblock %}
 {% block content %}
 <div class="indexlist">

@@ -4,9 +4,9 @@
 {% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
 {% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block postsclass %}wrap{% endblock %}
-{% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %}{% endblock %}
+{% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{# trans 'Posts and notes' #}{% endif %}{% endblock %}
 {% block content %}
-<p>Читайте, пишите заметки, оставляйте комментарии.<p>
+<p>{% if subject.subject %}{{ subject.subject }}{% else %}Читайте, пишите заметки, оставляйте комментарии.{% endif %}<p>
 {% if request.user.is_authenticated %}
   <p>
     <form action="{% url 'posts.views.edit_post' id=form.initial.id %}" method="post">{% csrf_token %}

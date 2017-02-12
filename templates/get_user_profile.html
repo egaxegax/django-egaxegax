@@ -5,11 +5,9 @@
 ul.profile li { padding: 1px 0 1px 0; }
 {% endblock %}
 {% block aboutclass %}wrap{% endblock %}
-{% block pageheader %}{% trans 'Profile' %}{% endblock %}
+{% block pageheader %}{# trans 'Profile' #}{% endblock %}
 {% block content %}
-<p>
-  Информация о пользователе:
-</p>
+<p>Информация о пользователе:</p>
 <ul class="profile">
   <li>{% trans 'avatar'|capfirst %}: <img width="26px" height="26px" src="{% url 'my.views.get_avatar' id=record.author.id %}" title="{{ record.author.username }}"/></li>
   <li>{% trans 'name'|capfirst %}: <span class="smaller">{{ record.author.username }}</span></li>

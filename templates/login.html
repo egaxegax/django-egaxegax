@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block title %}{% trans 'Log in' %} - {% endblock %}
-{% block pageheader %}{% trans 'Log in' %}{% endblock %}
+{% block pageheader %}{# trans 'Log in' #}{% endblock %}
 {% block content %}
+<p>Введите свои учетные данные.</p>
 <form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
 <table>
   {{ form }}
