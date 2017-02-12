@@ -44,8 +44,6 @@ dt .cont { display: table; width: 100%; }
   <p>Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}.</p>
 {% endif %}
 
-<p>Последние добавления:</p>
-
 {% if books.object_list %}
 
   <table class="cont">
@@ -93,7 +91,7 @@ dt .cont { display: table; width: 100%; }
 
   <tr>
 {% if subjects.object_list %}
-  <td valign="top" width="30%">
+  <td valign="top" width="30%">Жанры:
   <div class="wrap">
 {% for subj in subjects.object_list %}
   <dl class="msgtext">
@@ -107,6 +105,7 @@ dt .cont { display: table; width: 100%; }
 {% endif %}
   <td valign="top">
 {% if last_count %}
+  Последние добавления:
 {% endif %}
   <div class="wrap">
 {% for book in books.object_list %}
