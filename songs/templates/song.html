@@ -15,7 +15,6 @@
 <!--/google+ comments-->
 {% endblock %}
 {% block pageheader %}
-<a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a><span class="hspace">&nbsp;</span>{{ song.title }}
 {% endblock %}
 {% block content %}
 <div class="indexlist">
@@ -28,6 +27,9 @@
     <input class="submit" type="submit" value="{% trans 'Search' %}" />
   </form>
 </div>
+<p>
+  <a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a><span class="hspace">&nbsp;</span>{{ song.title }}
+</p>
 {% if song.audio %}
 <p>
   <table>

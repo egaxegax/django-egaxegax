@@ -20,7 +20,7 @@
 {% endblock %}
 {% block pageheader %}{% if subject.subject %}{{ subject.subject }}{% else %}{# trans 'Posts and notes' #}{% endif %}{% endblock %}
 {% block content %}
-<p>{% if not subject.subject %}Читайте, пишите заметки, оставляйте комментарии.{% endif %}<p>
+{% if not subject.subject %}<p>Читайте, пишите заметки, оставляйте комментарии.</p>{% endif %}
 {% for post in posts.object_list %}
   <div class="wrap">
     <a id="id{{ post.id }}" name="id{{ post.id }}"></a>

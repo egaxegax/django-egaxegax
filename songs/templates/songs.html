@@ -13,11 +13,9 @@
 {% endblock %}
 {% block songsclass %}wrap{% endblock %}
 {% block pageheader %}
-{% if search_count %}{% trans 'Search result' %} '{{ request.GET.search }}'{% endif %}
-{% if song_count and not search_count %}{% if art_key %}Список исполнителей '{{ art_key }}'{% else %}{% with songs.object_list|first as f %}<a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}">{{ f.artist }}</a>{% endwith %}{% endif %}{% endif %}
-{# if not song_count and not search_count #}{# trans 'Chords, lyrics' #}{# endif #}
 {% endblock %}
 {% block content %}
+<p>Подборы гитарных аккордов к песням. В базе свыше <b>11000</b> текстов. Читайте, добавляйте свои подборы и тексты. </p>
 <div class="indexlist">
   <a class="hspaced" href="{% url 'songs.views.list_art' %}">{% trans 'Full list' %}</a>
   {% for i, v in art_index.items %}
@@ -28,10 +26,14 @@
     <input class="submit" type="submit" value="{% trans 'Search' %}" />
   </form>
 </div>
-<p>Подборы гитарных аккордов к песням. В базе свыше <b>11000</b> текстов. Читайте, добавляйте свои подборы и тексты. </p>
+<p>
 {% if song_count %}
-  <p>Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов.</p>
+{% if search_count %}Поиск '{{ request.GET.search }}'. {% endif %}
+{% if song_count and not search_count %}{% if art_key %}{% else %}{% with songs.object_list|first as f %}<a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}">{{ f.artist }}. </a>{% endwith %}{% endif %}{% endif %}
+{# if not song_count and not search_count #}{# trans 'Chords, lyrics' #}{# endif #}
+  Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов.
 {% endif %}
+</p>
 {% if last_count %}
   <p>Последние обновления:</p>
 {% endif %}
