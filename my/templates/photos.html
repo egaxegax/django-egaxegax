@@ -225,7 +225,7 @@ function viewchange(counter) {
   {% endfor %}
     </table>
 {% else %}
-  <p>{% trans 'No photos' %}.</p>
+  <div class="msgtext">{% trans 'No photos' %}.</div>
 {% endif %}
   </div>
 {% if request.user.is_authenticated %}

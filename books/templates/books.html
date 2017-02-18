@@ -27,7 +27,7 @@ dt .cont { display: table; width: 100%; }
 Коллекция электронных книг различных жанров отечественных и зарубежных авторов. 
 Все тексты взяты из свободных источников и представлены исключительно для ознакомления.
 </p>
-<div class="indexlist">
+<div class="indexlist wrap">
   <a class="hspaced" href="{% url 'books.views.list_wrt' %}">{% trans 'Full list' %}</a>
   {% for i, v in wrt_index.items %}
     <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
