@@ -76,9 +76,7 @@
   {% endif %}
   </p>
 {% else %}
-  <div class="wrap">
-    <div class="msgtext">{% trans 'No songs' %}.</div>
-  </div>
+  <p>{% trans 'No songs' %}.</p>
 {% endif %}
 {% if request.user.is_authenticated %}
   <p class="smaller"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>

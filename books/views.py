@@ -98,20 +98,23 @@ def AddBookListCache(mkey, book_list):
             continue
         dkey = book.writer.writer + ' ' + book.title
         if not dkey in dlist: 
-            thumb_url = ''
-            if hasattr(book, 'img') and book.img:
-                name = book.img.name.rsplit('/')[-1]
-                for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name.replace("'","''"),)):
-                    thumb_url = images.get_serving_url(blob.key())
+            # cover image
+#             thumb_url = ''
+#             if hasattr(book, 'img') and book.img:
+#                 name = book.img.name.rsplit('/')[-1]
+#                 for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name.replace("'","''"),)):
+#                     thumb_url = images.get_serving_url(blob.key())
+            # description content
+            content = GetBookContent(book, 'content.opf')
             dlist.append(dkey)
             cache_list.append({
                'id': book.id,
                'writer': {'id': book.writer.id, 'writer': book.writer.writer, 'count': book.writer.count},
                'subject': {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count},
                'title': book.title,
-               'content': truncatewords(striptags(book.content).strip('Annotation'), 80),
+               'content': truncatewords(content, 80),
                'index': book.index,
-               'thumb_url': thumb_url,
+#                'thumb_url': thumb_url,
                'date': book.date.strftime('%Y-%m-%d %H:%M:%S') })
     cache.add('books:' + str(mkey), str(cache_list))
 
@@ -136,6 +139,42 @@ def ClearBookListSubjCache(subj_id, num_pages):
         cache.delete_many(['books:.subj' + str(subj_id) + '.' + str(page_num)])
     cache.delete_many(['books:.last_update'])
     ClearSubjListCache()
+
+# extract content text, image, cover_image from .epub
+def GetBookContent(book, part='0'):
+        content = ''
+        if ((hasattr(book, 'file') and book.file)):
+            name = book.file.name.replace("'","''").rsplit('/')[-1]
+            for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name,)):
+                za = zipfile.ZipFile(blob.open())
+                # get content from zip archive by name or num part
+                for f in za.namelist():
+                    mpart = re.findall('(\d+)', f)
+                    if (part.isdigit() and f.endswith('.xhtml') and len(mpart) and int(part) == int(mpart[0])) or (part == f) or (part == '0' and f == 'index.xhtml') or (part.startswith('cover') and f.startswith('cover')):
+                        try:
+                            ft = za.read(f)
+                            if f.startswith('index') and f.endswith('.xhtml'):
+                                try:
+                                    content = re.findall('<body[^>]*>(.*)</body>', ft, re.M | re.S)[0]
+                                except:
+                                    content = ''
+                            elif f.startswith('content.opf'):
+                                try:                                
+                                    title = re.findall('>(.*)</dc:title>', ft)[0]
+                                    writer = re.findall('>(.*)</dc:creator>', ft)[0]
+                                    content = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)
+                                    if len(content):
+                                        content = content[0]
+                                    else:
+                                        content = writer + ' ' + title
+                                except:
+                                    content = ''
+                            elif f.startswith('cover'):
+                                content = base64.b64encode(ft)
+                        except:
+                            continue
+                        break
+        return content
 
 # increment wrt book count
 def IncWrtCount(**kw):
@@ -215,17 +254,15 @@ def list_wrt(request, **kw):
 
 def list_books(request, **kw):
     book_count = 0
-    book_last_count = 0
+    last_count = 0
     search_count = 0
     book_list = []
     subj_list = []
     subject = ''
-    rows = 10
-    cols = 1
-    per_page = rows * cols
     page_num = ZI(request.GET.get('page', '1'))
+    per_page = 10
     page_bottom = (page_num-1)*per_page
-    page_top = page_bottom+per_page 
+    page_top = page_bottom+per_page
     if kw.get('id_wrt'): # filter by wrt
         wrt_id = ZI(kw.get('id_wrt'))
         wrt_key = str(wrt_id) + '.' + str(page_num)
@@ -234,7 +271,7 @@ def list_books(request, **kw):
             AddBookListCache(wrt_key, book_list)
         book_list = eval(cache.get('books:' + wrt_key))
         if len(book_list):
-            book_count = book_list[0]['writer']['count']                        
+            book_count = book_list[0]['writer']['count']
     elif kw.get('id_subj'): # filter by subj
         subj_id = ZI(kw.get('id_subj'))
         subj_key = '.subj' + str(subj_id) + '.' + str(page_num)
@@ -247,36 +284,40 @@ def list_books(request, **kw):
             subject = book_list[0]['subject']['subject']
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
-        book_list = Book.objects.filter(Q(title__startswith=st)&Q(part=0))
-        search_key = '.search' + transliterate.translit(st, 'ru', reversed=True)
-        AddBookListCache(search_key, book_list)
+        search_key = '.search' + transliterate.translit(st, 'ru', reversed=True) + '.' + str(page_num)
+        if not cache.has_key('search_key:' + search_key):
+            book_list = Book.objects.filter(Q(title__startswith=st)&Q(part=0))[page_bottom:page_top]
+            AddBookListCache(search_key, book_list)
         book_list = eval(cache.get('books:' + search_key))
         book_count = len(book_list)
         search_count = book_count
     else:  # last update
         wrt_id = '.last_update'
-        if not cache.has_key('books:' + wrt_id):
-            book_list = Book.objects.filter(Q(part=0)).order_by('-date')[:34]
-            AddBookListCache(wrt_id, book_list)
-        book_list = eval(cache.get('books:' + wrt_id))
-        book_last_count = len(book_list)
+        wrt_key = str(wrt_id) + '.' + str(page_num)
+        per_page = 30
+        page_bottom = (page_num-1)*per_page
+        page_top = page_bottom+per_page
+        if not cache.has_key('books:' + wrt_key):
+            book_list = Book.objects.filter(Q(part=0)).order_by('-date')[page_bottom:page_top]
+            AddBookListCache(wrt_key, book_list)
+        book_list = eval(cache.get('books:' + wrt_key))
+        last_count = len(book_list)
         # subjects
         subj_key = '.full_list'
         if not cache.has_key('subj:' + subj_key):
             subj_list = Subject.objects.order_by('subject')
             AddSubjListCache(subj_key, subj_list)
         subj_list = eval(cache.get('subj:' + subj_key))
-    num_pages = int(ceil(book_count / float(per_page)))
+    num_pages = int(ceil(book_count/ float(per_page)))
     return render_to_response('books.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
                                'wrt_index': wrt_index,
-                               'rows_count': range(1, rows * cols + 1, cols),
                                'form': SearchForm(initial={'search':request.GET.get('search')}),
                                'book_count': book_count,
-                               'last_count': book_last_count,
+                               'last_count': last_count,
                                'search_count': search_count,
-                               'books': { # Paginator imitate
+                               'books': {  # Paginator imitate
                                    'has_previous': page_num > 1,
                                    'has_next': page_num < num_pages,
                                    'previous_page_number': page_num - 1,
@@ -286,7 +327,7 @@ def list_books(request, **kw):
                                    'object_list': book_list
                                },
                                'subject': subject,
-                               'subjects': PageList(request, subj_list, 1000),                            
+                               'subjects': PageList(request, subj_list, 1000),       
                                'logback': reverse('books.views.list_books')}))
 
 def get_book(request, **kw):
@@ -294,25 +335,8 @@ def get_book(request, **kw):
         book_ind = kw.get('ind', '')
         part = kw.get('part', '') or '0'
         if not cache.has_key('book:' + book_ind + '.' + str(part)):
-            content = ''
             book = get_object_or_404(Book, Q(index=ZI(book_ind))&Q(part=0))            
-            if ((hasattr(book, 'file') and book.file)):
-                name = book.file.name.replace("'","''").rsplit('/')[-1]
-                for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name,)):
-                    za = zipfile.ZipFile(blob.open())
-                    # get content from zip archive by name or num part
-                    for f in za.namelist():
-                        mpart = re.findall('(\d+)', f)
-                        if (part.isdigit() and f.endswith('.xhtml') and len(mpart) and int(part) == int(mpart[0])) or (part == f) or (part == '0' and f == 'index.xhtml'):
-                            try:
-                                ft = za.read(f)
-                                if f.startswith('index') and f.endswith('.xhtml'):
-                                    content = re.findall('<body[^>]*>(.*)</body>', ft, re.M | re.S)[0]
-                                elif f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png'):                                
-                                    content = base64.b64encode(ft)
-                            except:
-                                continue
-                            break
+            content = GetBookContent(book, part)
             if not content:
                 raise Http404
             book = AddBookCache(book, part, content)
@@ -323,7 +347,7 @@ def read_book(request, **kw):
     book = get_book(request, **kw)
     f = book['part']
     if f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png'):
-        content_type = mimetypes.guess_type(book['part'])[0]
+        content_type = mimetypes.guess_type(book['part'])
         response = HttpResponse(base64.b64decode(book['content']), content_type)
         return response         
     return render_to_response('book.html', 

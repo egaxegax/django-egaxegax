@@ -43,13 +43,20 @@ for root, dirs, files in os.walk(path, topdown=False):
         continue
 
       za = zipfile.ZipFile(curname)
-      for f in za.namelist():
+      book_list = za.namelist()
+      book_list.sort()
+
+      for f in book_list:
 
         ft = za.read(f)
         if (f == 'content.opf'):
-          title = re.findall('>(.*)</dc:title>', ft)[0].replace('?','')
-          writer = re.findall('dc:creator .*opf:file-as="([^"\&\;]*)', ft)[0].replace(' &amp', '')
-          subj = re.findall('>(.*)</dc:subject>', ft)
+          title = re.findall('>(.*)</dc:title>', ft)[0]
+          writer = re.findall('opf:file-as="([^"]*)">.*</dc:creator>', ft)[0].replace(' &amp', '')
+          subj = re.findall('>(.*)</dc:subject>', ft) 
+          try:
+              desc = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)[0]
+          except:
+	          desc = title
           if subj:
               subj = subj[0]
           else:
@@ -60,17 +67,16 @@ for root, dirs, files in os.walk(path, topdown=False):
             pindex = index
             part = 0
 
-        if (f.startswith('cover')):
-          za.extract(f, './')
-          newname = name + '.jpg'
-          if os.path.isfile(newname):
-            os.remove(newname)
-          os.rename(f, newname)
+#         if (f.startswith('cover')):
+#           za.extract(f, './')
+#           newname = name + '.jpg'
+#           if os.path.isfile(newname):
+#             os.remove(newname)
+#           os.rename(f, newname)
 
         if (f.startswith('index') and f.endswith('html') and part == 0):
-          content = re.findall('<body class="calibre">(.*)</body>', ft, re.M | re.S)[0]
           fn = name + '@' + writer.decode('utf-8').strip() + '@' + title.decode('utf-8').strip() + '@' + subj.decode('utf-8').strip() + '@' + str(part) + '.txt'
           fbook = file(fn, 'w')
-          fbook.write(E_OS(content))
+          fbook.write(E_OS(desc))
           fbook.close()
           part += 1

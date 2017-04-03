@@ -24,9 +24,9 @@ input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .msgfooter { padding: 0 10px; font-size: 70%; text-align: right; }
 .msgtext dt { padding: 5px 0; border-bottom: 1px solid #ddd; }
 .msgtext dd { padding-bottom: 5px; color: gray; }
-a { color: #5645ad; }
-a.nodecor { text-decoration:none; }
-a.nodecor img { border: 0 none; padding: 0 5px; }
+a, a:active, a:focus { color: #5645ad; outline:none; }
+a.nodecor { text-decoration:none; outline:none; }
+a.nodecor img { border: 0px none; padding: 5px; }
 .inl table { display: inline; }
 .inl li { display: inline; vertical-align: top; }
 ul.nolist { list-style-type: none; }
@@ -39,5 +39,6 @@ ul.nolist li { padding: 10px 0 0 0; }
 .hspace2 { padding: 0 48px; }
 .lfloat { float: left; text-align: left; }
 .rfloat { float: right; text-align: right; }
+.cfloat { text-align: center; }
 .smaller { font-size: smaller; }
 .bigger { font-size: 150%; }
