@@ -51,7 +51,7 @@ for root, dirs, files in os.walk(path, topdown=False):
         ft = za.read(f)
         if (f == 'content.opf'):
           title = re.findall('>(.*)</dc:title>', ft)[0]
-          writer = re.findall('opf:file-as="([^"]*)">.*</dc:creator>', ft)[0].replace(' &amp', '')
+          writer = re.findall('opf:file-as="([^"]*)".*>.*</dc:creator>', ft)[0].replace(' &amp', '')
           subj = re.findall('>(.*)</dc:subject>', ft) 
           try:
               desc = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)[0]

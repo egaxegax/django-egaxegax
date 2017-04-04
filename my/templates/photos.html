@@ -191,8 +191,9 @@ function viewchange(counter) {
     <p>Найдено <b>{{ photos_count }}</b> альбомов.</p>
   {% endif %}
 {% endif %}
-  <div class="wrap">
+
 {% if photos.object_list %}
+  <div class="wrap">
     <table class="cont">
   {% for photo in photos.object_list %}
     {% if forloop.counter in rows_count %}<tr>{% endif %}
@@ -224,10 +225,12 @@ function viewchange(counter) {
     {% endif %}
   {% endfor %}
     </table>
-{% else %}
-  <div class="msgtext">{% trans 'No photos' %}.</div>
-{% endif %}
   </div>
+{% else %}
+
+  <p>{% trans 'No photos' %}.</p>
+
+{% endif %}
 {% if request.user.is_authenticated %}
   <p class="smaller"><a href="{% url 'my.views.add_photo' %}">{% trans 'Add photo' %}</a></p>
 {% else %}
