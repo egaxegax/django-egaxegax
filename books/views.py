@@ -409,6 +409,8 @@ def add_book(request):
                 ClearBookListSubjCache(subj.id, subj.count)
                 ClearBookCache(book.index, book.part)
                 return HttpResponseRedirect(reverse('books.views.list_books'))
+            else:
+                edit_book(request, id=book_list[0].id)
     else:
         form = AddBookForm()
         form_wrt = AddWrtForm()
