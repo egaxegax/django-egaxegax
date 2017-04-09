@@ -131,13 +131,15 @@ def ClearBookCache(book_ind, book_part):
 def ClearBookListWrtCache(wrt_id, num_pages):
     for page_num in range(num_pages):
         cache.delete_many(['books:' + str(wrt_id) + '.' + str(page_num)])
-    cache.delete_many(['books:.last_update'])
+    for page_num in range(1, 101):
+        cache.delete_many(['books:.last_update' + '.' + str(page_num)])
     ClearSubjListCache()
 
 def ClearBookListSubjCache(subj_id, num_pages):
     for page_num in range(num_pages):
         cache.delete_many(['books:.subj' + str(subj_id) + '.' + str(page_num)])
-    cache.delete_many(['books:.last_update'])
+    for page_num in range(1, 101):
+        cache.delete_many(['books:.last_update' + '.' + str(page_num)])
     ClearSubjListCache()
 
 # extract content text, image, cover_image from .epub
@@ -169,7 +171,7 @@ def GetBookContent(book, part='0'):
                                         content = writer + ' ' + title
                                 except:
                                     content = ''
-                            elif f.startswith('cover'):
+                            elif f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png'):
                                 content = base64.b64encode(ft)
                         except:
                             continue
@@ -323,6 +325,7 @@ def list_books(request, **kw):
                                    'previous_page_number': page_num - 1,
                                    'next_page_number': page_num + 1,
                                    'number': page_num,
+                                   'per_page': per_page,
                                    'paginator': { 'num_pages': num_pages },
                                    'object_list': book_list
                                },
@@ -353,6 +356,8 @@ def read_book(request, **kw):
     return render_to_response('book.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
+                               'wrt_index': wrt_index,
+                               'form': SearchForm(initial={'search':request.GET.get('search')}),
                                'book': book,
                                'logback': reverse('books.views.read_book', kwargs={'ind': book['index'], 'part': book['part']}) }))
 
@@ -377,7 +382,7 @@ def add_book(request):
             book = form.save(commit=False)
             writer = form_wrt.save(commit=False)
             subject = form_subj.save(commit=False)
-            for f in ['img', 'file']:
+            for f in ['file']:
                 if f in request.FILES: # check duplicates
                     if book.part == 0:
                         o = request.FILES[f]
@@ -385,7 +390,6 @@ def add_book(request):
                             if blob.key() != o.blobstore_info.key(): blob.delete()
                     else:
                         book.file = None
-                        book.img = None
             if isinstance(request.user, User):
                 book.author = request.user
             # uniques

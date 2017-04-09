@@ -14,8 +14,11 @@
 {% block songsclass %}wrap{% endblock %}
 {% block pageheader %}
 {% endblock %}
+
 {% block content %}
+
 <p>Подборы гитарных аккордов к песням. В базе свыше <b>11000</b> текстов. Читайте, добавляйте свои подборы и тексты. </p>
+
 <div class="indexlist wrap">
   <a class="hspaced" href="{% url 'songs.views.list_art' %}">{% trans 'Full list' %}</a>
   {% for i, v in art_index.items %}
@@ -26,6 +29,7 @@
     <input class="submit" type="submit" value="{% trans 'Search' %}" />
   </form>
 </div>
+
 <p>
 {% if song_count %}
 {% if search_count %}Поиск '{{ request.GET.search }}'. {% endif %}
@@ -34,9 +38,11 @@
   Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов.
 {% endif %}
 </p>
+
 {% if last_count %}
   <p>Последние обновления:</p>
 {% endif %}
+
 {% if songs.object_list %}
   <div class="wrap">
 {% for song in songs.object_list %}
@@ -78,9 +84,11 @@
 {% else %}
   <p>{% trans 'No songs' %}.</p>
 {% endif %}
+
 {% if request.user.is_authenticated %}
   <p class="smaller"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
 {% else %}
   <p class="smaller">{% trans 'Please authorize to add songs' %}.</p>
 {% endif %}
+
 {% endblock %}

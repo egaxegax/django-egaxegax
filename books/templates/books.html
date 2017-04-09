@@ -48,12 +48,15 @@ dt .cont { display: table; width: 100%; }
 {% if book_count and not search_count %}
   {% if wrt_key %}{% else %}
     {% if subject %}Жанр <b>{{ subject }}</b>. {% else %}
-      {% with books.object_list|first as f %}<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=f.wrt_id %}">{{ f.writer.writer }}. </a>{% endwith %}
+      {% with books.object_list|first as f %}<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=f.wrt_id %}"><span class="hspace">{{ f.writer.writer }} </span></a>{% endwith %}
     {% endif %}
   {% endif %}
 {% endif %}
+{% if search_count %}
+  <span class="hspace">Поиск фразы <b>{{ request.GET.search }}</b></span>
+{% endif %}
 {% if book_count or wrt_count %}
-  Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}.
+  Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}
 {% endif %}
 </p>
 
@@ -61,12 +64,15 @@ dt .cont { display: table; width: 100%; }
 
 {% if book_count and not wrt_count %}
 
-  {% if search_count %}
-    {% if books.has_previous %}
+  {% if books.has_previous %}
+    {% if search_count %}
       <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">
-        <div class="wrap cfloat">
-          <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
     {% endif %}
+    {% if not search_count %}
+      <a href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.previous_page_number }}">    
+    {% endif %}
+      <div class="wrap cfloat">
+        <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
   {% endif %}
 
   {% for book in books.object_list %}
@@ -74,23 +80,16 @@ dt .cont { display: table; width: 100%; }
     <dl class="msgtext"><dt class="cont">
       <div class="cont">
   	  <div class="lfloat lside2 cfloat">
-  	  {% if not search_count and books.has_previous and forloop.counter == 1 %}
-        <a class="prev" id="pageprev" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.previous_page_number }}">
-          <img src='{{ MEDIA_URL }}img/s_prev.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></a>
-      {% endif %}
   	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
+  	    {% if search_count %}
+  	      <div class="gray smaller">{{ book.writer.writer }}</div></a>
+  	    {% endif %}
   	      <img id="thumb{{ forloop.counter }}" title="{{ book.writer.writer }} {{ book.title }}" alt="{{ book.writer.writer }} {{ book.title }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" height="200px"/><br/>
   	      <div class="gray smaller">{{ book.title }}</div></a>
 	    </div>
 	    <div class="lfloat rside2 smaller">
 	      <br/>{{ book.content }}
       </div>
-    {% if not search_count and books.has_next and forloop.revcounter == 1 %}
-      <div class="rfloat next">
-        <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.next_page_number }}">
-          <img src='{{ MEDIA_URL }}img/s_next.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></a>
-      </div>
-    {% endif %}
       <div class="bbar smaller">
         <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="gray button lfloat">Скачать</div></a>&nbsp;
         <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="gray button lfloat">Читать</div></a>
@@ -98,17 +97,28 @@ dt .cont { display: table; width: 100%; }
 	    </div>
     </dt></dl>
     </div>
-  {% if books.paginator.num_pages > 1 and forloop.revcounter == 1 %}  
+  {% endfor %}
+
+  {% if books.has_next %}
+    {% if not search_count %}
+      <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.next_page_number }}">      
+    {% endif %}
+      <div class="wrap cfloat">
+        <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>
+  {% endif %}
+
+  {% if search_count >= books.per_page %}
+    {% if search_count %}
+      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">
+      <div class="wrap cfloat">
+        <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>
+    {% endif %}
+  {% endif %}
+
+  {% if books.paginator.num_pages > 1 %}
     <p class="cfloat smaller">
       {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
     </p>
-  {% endif %}
-  {% endfor %}
-
-  {% if search_count %}
-    <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">
-      <div class="wrap cfloat">
-        <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>
   {% endif %}
 
 {% else %}
@@ -138,7 +148,15 @@ dt .cont { display: table; width: 100%; }
           <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
     {% endif %}
   {% endif %}
-  
+
+  {% if wrt_count %}
+    {% if books.has_previous %}
+      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">
+        <div class="wrap cfloat">
+          <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
+    {% endif %}
+  {% endif %}
+
     <div class="wrap">
   {% for book in books.object_list %}
     <dl class="msgtext"><dt>
@@ -178,20 +196,12 @@ dt .cont { display: table; width: 100%; }
   {% endif %}
     </div>
 
-  {% if books.object_list and wrt_count %}
-    <p class="smaller">
-      {% if books.has_previous %}
-        <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">‹ {% trans 'previous' %}</a>
-      {% endif %}
-      {% if books.paginator.num_pages > 1 %}
-        <span class="hspace2">
-          {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
-        </span>
-      {% endif %}
-      {% if books.has_next %}
-        <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">{% trans 'next' %} ›</a>
-      {% endif %}
-    </p>
+  {% if wrt_count %}
+    {% if books.has_next %}
+      <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">
+        <div class="wrap cfloat">
+          <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>
+    {% endif %}
   {% endif %}
 
 {% endif %}

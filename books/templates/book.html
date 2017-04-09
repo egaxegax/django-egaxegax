@@ -8,33 +8,59 @@
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/books/stylesheet.css" type="text/css" />
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/books/page_styles.css" type="text/css" />
 {% endblock %}
+{% block pagestyle%}
+#id_search { height: 16px; margin-left: 12px; }
+{% endblock %}
 {% block booksclass %}wrap{% endblock %}
 {% block pagescript %}
 {% endblock %}
 {% block pageheader %}
-  <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a><span class="hspace">&nbsp;</span>{{ book.title }}
 {% endblock %}
+
 {% block content %}
-  <div class="wrap">
-    <div class="msgtext">
-      <div class="calibre">{{ book.content|safe }}</div>
-    </div>
-  </div>  
-  <p class="smaller">
-    {% if book.prev_npart >= 0 %}
-      <a href="{% url 'books.views.read_book' ind=book.index part=book.prev_npart %}">‹ {% trans 'previous' %}</a>
-    {% endif %}
-      <span class="hspace2">{% trans 'part' %} {{ book.npart }}</span> 
-    {% if book.next_npart >= 0 %}
-      <a href="{% url 'books.views.read_book' ind=book.index part=book.next_npart %}">{% trans 'next' %} ›</a>
-    {% endif %}
-  </p>
-  <p class="smaller">{% trans 'Added' %} <a href="{% url 'books.views.get_user_profile' id=book.author.id %}">{{ book.author.username }}</a> 
-  <acronym title="{{ book.date }}">{{ book.date|time_since }}</acronym> {% trans 'ago' %}</p>
+
+<div class="indexlist wrap">
+  <a class="hspaced" href="{% url 'books.views.list_wrt' %}">{% trans 'Full list' %}</a>
+  {% for i, v in wrt_index.items %}
+    <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
+  {% endfor %}
+  <form class="search" action="{% url 'books.views.list_books' %}" method="get">{% csrf_token %}
+    {{ form }}
+    <input class="submit" type="submit" value="{% trans 'Search' %}" />
+  </form>
+</div>
+
+<p>
+  <h2 class="nomarg"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}"><span class="hspace">{{ book.writer.writer }} </span></a>{{ book.title }}</h2>
+</p>
+
+{% if book.prev_npart >= 0 %}
+  <a href="{% url 'books.views.read_book' ind=book.index part=book.prev_npart %}">
+    <div class="wrap cfloat">
+      <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
+{% endif %}
+
+<div class="wrap">
+  <div class="msgtext">
+    <div class="calibre">{{ book.content|safe }}</div>
+  </div>
+</div>
+
+{% if book.next_npart >= 0 %}
+  <a href="{% url 'books.views.read_book' ind=book.index part=book.next_npart %}"><div class="wrap cfloat">
+    <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>
+{% endif %}
+
+<p class="smaller">{% trans 'part' %} {{ book.npart }}</p>
+<p class="smaller"><a href="{% url 'books.views.get_file' ind=book.index %}">Скачать книгу</a></p>
+<p class="smaller">{% trans 'Added' %} <a href="{% url 'books.views.get_user_profile' id=book.author.id %}">{{ book.author.username }}</a> 
+<acronym title="{{ book.date }}">{{ book.date|time_since }}</acronym> {% trans 'ago' %}</p>
+
 {% if request.user.is_authenticated and request.user.id == book.author.id or request.user.is_superuser %}
   <p class="smaller">
     <a href="{% url 'books.views.edit_book' id=book.id %}">{% trans 'Edit' %}</a>
     <a class="hspace2" href="{% url 'books.views.delete_book' id=book.id %}">{% trans 'Delete' %}</a>
   </p>
 {% endif %}
+
 {% endblock %}

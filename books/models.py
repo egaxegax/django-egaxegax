@@ -21,5 +21,4 @@ class Book(models.Model):
     content = models.TextField(verbose_name=_('content'))
     author = models.ForeignKey(User, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_('date'))
-    img = models.FileField(null=True, blank=True, upload_to='img', verbose_name=_('img'))
     file = models.FileField(null=True, blank=True, upload_to='files', verbose_name=_('file'))
