@@ -27,8 +27,8 @@ input[type=text], input[type=password], input[type=number]  { height: 24px; }
 a, a:active, a:focus { color: #5645ad; outline:none; }
 a.nodecor { text-decoration:none; outline:none; }
 a.nodecor img { border: 0px none; padding: 5px; }
-.inl table { display: inline; }
-.inl li { display: inline; vertical-align: top; }
+.inl { display: inline; }
+li.inl { display: inline; vertical-align: top; }
 ul.nolist { list-style-type: none; }
 ul.nolist li { padding: 10px 0 0 0; }
 .nomarg { margin: 0 0 0 0; }

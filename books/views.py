@@ -260,7 +260,8 @@ def list_books(request, **kw):
     search_count = 0
     book_list = []
     subj_list = []
-    subject = ''
+    subject = None
+    writer = None
     page_num = ZI(request.GET.get('page', '1'))
     per_page = 10
     page_bottom = (page_num-1)*per_page
@@ -274,6 +275,7 @@ def list_books(request, **kw):
         book_list = eval(cache.get('books:' + wrt_key))
         if len(book_list):
             book_count = book_list[0]['writer']['count']
+            writer = book_list[0]['writer']
     elif kw.get('id_subj'): # filter by subj
         subj_id = ZI(kw.get('id_subj'))
         subj_key = '.subj' + str(subj_id) + '.' + str(page_num)
@@ -283,7 +285,7 @@ def list_books(request, **kw):
         book_list = eval(cache.get('books:' + subj_key))
         if len(book_list):
             book_count = book_list[0]['subject']['count']
-            subject = book_list[0]['subject']['subject']
+            subject = book_list[0]['subject']
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
         search_key = '.search' + transliterate.translit(st, 'ru', reversed=True) + '.' + str(page_num)
@@ -330,6 +332,7 @@ def list_books(request, **kw):
                                    'object_list': book_list
                                },
                                'subject': subject,
+                               'writer': writer,
                                'subjects': PageList(request, subj_list, 1000),       
                                'logback': reverse('books.views.list_books')}))
 

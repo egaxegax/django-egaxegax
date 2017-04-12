@@ -5,7 +5,7 @@
 {% block keywords %}{% if book_count %}, {% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}, {% trans 'books' %}{% endblock %}
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if book_count and not search_count %}{% if subject %}{{ subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}{% endif %}{% endif %}
+{% if book_count and not search_count %}{% if subject %}Жанр {{ subject.subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer }}{% endwith %}{% endif %}{% endif %}{% endif %}
 {% if not book_count and not search_count %}{% trans 'Books' %}{% endif %}
  - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
@@ -29,10 +29,7 @@ dt .cont { display: table; width: 100%; }
 {% block pageheader %}
 {% endblock %}
 {% block content %}
-<p>
-Коллекция электронных книг различных жанров отечественных и зарубежных авторов. 
-Все тексты взяты из свободных источников и представлены исключительно для ознакомления.
-</p>
+
 <div class="indexlist wrap">
   <a class="hspaced" href="{% url 'books.views.list_wrt' %}">{% trans 'Full list' %}</a>
   {% for i, v in wrt_index.items %}
@@ -44,11 +41,20 @@ dt .cont { display: table; width: 100%; }
   </form>
 </div>
 
+{% if not book_count and not search_count %}
+<p>
+Коллекция электронных книг различных жанров отечественных и зарубежных авторов. 
+Все тексты взяты из свободных источников и представлены исключительно для ознакомления.
+</p>
+{% endif %}
+
 <p>
 {% if book_count and not search_count %}
   {% if wrt_key %}{% else %}
-    {% if subject %}Жанр <b>{{ subject }}</b>. {% else %}
-      {% with books.object_list|first as f %}<a class="nodecor" href="{% url 'books.views.list_books' id_wrt=f.wrt_id %}"><span class="hspace">{{ f.writer.writer }} </span></a>{% endwith %}
+    {% if subject %}Жанр <b>{{ subject.subject }}</b>. {% endif %}
+    {% if writer %}
+      <h2 class="inl nomarg"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=writer.id %}">
+        <span class="hspace">{{ writer.writer }} </span></a></h2>
     {% endif %}
   {% endif %}
 {% endif %}
@@ -69,7 +75,7 @@ dt .cont { display: table; width: 100%; }
       <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">
     {% endif %}
     {% if not search_count %}
-      <a href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.previous_page_number }}">    
+      <a href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?page={{ books.previous_page_number }}">    
     {% endif %}
       <div class="wrap cfloat">
         <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
@@ -81,7 +87,7 @@ dt .cont { display: table; width: 100%; }
       <div class="cont">
   	  <div class="lfloat lside2 cfloat">
   	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
-  	    {% if search_count %}
+  	    {% if subject or search_count %}
   	      <div class="gray smaller">{{ book.writer.writer }}</div></a>
   	    {% endif %}
   	      <img id="thumb{{ forloop.counter }}" title="{{ book.writer.writer }} {{ book.title }}" alt="{{ book.writer.writer }} {{ book.title }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" height="200px"/><br/>
@@ -101,7 +107,7 @@ dt .cont { display: table; width: 100%; }
 
   {% if books.has_next %}
     {% if not search_count %}
-      <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=book.subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=book.writer.id %}{% endif %}?page={{ books.next_page_number }}">      
+      <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% else %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?page={{ books.next_page_number }}">      
     {% endif %}
       <div class="wrap cfloat">
         <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>

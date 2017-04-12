@@ -66,9 +66,9 @@ li.login { border-right: 1px solid gray; }
         <li><a class="nodecor" href="{% url 'django.contrib.auth.views.logout' %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
         </ul>
       {% else %}
-      <ul class="inl vspace">
-        <li class="login hspace"><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
-        <li class="hspace"><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
+      <ul class="vspace">
+        <li class="inl login hspace"><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
+        <li class="inl hspace"><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
       </ul>
       {% endif %}
     </div>

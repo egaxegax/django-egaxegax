@@ -201,7 +201,7 @@ def list_songs(request, **kw):
     else:  # last update
         artist = '.last_update'
         if not cache.has_key('songs:' + artist):
-            song_list = Song.objects.order_by('-date')[:7]
+            song_list = Song.objects.order_by('-date')[:10]
             AddSongListCache(artist, song_list)
         song_list = eval(cache.get('songs:' + artist))
         song_last_count = len(song_list)
