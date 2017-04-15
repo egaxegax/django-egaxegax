@@ -39,7 +39,7 @@
 
 {% if search_count %}Поиск <b>{{ request.GET.search }}</b>. {% endif %}
 {% if song_count and not search_count %}{% if art_key %}{% else %}{% with songs.object_list|first as f %}
-  <h2 class="inl nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}"><span class="hspace">{{ f.artist }}</span></a></h2>
+  <h2 class="inl nomarg space"><a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}">{{ f.artist }}</a></h2>
 {% endwith %}{% endif %}{% endif %}
 {# if not song_count and not search_count #}{# trans 'Chords, lyrics' #}{# endif #}
   Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов

@@ -161,7 +161,7 @@ def GetBookContent(book, part='0'):
                                 except:
                                     content = ''
                             elif f.startswith('content.opf'):
-                                try:                                
+                                try:
                                     title = re.findall('>(.*)</dc:title>', ft)[0]
                                     writer = re.findall('>(.*)</dc:creator>', ft)[0]
                                     content = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)
@@ -354,8 +354,16 @@ def read_book(request, **kw):
     f = book['part']
     if f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png'):
         content_type = mimetypes.guess_type(book['part'])
-        response = HttpResponse(base64.b64decode(book['content']), content_type)
-        return response         
+        data = base64.b64decode(book['content'])
+        if f.startswith('cover'):  # resize cover image
+            img = images.Image(image_data=data)
+            w = kw.get('width', 200)
+            h = int( float(img.height) * (w/float(img.width)) )
+            img.resize(width=w, height=h)
+            img.im_feeling_lucky()
+            data = img.execute_transforms(output_encoding=images.JPEG)
+        response = HttpResponse(data, content_type)
+        return response
     return render_to_response('book.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
