@@ -13,6 +13,7 @@ from songs.models import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 import time, os.path, sys
+import transliterate
 
 art_index = {
     20:'a',21:'b',22:'c',23:'d',24:'e',25:'f',26:'g',27:'h',28:'i',29:'j',30:'k',31:'l',32:'m',33:'n',34:'o',35:'p',36:'q',37:'r',38:'s',39:'t',40:'u',41:'v',42:'w',43:'x',44:'y',45:'z',
@@ -61,7 +62,7 @@ def AddSongCache(song):
         'date': song.date.strftime('%Y-%m-%d %H:%M:%S') }
     cache.add('song:' + str(song.id), str(cache_song))
 
-def AddSongListCache(artist, song_list):
+def AddSongListCache(artkey, song_list):
     cache_list = []
     for song in song_list:
         cache_list.append({
@@ -71,7 +72,7 @@ def AddSongListCache(artist, song_list):
            'title': song.title,
            'audio': hasattr(song.audio, 'file'),
            'date': song.date.strftime('%Y-%m-%d %H:%M:%S') })
-    cache.add('songs:' + artist, str(cache_list))
+    cache.add('songs:' + artkey, str(cache_list))
 
 def ClearArtListCache(artkey):
     cache.delete_many(['arts:.full_list', 'arts:' + artkey])
@@ -195,7 +196,11 @@ def list_songs(request, **kw):
         song_count = len(song_list)
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
-        song_list = Song.objects.filter(Q(title__startswith=st))
+        search_key = '.search' + transliterate.translit(st, 'ru', reversed=True)
+        if not cache.has_key('songs:' + search_key):
+            song_list = Song.objects.filter(Q(title__startswith=st))
+            AddSongListCache(search_key, song_list)
+        song_list = eval(cache.get('songs:' + search_key))    
         song_count = len(song_list)
         search_count = song_count
     else:  # last update

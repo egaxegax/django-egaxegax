@@ -289,7 +289,7 @@ def list_books(request, **kw):
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
         search_key = '.search' + transliterate.translit(st, 'ru', reversed=True) + '.' + str(page_num)
-        if not cache.has_key('search_key:' + search_key):
+        if not cache.has_key('books:' + search_key):
             book_list = Book.objects.filter(Q(title__startswith=st)&Q(part=0))[page_bottom:page_top]
             AddBookListCache(search_key, book_list)
         book_list = eval(cache.get('books:' + search_key))

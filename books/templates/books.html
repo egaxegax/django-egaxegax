@@ -50,16 +50,14 @@ dt .cont { display: table; width: 100%; }
 
 <p>
 {% if book_count and not search_count %}
-  {% if wrt_key %}{% else %}
-    {% if subject %}<span class="hspace">Жанр <b>{{ subject.subject }}</b></span>{% endif %}
-    {% if writer %}
-      <h2 class="inl nomarg space"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=writer.id %}">
-        {{ writer.writer }}</a></h2>
-    {% endif %}
+  {% if subject %}<span class="hspace">Жанр <b>{{ subject.subject }}</b></span>{% endif %}
+  {% if writer %}
+    <h2 class="inl nomarg"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=writer.id %}">
+      <span class="hspace">{{ writer.writer }}</span></a></h2>
   {% endif %}
 {% endif %}
 {% if search_count %}
-  Поиск фразы <b>{{ request.GET.search }}</b>
+  Поиск фразы &quot;<b>{{ request.GET.search }}</b>&quot;. 
 {% endif %}
 {% if book_count or wrt_count %}
   Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}
