@@ -34,7 +34,7 @@
     <a href="?page={{ news.previous_page_number }}">‹ {% trans 'previous' %}</a>
   {% endif %}
   {% if news.paginator.num_pages > 1 %}
-    <span class="current">
+    <span class="hspace2">
       {% trans 'Page' %} {{ news.number }} {% trans 'of' %} {{ news.paginator.num_pages }}
     </span>
   {% endif %}
@@ -43,7 +43,7 @@
   {% endif %}
   </p>
 {% else %}
-  <p class="smaller"><a href="{% url 'mynews.views.list_msg' all='all' %}">{% trans 'All news' %}</a></p>
+  <p class="smaller hspace"><a href="{% url 'mynews.views.list_msg' all='all' %}">{% trans 'All news' %}</a></p>
 {% endif %}
 {% else %}
   <p>{% trans 'No posts' %}.</p>
@@ -63,6 +63,6 @@
     </form>
   </p>
 {% else %}
-  <p class="smaller">{% trans 'Please authorize to post messages' %}.</p>
+  <p class="smaller hspace">{% trans 'Please authorize to post messages' %}.</p>
 {% endif %}
 {% endblock %}

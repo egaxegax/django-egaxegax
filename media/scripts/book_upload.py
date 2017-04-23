@@ -54,12 +54,12 @@ for root, dirs, files in os.walk(path, topdown=False):
       param += [("title", E_OS(title))]
       param += [("writer", E_OS(writer))]
       param += [("subject", E_OS(subject))]
-      param += [("content", file(name).read())]
+      param += [("content", E_OS(file(name).read()))]
       param += [("part", part)]
  
       datagen, headers = multipart_encode(param)
  
-      request = urllib2.Request("http://egaxegax.appspot.com/books/add")
+      request = urllib2.Request("http://127.0.0.1:8800/books/add")
       uri = re.findall(r'form action="([^\"]*)"', urllib2.urlopen(request).read())
       if uri:
           print mcount + 1, uri

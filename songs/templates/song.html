@@ -7,6 +7,7 @@
 {% block pagestyle %}
 #id_search { height: 16px; margin-left: 10px; }
 .msgcont { line-height: 1.5em; }
+.msgcont b { font-weight: 500; color: #5645ad; }
 {% endblock %}
 {% block songsclass %}wrap{% endblock %}
 {% block pagescript %}
@@ -31,7 +32,7 @@
 </div>
 
 <p>
-  <h2 class="nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.art_id %}"><span class="hspace">{{ song.artist }}</span></a>{{ song.title }}</h2>
+  <h2 class="nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.art_id %}"><span class="hspace">{{ song.artist }} </span></a>{{ song.title }}</h2>
 </p>
 
 {% if song.audio %}
@@ -50,10 +51,10 @@
   <div class="msgtext msgcont">{{ song.content|safe }}</div>
 </div>
 
-<p class="smaller">{% trans 'Added' %} <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> 
-<acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}</p>
+<p class="smaller hspace">{% trans 'Added' %} <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> 
+  <acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}</p>
 {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
-  <p class="smaller">
+  <p class="smaller hspace">
     <a href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
     <a class="hspace2" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
     <a class="hspace" href="{% url 'songs.views.edit_song_file' id=song.id %}">{% trans 'Audio' %}</a>

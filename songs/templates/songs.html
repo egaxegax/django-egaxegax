@@ -61,6 +61,9 @@
   {% if last_count or search_count%}
     <a class="nodecor pink" href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a>
   {% endif %}
+  {% if not art_count and not last_count and not search_count %}
+    <span class="smaller gray hspace">{{ forloop.counter }}</span>
+  {% endif %}
   {% if song.count %}
     <span class="smaller">[{{ song.count }}]</span>
   {% else %}
@@ -94,9 +97,9 @@
 {% endif %}
 
 {% if request.user.is_authenticated %}
-  <p class="smaller"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
+  <p class="smaller hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
 {% else %}
-  <p class="smaller">{% trans 'Please authorize to add songs' %}.</p>
+  <p class="smaller hspace">{% trans 'Please authorize to add songs' %}.</p>
 {% endif %}
 
 {% endblock %}

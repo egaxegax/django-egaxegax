@@ -128,15 +128,15 @@ def ClearSubjListCache():
 def ClearBookCache(book_ind, book_part):
     cache.delete_many(['book:' + str(book_ind) + '.' + str(book_part)])
 
-def ClearBookListWrtCache(wrt_id, num_pages):
-    for page_num in range(num_pages):
+def ClearBookListWrtCache(wrt_id):
+    for page_num in range(1, 101):
         cache.delete_many(['books:' + str(wrt_id) + '.' + str(page_num)])
     for page_num in range(1, 101):
         cache.delete_many(['books:.last_update' + '.' + str(page_num)])
     ClearSubjListCache()
 
-def ClearBookListSubjCache(subj_id, num_pages):
-    for page_num in range(num_pages):
+def ClearBookListSubjCache(subj_id):
+    for page_num in range(1, 101):
         cache.delete_many(['books:.subj' + str(subj_id) + '.' + str(page_num)])
     for page_num in range(1, 101):
         cache.delete_many(['books:.last_update' + '.' + str(page_num)])
@@ -405,23 +405,14 @@ def add_book(request):
                 book.author = request.user
             # uniques
             book.index = abs(zlib.crc32(writer.writer.encode('utf-8') + ' ' + book.title.encode('utf-8')))
-            # writer
-            book_list = Book.objects.filter(index=book.index)
-            if len(book_list): # check writer once
-                wrt = book_list[0].writer
-                subj = book_list[0].subject
-            else:
-                wrt = IncWrtCount(writer=writer.writer)
-                subj = IncSubjCount(subject=subject.subject)
-            book.writer = wrt
-            book.subject = subj
-            # if unique
             book_list = Book.objects.filter(Q(index=book.index)&Q(part=book.part))
             if len(book_list) == 0:
+                book.writer = IncWrtCount(writer=writer.writer)
+                book.subject = IncSubjCount(subject=subject.subject)
                 book.save()
-                ClearWrtListCache(wrt.writer[0].capitalize())
-                ClearBookListWrtCache(wrt.id, wrt.count)
-                ClearBookListSubjCache(subj.id, subj.count)
+                ClearWrtListCache(book.writer.writer[0].capitalize())
+                ClearBookListWrtCache(book.writer.id)
+                ClearBookListSubjCache(book.subject.id)
                 ClearBookCache(book.index, book.part)
                 return HttpResponseRedirect(reverse('books.views.list_books'))
             else:
@@ -452,8 +443,8 @@ def edit_book(request, **kw):
                 mbook.author = request.user
             mbook.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) 
             mbook.save(force_update=True)
-            ClearBookListWrtCache(mbook.writer.id, mbook.writer.count)
-            ClearBookListSubjCache(mbook.subject.id, mbook.subject.count)
+            ClearBookListWrtCache(mbook.writer.id)
+            ClearBookListSubjCache(mbook.subject.id)
             ClearBookCache(mbook.index, mbook.part)
             return HttpResponseRedirect(reverse('books.views.read_book', kwargs={'ind': mbook.index, 'part': mbook.part}))
     else:
@@ -480,8 +471,8 @@ def delete_book(request, **kw):
                 IncWrtCount(writer=book.writer.writer, count=-1)
                 IncSubjCount(subject=book.subject.subject, count=-1)
                 ClearWrtListCache(book.writer.writer[0].capitalize())
-                ClearBookListWrtCache(book.writer.id, book.writer.count)
-                ClearBookListSubjCache(book.subject.id, book.subject.count)
+                ClearBookListWrtCache(book.writer.id)
+                ClearBookListSubjCache(book.subject.id)
             ClearBookCache(book.index, book.part)
             book.delete()
     return HttpResponseRedirect(reverse('books.views.list_books'))

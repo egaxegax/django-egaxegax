@@ -12,7 +12,7 @@ from songs.forms import *
 from songs.models import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
-import time, os.path, sys
+import os.path, time, sys, re, base64, zlib
 import transliterate
 
 art_index = {
@@ -58,7 +58,7 @@ def AddSongCache(song):
         'title': song.title,
         'content': song.content,
         'audio': hasattr(song.audio, 'file'),
-        'author': (hasattr(song, 'author') and {'id': song.author.id, 'username': song.author.username}) or {},
+        'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
         'date': song.date.strftime('%Y-%m-%d %H:%M:%S') }
     cache.add('song:' + str(song.id), str(cache_song))
 
@@ -102,6 +102,16 @@ def GetArtArtist(art_id):
         return art_list[0]['artist']
     except:
         raise Http404
+
+# pack/unpack text
+def PackContent(t):
+    return "base64,"+base64.b64encode(zlib.compress(t.encode('1251')))
+
+def UnpackContent(t):
+    if t[:7]=='base64,':
+        try:   t = zlib.decompress(base64.b64decode(t[7:])).decode('cp1251')
+        except zlib.error, TypeError: pass
+    return t
 
 # increment art song count
 def IncArtCount(**kw):
@@ -228,15 +238,20 @@ def add_song(request):
         form = AddSongForm(request.POST)
         form_art = AddArtForm(request.POST)
         if form.is_valid():
-            song = form.save(commit=False)
-            song.content = song.content.strip('\r\n')
-            song.author = request.user
-            art = IncArtCount(artist=request.POST['artist'])
-            song.artist = art.artist
-            song.save()
-            ClearArtListCache(song.artist[0].capitalize())
-            ClearSongListCache(song.artist)
-            return HttpResponseRedirect(reverse('songs.views.list_songs'))
+            song = form.save(commit=False)            
+            song_list = Song.objects.filter(Q(artist=request.POST['artist'])&Q(title=song.title))
+            if len(song_list) == 0:
+                song.content = PackContent(song.content.strip('\r\n'))
+                if isinstance(request.user, User):
+                    song.author = request.user
+                art = IncArtCount(artist=request.POST['artist'])
+                song.artist = art.artist
+                song.save()
+                ClearArtListCache(song.artist[0].capitalize())
+                ClearSongListCache(song.artist)
+                return HttpResponseRedirect(reverse('songs.views.list_songs'))
+            else:
+                edit_song(request, id=song_list[0].id)
     else:
         form = AddSongForm()
         form_art = AddArtForm()
@@ -254,8 +269,9 @@ def edit_song(request, **kw):
         form = AddSongForm(request.POST, instance=song)
         if form.is_valid():
             song = form.save(commit=False)
-            song.content = song.content.strip('\r\n')
-            song.author = request.user
+            song.content = PackContent(song.content.strip('\r\n'))
+            if isinstance(request.user, User):
+                song.author = request.user
             #-- song.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
             song.save(force_update=True)
             ClearSongListCache(song.artist)
@@ -265,7 +281,7 @@ def edit_song(request, **kw):
         form = AddSongForm(initial={
                            'id': song.id,
                            'title': song.title,
-                           'content': song.content})
+                           'content': UnpackContent(song.content)})
     return render_to_response('edit_song.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
@@ -310,10 +326,15 @@ def get_song(request, **kw):
         song_id = kw.get('id', '')
         if not cache.has_key('song:' + song_id):
             song = get_object_or_404(Song, id=ZI(song_id))
-            t = song.content
-            t = t.replace('\n','<br/>')
-            t = t.replace('\t', '  ')
+            t = UnpackContent(song.content)
+            t = re.sub(r"\n>(.*)","\n*#*\g<1>*##*", t)
+            t = re.sub(r"\n!(.*)","\n*_*\g<1>*__*", t)
+            t = re.sub(r"<([^>]*)>", ' *#*\g<1>*##* ', t)
+            t = t.replace('*#*', '<b>').replace('*##*', '</b>')
+            t = t.replace('*_*', '<i>').replace('*__*', '</i>')
+            t = t.replace('\t', ' ')
             t = t.replace(' ', '&nbsp;')
+            t = t.replace('\n','<br/>')
             song.content = t
             AddSongCache(song)
         song = eval(cache.get('song:' + song_id))

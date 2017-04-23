@@ -9,7 +9,7 @@
 {% block booksclass %}wrap{% endblock %}
 {% block pageheader %}{# trans 'Add book' #}{% endblock %}
 {% block content %}
-<p>Добавляйте свои тексты книг по главам или частям. </p>
+<p>Добавляйте свои тексты книг. </p>
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
   {% render_upload_data upload_data %}
 {% if request.user.is_authenticated %}

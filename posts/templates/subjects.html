@@ -23,7 +23,7 @@
   {% endif %}
 {% endfor %}
 </div>
-<p class="smaller"><a href="{% url 'posts.views.list_posts' %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
+<p class="smaller hspace"><a href="{% url 'posts.views.list_posts' %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
 {% if subjects.object_list %}
   <p class="smaller">
     {% if subjects.has_previous %}
@@ -56,6 +56,6 @@
     </form>
   </p>
 {% else %}
-  <p class="smaller">{% trans 'Please authorize to post messages' %}.</p>
+  <p class="smaller hspace">{% trans 'Please authorize to post messages' %}.</p>
 {% endif %}
 {% endblock %}

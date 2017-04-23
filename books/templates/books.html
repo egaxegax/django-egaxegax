@@ -217,9 +217,9 @@ dt .cont { display: table; width: 100%; }
 {% endif %}
 
 {% if request.user.is_authenticated %}
-  <p class="smaller"><a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a></p>
+  <p class="smaller hspace"><a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a></p>
 {% else %}
-  <p class="smaller">{% trans 'Please authorize to add books' %}.</p>
+  <p class="smaller hspace">{% trans 'Please authorize to add books' %}.</p>
 {% endif %}
 
 {% endblock %}

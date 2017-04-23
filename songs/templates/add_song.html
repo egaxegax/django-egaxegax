@@ -9,14 +9,14 @@
 {% block pageheader %}{# trans 'Add song' #}{% endblock %}
 {% block content %}
 <p>Добавляйте свои подборы и песни.</p>
-{% if request.user.is_authenticated %}
   <form action="{% url 'songs.views.add_song' %}" method="post">{% csrf_token %}
+{% if request.user.is_authenticated %}
     <table class="formpost">
       {{ form_art }}{{ form }}
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
-  </form>
 {% else %}
   <p>{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
+  </form>
 {% endblock %}

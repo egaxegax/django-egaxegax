@@ -10,7 +10,7 @@ class Art(models.Model):
 
 class Song(models.Model):
     class Meta:
-        unique_together = (('artist', 'title'),)
+        unique_together = (('artist', 'title'),) # not working for gae
         db_table = 'my_song'
     artist = models.CharField(max_length=50, db_index=True, verbose_name=_('artist'))
     title = models.CharField(max_length=50, verbose_name=_('title'))
