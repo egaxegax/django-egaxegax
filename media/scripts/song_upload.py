@@ -17,13 +17,14 @@ def E_OS(text):
 path = u'.'
 mcount = 0 # files uploaded counter
 nstart = 0 # start counter
-uplog = file('up.log', 'w')
 
 if len(sys.argv) > 1:
   path = os.path.abspath(sys.argv[1])
 
 if len(sys.argv) > 2:
   nstart = int(sys.argv[2])
+
+uplog = file(os.path.join(path, 'up.log'), 'w')
 
 for root, dirs, files in os.walk(path, topdown=False):
   for name in files:

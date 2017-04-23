@@ -104,13 +104,17 @@ def GetArtArtist(art_id):
         raise Http404
 
 # pack/unpack text
-def PackContent(t):
-    return "base64,"+base64.b64encode(zlib.compress(t.encode('1251')))
+def PackContent(song):
+    return "base64,"+base64.b64encode(zlib.compress(song.content.strip('\r\n').encode('1251')))
 
-def UnpackContent(t):
+def UnpackContent(song):
+    t = song.content
     if t[:7]=='base64,':
         try:   t = zlib.decompress(base64.b64decode(t[7:])).decode('cp1251')
         except zlib.error, TypeError: pass
+    else: # repack
+        song.content = PackContent(song)
+        song.save(force_update=True)
     return t
 
 # increment art song count
@@ -241,7 +245,7 @@ def add_song(request):
             song = form.save(commit=False)            
             song_list = Song.objects.filter(Q(artist=request.POST['artist'])&Q(title=song.title))
             if len(song_list) == 0:
-                song.content = PackContent(song.content.strip('\r\n'))
+                song.content = PackContent(song)
                 if isinstance(request.user, User):
                     song.author = request.user
                 art = IncArtCount(artist=request.POST['artist'])
@@ -269,7 +273,7 @@ def edit_song(request, **kw):
         form = AddSongForm(request.POST, instance=song)
         if form.is_valid():
             song = form.save(commit=False)
-            song.content = PackContent(song.content.strip('\r\n'))
+            song.content = PackContent(song)
             if isinstance(request.user, User):
                 song.author = request.user
             #-- song.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -281,7 +285,7 @@ def edit_song(request, **kw):
         form = AddSongForm(initial={
                            'id': song.id,
                            'title': song.title,
-                           'content': UnpackContent(song.content)})
+                           'content': UnpackContent(song)})
     return render_to_response('edit_song.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
@@ -326,9 +330,9 @@ def get_song(request, **kw):
         song_id = kw.get('id', '')
         if not cache.has_key('song:' + song_id):
             song = get_object_or_404(Song, id=ZI(song_id))
-            t = UnpackContent(song.content)
-            t = re.sub(r"\n>(.*)","\n*#*\g<1>*##*", t)
-            t = re.sub(r"\n!(.*)","\n*_*\g<1>*__*", t)
+            t = UnpackContent(song)
+            t = re.sub(r"(^|\n)>(.*)","\g<1>*#*\g<2>*##*", t)
+            t = re.sub(r"(^|\n)!(.*)","\g<1>*_*\g<2>*__*", t)
             t = re.sub(r"<([^>]*)>", ' *#*\g<1>*##* ', t)
             t = t.replace('*#*', '<b>').replace('*##*', '</b>')
             t = t.replace('*_*', '<i>').replace('*__*', '</i>')
