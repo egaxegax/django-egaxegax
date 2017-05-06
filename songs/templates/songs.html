@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load myfilter %}
+{% load mathfilters %}
 {% block description %}{% if song_count %}. {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block keywords %}{% if song_count %}, {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block title %}
@@ -63,7 +64,7 @@
     <a class="nodecor pink" href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a>
   {% endif %}
   {% if not art_count and not last_count and not search_count %}
-    <span class="smaller gray hspace">{% widthratio songs.number 1 forloop.counter %}</span>
+    <span class="smaller gray hspace">{{ forloop.counter }}</span>
   {% endif %}
   {% if song.count %}
     <span class="smaller">[{{ song.count }}]</span>

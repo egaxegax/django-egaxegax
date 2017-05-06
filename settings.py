@@ -18,6 +18,8 @@ INSTALLED_APPS = (
     'djangotoolbox',
     'djangoappengine',
     'captcha',
+    'mathfilters',
+    'myfilter',
     'filetransfers',
     'upload',
     'my',
