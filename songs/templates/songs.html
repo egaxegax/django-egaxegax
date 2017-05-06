@@ -37,12 +37,13 @@
 <p>
 {% if song_count %}
 
-{% if search_count %}Поиск &quot;<b>{{ request.GET.search }}</b>&quot;. {% endif %}
 {% if song_count and not search_count %}{% if art_key %}{% else %}{% with songs.object_list|first as f %}
-  <h2 class="inl nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}"><span class="hspace">{{ f.artist }}</span></a></h2>
+  <h2 class="inl nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}">
+    <span class="hspace">{{ f.artist }}</span></a></h2>
 {% endwith %}{% endif %}{% endif %}
-{# if not song_count and not search_count #}{# trans 'Chords, lyrics' #}{# endif #}
-  Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов
+{% if art_count or search_count %}
+  <span class="hspace"></span> Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов
+{% endif %}
 
 {% endif %}
 </p>
@@ -62,7 +63,7 @@
     <a class="nodecor pink" href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a>
   {% endif %}
   {% if not art_count and not last_count and not search_count %}
-    <span class="smaller gray hspace">{{ forloop.counter }}</span>
+    <span class="smaller gray hspace">{% widthratio songs.number 1 forloop.counter %}</span>
   {% endif %}
   {% if song.count %}
     <span class="smaller">[{{ song.count }}]</span>

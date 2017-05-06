@@ -62,7 +62,7 @@ def AddSongCache(song):
         'date': song.date.strftime('%Y-%m-%d %H:%M:%S') }
     cache.add('song:' + str(song.id), str(cache_song))
 
-def AddSongListCache(artkey, song_list):
+def AddSongListCache(mkey, song_list):
     cache_list = []
     for song in song_list:
         cache_list.append({
@@ -72,7 +72,7 @@ def AddSongListCache(artkey, song_list):
            'title': song.title,
            'audio': hasattr(song.audio, 'file'),
            'date': song.date.strftime('%Y-%m-%d %H:%M:%S') })
-    cache.add('songs:' + artkey, str(cache_list))
+    cache.add('songs:' + mkey, str(cache_list))
 
 def ClearArtListCache(artkey):
     cache.delete_many(['arts:.full_list', 'arts:' + artkey])

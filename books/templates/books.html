@@ -56,11 +56,8 @@ dt .cont { display: table; width: 100%; }
       <span class="hspace">{{ writer.writer }}</span></a></h2>
   {% endif %}
 {% endif %}
-{% if search_count %}
-  Поиск фразы &quot;<b>{{ request.GET.search }}</b>&quot;. 
-{% endif %}
 {% if book_count or wrt_count %}
-  Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}
+  <span class="hspace"></span> Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}
 {% endif %}
 </p>
 
