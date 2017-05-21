@@ -77,6 +77,7 @@ function dbCartaSvg(cfg) {
      *   scalebg: bgcolor for paintBar
      *   sbar: show scale bar?
      *   sbarpos: bar pos {left|right}
+     *   sbarsize: bar size {height/6}
      * }
      */
     cfg: {
@@ -84,7 +85,8 @@ function dbCartaSvg(cfg) {
       boundbg: cfg.boundbg || 'rgb(90,140,190)',
       scalebg: cfg.scalebg || 'rgba(200,200,200,0.3)',
       sbar: cfg.sbar == undefined ? true : cfg.sbar,
-      sbarpos: cfg.sbarpos || 'right'
+      sbarpos: cfg.sbarpos || 'right',
+      sbarsize: cfg.sbarsize||6
     },
     /**
      * Interval vars
@@ -256,7 +258,7 @@ function dbCartaSvg(cfg) {
       var sz = this.sizeOf(),
           cw = sz[2],
           ch = sz[3];
-      var h = ch/6,
+      var h = ch/this.cfg.sbarsize,
           w = h/2,
           tleft = this.cfg.sbarpos == 'left' ? w/10 : cw - w - w/10,
           ttop = ch/2 - h/2,
@@ -330,7 +332,7 @@ function dbCartaSvg(cfg) {
       var sz = this.sizeOf(),
           cw = sz[2],
           ch = sz[3];
-      var h = ch/6,
+      var h = ch/this.cfg.sbarsize,
           w = h/2,
           tleft = this.cfg.sbarpos == 'left' ? w/10 : cw - w - w/10,
           ttop = ch/2 - h/2,

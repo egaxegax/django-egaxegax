@@ -2,17 +2,18 @@
 {% load i18n %}
 {% block title %}{% trans 'Profile' %} - {% endblock %}
 {% block pagestyle %}
-ul.profile li { padding: 1px 0 1px 0; }
 {% endblock %}
 {% block aboutclass %}wrap{% endblock %}
 {% block pageheader %}{# trans 'Profile' #}{% endblock %}
 {% block content %}
 <p>Информация о пользователе:</p>
-<ul class="profile">
-  <li>{% trans 'avatar'|capfirst %}: <img width="26px" height="26px" src="{% url 'my.views.get_avatar' id=record.author.id %}" title="{{ record.author.username }}"/></li>
-  <li>{% trans 'name'|capfirst %}: <span class="smaller">{{ record.author.username }}</span></li>
-  <li>{% trans 'last login'|capfirst %}: <span class="smaller">{{ record.author.last_login }}</span></li>
-  <li>{% trans 'date joined'|capfirst %}: <span class="smaller">{{ record.author.date_joined }}</span></li>
-  <li>{% trans 'Posts'|capfirst %}: <span class="smaller">{{ record_count }}</span></li>
-</ul>
+ <div class="wrap">
+ <dl class="msgtext">
+   <dt>{% trans 'avatar'|capfirst %}&nbsp; <img width="26px" height="26px" src="{% url 'my.views.get_avatar' id=record.author.id %}" title="{{ record.author.username }}"/></dt>
+   <dt>{% trans 'name'|capfirst %}&nbsp; <span class="smaller">{{ record.author.username }}</span></dt>
+   <dt>{% trans 'last login'|capfirst %}&nbsp; <span class="smaller">{{ record.author.last_login }}</span></dt>
+   <dt>{% trans 'date joined'|capfirst %}&nbsp; <span class="smaller">{{ record.author.date_joined }}</span></dt>
+   <dt>{% trans 'posts'|capfirst %}&nbsp; <span class="smaller">{{ record_count }}</span></dt>
+ </dl>
+ </div>
 {% endblock %}

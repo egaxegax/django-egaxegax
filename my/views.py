@@ -126,7 +126,7 @@ def index(request):
 def list_photos(request, **kw):
     album =''
     if kw.get('id_album'): # filter by album
-        rows = 2
+        rows = 10
         cols = 5
         photos_list = []
         cache_photo_id = 'photo:' + kw.get('id_album', '')
