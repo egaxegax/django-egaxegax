@@ -92,8 +92,8 @@ dt .cont { display: table; width: 100%; }
 	      <br/>{{ book.content }}
       </div>
       <div class="bbar smaller">
-        <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="gray button lfloat">Скачать</div></a>&nbsp;
-        <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="gray button lfloat">Читать</div></a>
+        <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="pink button lfloat">Скачать</div></a>&nbsp;
+        <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="pink button lfloat">Читать</div></a>
       </div>
 	    </div>
     </dt></dl>
@@ -178,8 +178,8 @@ dt .cont { display: table; width: 100%; }
           <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
       </div>
       <div class="bbar smaller">
-        <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="gray button lfloat">Скачать</div></a>&nbsp;
-        <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="gray button lfloat">Читать</div></a>
+        <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="pink button lfloat">Скачать</div></a>&nbsp;
+        <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="pink button lfloat">Читать</div></a>
       </div>
       </div>
     {% endif %}
