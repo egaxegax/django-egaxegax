@@ -16,7 +16,7 @@ from my.forms import *
 from my.models import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
-import time, os.path, re
+import datetime, time, os.path, re
 
 def ZI(s):
     try:
@@ -47,11 +47,12 @@ def FromTranslit(s):
     return re.sub(pattern, lambda m: r[m.group()], s)
 
 def AddAlbumListCache(allkey, photos_list):
-    album_list = {}
+    lst = {}
+    album_list = []
     for photo in photos_list:
-        if not photo.album in album_list:
-            album_list[photo.album] = {
-               'album_count': 1,     
+        if not photo.album in lst:
+            lst[photo.album] = {
+               'album_count': 1,
                'id': photo.id,
                'title': photo.title,
                'album': photo.album,
@@ -59,9 +60,15 @@ def AddAlbumListCache(allkey, photos_list):
                'height': photo.height,
                'thumb_url': photo.thumb_url,
                'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-               'date': photo.date.strftime('%Y-%m-%d %H:%M:%S') }
+               'date': photo.date }
         else:
-            album_list[photo.album]['album_count'] += 1
+            lst[photo.album]['album_count'] += 1
+            if photo.date > lst[photo.album]['date']:
+                lst[photo.album]['date'] = photo.date
+                lst[photo.album]['thumb_url'] = photo.thumb_url
+    # sort by album
+    for k in sorted(lst):
+        album_list.append(lst[k])
     cache.add('photos:' + allkey, str(album_list))
 
 def AddPhotoCache(photo):
@@ -70,7 +77,7 @@ def AddPhotoCache(photo):
         'title': photo.title,
         'album': photo.album,
         'thumb_url': photo.thumb_url,
-        'date': photo.date.strftime('%Y-%m-%d %H:%M:%S') }
+        'date': photo.date }
     cache.add('photo:' + str(photo.id), str(cache_photo))
 
 def AddPhotosListCache(album, photos_list):
@@ -84,7 +91,7 @@ def AddPhotosListCache(album, photos_list):
            'height': photo.height,
            'thumb_url': photo.thumb_url,
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-           'date': photo.date.strftime('%Y-%m-%d %H:%M:%S') })
+           'date': photo.date })
     cache.add('photos:' + album, str(cache_list))
 
 def ClearPhotoCache(photo):
@@ -111,7 +118,7 @@ def UpdateFullListCache(photo):
            'height': photo.height,
            'thumb_url': photo.thumb_url,
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-           'date': photo.date.strftime('%Y-%m-%d %H:%M:%S') }
+           'date': photo.date }
         ClearPhotosFullListCache()
         cache.add(cache_id, str(album_list))
 
@@ -126,7 +133,7 @@ def index(request):
 def list_photos(request, **kw):
     album =''
     if kw.get('id_album'): # filter by album
-        rows = 10
+        rows = 20
         cols = 5
         photos_list = []
         cache_photo_id = 'photo:' + kw.get('id_album', '')
@@ -142,14 +149,14 @@ def list_photos(request, **kw):
                 AddPhotosListCache(album, photos_list)
             photos_list = eval(cache.get('photos:' + album))
     else: # full list by album
-        rows = 5
-        cols = 3
+        rows = 50
+        cols = 2
         photos_list = {}
         allkey = '.full_list'
         if not cache.has_key('photos:' + allkey):
-            photos_list = Photo.objects.all()
+            photos_list = Photo.objects.all().order_by('album')
             AddAlbumListCache(allkey, photos_list)
-        photos_list = eval(cache.get('photos:' + allkey)).values()
+        photos_list = eval(cache.get('photos:' + allkey))
     return render_to_response('photos.html', 
                               context_instance=RequestContext(request,
                               {'request': request,

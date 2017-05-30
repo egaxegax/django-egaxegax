@@ -16,7 +16,7 @@ from books.models import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 from math import ceil
-import re, time, sys, os.path
+import datetime, time, sys, os.path, re
 import zlib, zipfile, base64, mimetypes
 import transliterate
 
@@ -84,7 +84,7 @@ def AddBookCache(book, part, content):
         'file': ((hasattr(book, 'file') and book.file) and {'name': book.file.name.rsplit('/')[-1]}) or {},
         'content': E_OS(content),
         'author': ((hasattr(book, 'author') and book.author) and {'id': book.author.id, 'username': book.author.username}) or {},
-        'date': book.date.strftime('%Y-%m-%d %H:%M:%S') }
+        'date': book.date }
     cache.add('book:' + str(book.index) + '.' + str(part), str(cache_book))
     return cache_book
 
@@ -115,7 +115,7 @@ def AddBookListCache(mkey, book_list):
                'content': truncatewords(content, 80),
                'index': book.index,
 #                'thumb_url': thumb_url,
-               'date': book.date.strftime('%Y-%m-%d %H:%M:%S') })
+               'date': book.date })
     cache.add('books:' + str(mkey), str(cache_list))
 
 def ClearWrtListCache(wrt_key):
@@ -441,7 +441,7 @@ def edit_book(request, **kw):
             mbook = form.save(commit=False)
             if isinstance(request.user, User):
                 mbook.author = request.user
-            mbook.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) 
+            mbook.date = datetime.datetime.today()
             mbook.save(force_update=True)
             ClearBookListWrtCache(mbook.writer.id)
             ClearBookListSubjCache(mbook.subject.id)

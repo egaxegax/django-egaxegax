@@ -7,6 +7,6 @@ register = template.Library()
 @register.filter
 def time_since(strval):
     try:
-        return timesince(datetime.strptime(strval, '%Y-%m-%d %H:%M:%S'))
+        return timesince(strval)
     except:
         return strval

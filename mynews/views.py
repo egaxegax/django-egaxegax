@@ -10,7 +10,7 @@ from django.template.context import RequestContext
 from django.template.defaultfilters import timesince
 from mynews.forms import *
 from mynews.models import *
-import time
+import datetime, time
 
 def ZI(s):
     try:
@@ -39,7 +39,7 @@ def AddMsgListCache(theme, msg_list):
            'id': msg.id,
            'content': msg.content,
            'author': (hasattr(msg, 'author') and hasattr(msg.author, 'id') and {'id': msg.author.id, 'username': msg.author.username}) or {},
-           'date': msg.date.strftime('%Y-%m-%d %H:%M:%S') })
+           'date': msg.date })
     cache.add('news:' + theme, str(cache_list))
 
 def ClearMsgListCache():

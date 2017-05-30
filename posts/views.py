@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template.context import RequestContext
 from posts.forms import *
 from posts.models import *
-import time, sys
+import datetime, time, sys
 
 def ZI(s):
     try:
@@ -42,7 +42,7 @@ def AddSubjListCache(subj_list):
            'id': subj.id,
            'subject': subj.subject,
            'count': subj.count,
-           'date': subj.date.strftime('%Y-%m-%d %H:%M:%S') })
+           'date': subj.date })
     cache.add('subjects:.full_list', str(cache_list))
 
 def AddPostCache(post):
@@ -52,7 +52,7 @@ def AddPostCache(post):
        'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
        'title': post.title,
        'content': post.content,
-       'date': post.date.strftime('%Y-%m-%d %H:%M:%S') }]
+       'date': post.date }]
     cache.add('post:' + str(post.id), str(cache_post))
 
 def AddPostListCache(subj_id, posts_list):
@@ -64,7 +64,7 @@ def AddPostListCache(subj_id, posts_list):
            'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
            'title': post.title,
            'content': post.content,
-           'date': post.date.strftime('%Y-%m-%d %H:%M:%S') })
+           'date': post.date })
     cache.add('posts:' + str(subj_id), str(cache_list))
 
 def ClearSubjListCache():
@@ -83,7 +83,7 @@ def IncSubjCount(**kw):
             form = AddSubjForm(instance=Greeting_Subject.objects.get(subject=kw['subject']))
             subj = form.save(commit=False)
             subj.count += kw.get('count', 1)
-            subj.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            subj.date = datetime.datetime.today()
             subj.save(force_update=True)
             if subj.count < 1:
                 subj.delete()
@@ -187,7 +187,7 @@ def edit_post(request, **kw):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-#            post.date = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+#            post.date = datetime.datetime.today()
             post.save(force_update=True)
             if post.subject:
                 IncSubjCount(subject=post.subject.subject, count=0)

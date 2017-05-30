@@ -12,7 +12,7 @@ from songs.forms import *
 from songs.models import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
-import os.path, time, sys, re, base64, zlib
+import os.path, datetime, time, sys, re, base64, zlib
 import transliterate
 
 art_index = {
@@ -59,7 +59,7 @@ def AddSongCache(song):
         'content': song.content,
         'audio': hasattr(song.audio, 'file'),
         'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
-        'date': song.date.strftime('%Y-%m-%d %H:%M:%S') }
+        'date': song.date }
     cache.add('song:' + str(song.id), str(cache_song))
 
 def AddSongListCache(mkey, song_list):
@@ -71,7 +71,7 @@ def AddSongListCache(mkey, song_list):
            'art_id': GetArtId(song.artist),
            'title': song.title,
            'audio': hasattr(song.audio, 'file'),
-           'date': song.date.strftime('%Y-%m-%d %H:%M:%S') })
+           'date': song.date })
     cache.add('songs:' + mkey, str(cache_list))
 
 def ClearArtListCache(artkey):
@@ -276,7 +276,7 @@ def edit_song(request, **kw):
             song.content = PackContent(song)
             if isinstance(request.user, User):
                 song.author = request.user
-            #-- song.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            #-- song.date = datetime.datetime.today()
             song.save(force_update=True)
             ClearSongListCache(song.artist)
             ClearSongCache(song)
