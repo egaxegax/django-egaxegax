@@ -15,26 +15,35 @@ def E_OS(text):
   return text
 
 path = u'.'
-if (len(sys.argv) > 1):
+mcount = 0 # files uploaded counter
+nstart = 0 # start counter
+
+if len(sys.argv) > 1:
   path = os.path.abspath(sys.argv[1])
 
-uplog = file('up.log', 'w')
-mcount = 0 # files uploaded counter
+if len(sys.argv) > 2:
+  nstart = int(sys.argv[2])
+
+uplog = file(os.path.join(path, 'up.log'), 'w')
 
 for root, dirs, files in os.walk(path, topdown=False):
   for name in files:
-#     print name
+
     fname, ext = os.path.splitext(name)
-    
+
     if ext == '.txt':
+
+      mcount += 1
+
+      if mcount < nstart:
+          continue
+
       ss = fname.split('@')
       mname, writer, title, subject, part = ss
       
       print mname, writer, title, subject, part
 
-      # Register the streaming http handlers with urllib2
-      register_openers()
- 
+      os.chdir(root)
       param = []
  
       if int(part) == 0:
@@ -56,14 +65,15 @@ for root, dirs, files in os.walk(path, topdown=False):
       param += [("subject", E_OS(subject))]
       param += [("content", file(name).read())]
       param += [("part", part)]
- 
+
+      register_openers()
       datagen, headers = multipart_encode(param)
  
       request = urllib2.Request("http://egaxegax.appspot.com/books/add")
       uri = re.findall(r'form action="([^\"]*)"', urllib2.urlopen(request).read())
       if uri:
-          print mcount + 1, uri
+          print mcount, uri
           request = urllib2.Request(uri[0], datagen, headers)
           print >> uplog, urllib2.urlopen(request).read()
           time.sleep(3)
-          mcount += 1
+
