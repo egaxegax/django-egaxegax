@@ -157,7 +157,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
 		for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
 		dw.caption.appendChild(document.createTextNode(this.title));
-		var ratio = dw.root.getAttribute('width') > dw.root.getAttribute('height') ? this.width/this.height : this.height/this.width;
+		var ratio = this.width/this.height;
 		var vs = dw.viewsizeOf();
 		var crds = [[-vs[1]*ratio,vs[1]],[-vs[3]*ratio,vs[3]]],
 			  pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
