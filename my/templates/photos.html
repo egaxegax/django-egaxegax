@@ -7,7 +7,7 @@
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
 table.cont { padding: 10px 2px; }
-#viewtab { visibility: hidden; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
+#viewtab { visibility: hidden; border-collapse: collapse; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
 #viewtab td div { color: rgba(255,255,255,0.8); text-align: center; font-size: 40pt; }
 #viewcol { vertical-align: center; padding:0; width: 120px; }
 #viewcol img {border:2px transparent solid} 
@@ -16,7 +16,7 @@ table.cont { padding: 10px 2px; }
 .pan { padding:0 margin: 0; width: 100%; height: 100%; }
 .albcont { padding: 10px; }
 .photocont { max-width: 150px; }
-.nav { fill: rgba(255,255,255,0.8); }
+.nav { fill: rgba(255,255,255,0.6); }
 {% endblock %}
 {% block myclass %}wrap{% endblock %}
 {% block pageheader %}{# trans 'Photogallery' #}{% endblock %}
@@ -38,9 +38,9 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
     	vCont = document.getElementById('viewcont'),
     	vCol = document.getElementById('viewcol'),
     	vDiv = document.getElementById('viewdiv'),
-       	thumbPhoto = document.getElementById('thumb' + counter);
+      thumbPhoto = document.getElementById('thumb' + counter);
   	var thumb, k=1;
-  	// thumblist
+  	  // thumblist
   	while(thumb = document.getElementById('thumb'+k)){
     	var el2 = document.createElement('img');
     	el2.style.display = 'block';
@@ -72,6 +72,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	vPhoto.title = thumbPhoto.title;
 	vPhoto.onload = function() {
 		vTab.style.visibility = 'visible';
+		document.body.style.overflow='hidden';
 		if (!window.dw){
 			dw = new dbCartaSvg({
 				id:'viewcont',
@@ -81,13 +82,16 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 				sbarpos: 'left',
 				sbarsize:2
 			});
+			  // map size
+      var mapWidth = dw.root.getAttribute('width'),
+          mapHeight = dw.root.getAttribute('height');
 			  // close
 	    var link = dw.append(dw.root, 'a', {});
 	    link.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:cl()');
 	    link.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
 	    var text = dw.append(link, 'text', {
 	    	class: 'nav',
-	    	x:dw.root.getAttribute('width'), y:0, dy:'0.8em', 
+	    	x:mapWidth, y:0, dy:'0.8em', 
 	    	'text-anchor': 'end'
 	    });
 	    text.appendChild(document.createTextNode('\u2715'));
@@ -95,7 +99,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	    dw.prevlink = dw.append(dw.root, 'a', {});
 	    var text = dw.append(dw.prevlink, 'text', {
 	    	class: 'nav',
-	    	x:0, y:dw.root.getAttribute('height')/2, dy: '0.25em',
+	    	x:0, y:mapHeight/2, dy: '0.25em',
 	    	'font-size':'200%',
 	    	'text-anchor': 'start'
 	    });
@@ -104,7 +108,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	    dw.nextlink = dw.append(dw.root, 'a', {});
 	    var text = dw.append(dw.nextlink, 'text', {
 	    	class: 'nav',
-	    	x:dw.root.getAttribute('width'), y:dw.root.getAttribute('height')/2, dy:'0.25em',
+	    	x:mapWidth, y:mapHeight/2, dy:'0.25em',
 	    	'font-size':'200%',
 	    	'text-anchor': 'end'
 	    });
@@ -114,14 +118,14 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
       dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Click to view full size' %}");
 	    var text = dw.append(dw.viewfull, 'text', {
 	    	class: 'nav',
-	    	x:dw.root.getAttribute('width'), y:dw.root.getAttribute('height'),
+	    	x:mapWidth, y:mapHeight, dy:'-0.25em',
 	    	'text-anchor': 'end'
 	    });
-	    text.appendChild(document.createTextNode('\u2922'));
+	    text.appendChild(document.createTextNode('\u2750'));
 	      // caption
 	    dw.caption = dw.append(dw.root, 'text', {
 	    	class: 'nav',
-	    	x:dw.root.getAttribute('width')/2, y:dw.root.getAttribute('height'), dy:'-0.2em',
+	    	x:mapWidth/2, y:mapHeight, dy:'-0.2em',
 	    	'font-size': '10pt',
 	    	'text-anchor': 'middle'
 	    });
@@ -140,7 +144,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		    dw.viewdel = dw.append(dw.root, 'a', {});
 		    var text = dw.append(dw.viewdel, 'text', {
 		    	class: 'nav',
-		    	x:0, y:dw.root.getAttribute('height'),
+		    	x:0, y:mapHeight, dy:'-0.25em',
 		    	'text-anchor': 'start'
 		    });
 		    text.appendChild(document.createTextNode('\u2672'));
@@ -153,8 +157,9 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
 		for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
 		dw.caption.appendChild(document.createTextNode(this.title));
-		var ratio = this.width/this.height;
-		var crds = [[-90*ratio,90],[90*ratio,-90]],
+		var ratio = dw.root.getAttribute('width') > dw.root.getAttribute('height') ? this.width/this.height : this.height/this.width;
+		var vs = dw.viewsizeOf();
+		var crds = [[-vs[1]*ratio,vs[1]],[-vs[3]*ratio,vs[3]]],
 			  pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
 		dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
 		dw.attr(dw.img, {
@@ -167,7 +172,10 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		});
 	}
 }
-function cl(){ document.getElementById("viewtab").style.visibility="hidden"; }
+function cl(){ 
+    document.getElementById("viewtab").style.visibility="hidden";
+    document.body.style.overflow='auto';
+}
 function viewchange(counter) {
     var nref = document.getElementById('thumbref' + String(Math.abs(counter)));
     if (nref) {

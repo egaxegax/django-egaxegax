@@ -152,7 +152,7 @@ def GetBookContent(book, part='0'):
                 # get content from zip archive by name or num part
                 for f in za.namelist():
                     mpart = re.findall('(\d+)', f)
-                    if (part.isdigit() and f.endswith('.xhtml') and len(mpart) and int(part) == int(mpart[0])) or (part == f) or (part == '0' and f == 'index.xhtml') or (part.startswith('cover') and f.startswith('cover')):
+                    if (part.isdigit() and f.endswith('.xhtml') and len(mpart) and int(part) == int(mpart[0])) or (part == f) or (part == '0' and f == 'index.xhtml') or (part.startswith('cover') and (part in f)):
                         try:
                             ft = za.read(f)
                             if f.startswith('index') and f.endswith('.xhtml'):

@@ -47,12 +47,11 @@ def FromTranslit(s):
     return re.sub(pattern, lambda m: r[m.group()], s)
 
 def AddAlbumListCache(allkey, photos_list):
-    lst = {}
-    album_list = []
+    album_list = {}
     for photo in photos_list:
-        if not photo.album in lst:
-            lst[photo.album] = {
-               'album_count': 1,
+        if not photo.album in album_list:
+            album_list[photo.album] = {
+               'album_count': 1,     
                'id': photo.id,
                'title': photo.title,
                'album': photo.album,
@@ -62,14 +61,30 @@ def AddAlbumListCache(allkey, photos_list):
                'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
                'date': photo.date }
         else:
-            lst[photo.album]['album_count'] += 1
-            if photo.date > lst[photo.album]['date']:
-                lst[photo.album]['date'] = photo.date
-                lst[photo.album]['thumb_url'] = photo.thumb_url
-    # sort by album
-    for k in sorted(lst):
-        album_list.append(lst[k])
+            album_list[photo.album]['album_count'] += 1
+            if photo.date > album_list[photo.album]['date']:
+                album_list[photo.album]['date'] = photo.date
+                album_list[photo.album]['thumb_url'] = photo.thumb_url
     cache.add('photos:' + allkey, str(album_list))
+
+def UpdateAlbumListCache(photo):
+    cache_id = 'photos:' + '.full_list' 
+    if cache.has_key(cache_id):
+        album_list = eval(cache.get(cache_id))
+        if not album_list.has_key(photo.album):
+            album_list[photo.album] = {'album_count': 0}
+        album_list[photo.album] = {
+           'album_count': album_list[photo.album]['album_count'] + 1,
+           'id': photo.id,
+           'title': photo.title,
+           'album': photo.album,
+           'width': photo.width,
+           'height': photo.height,
+           'thumb_url': photo.thumb_url,
+           'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
+           'date': photo.date }
+        ClearPhotosFullListCache()
+        cache.add(cache_id, str(album_list))
 
 def AddPhotoCache(photo):
     cache_photo = {
@@ -102,25 +117,6 @@ def ClearPhotosListCache(album):
 
 def ClearPhotosFullListCache():
     cache.delete_many(['photos:.full_list'])
-
-def UpdateFullListCache(photo):
-    cache_id = 'photos:' + '.full_list' 
-    if cache.has_key(cache_id):
-        album_list = eval(cache.get('photos:.full_list'))
-        if not album_list.has_key(photo.album):
-            album_list[photo.album] = {'album_count': 0}
-        album_list[photo.album] = {
-           'album_count': album_list[photo.album]['album_count'] + 1,
-           'id': photo.id,
-           'title': photo.title,
-           'album': photo.album,
-           'width': photo.width,
-           'height': photo.height,
-           'thumb_url': photo.thumb_url,
-           'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-           'date': photo.date }
-        ClearPhotosFullListCache()
-        cache.add(cache_id, str(album_list))
 
 # Controllers
 
@@ -156,7 +152,7 @@ def list_photos(request, **kw):
         if not cache.has_key('photos:' + allkey):
             photos_list = Photo.objects.all().order_by('album')
             AddAlbumListCache(allkey, photos_list)
-        photos_list = eval(cache.get('photos:' + allkey))
+        photos_list = eval(cache.get('photos:' + allkey)).values()
     return render_to_response('photos.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
@@ -222,7 +218,7 @@ def add_photo(request):
                     photo.author = request.user
                 photo = form.save()
                 ClearPhotosListCache(photo.album)
-                UpdateFullListCache(photo)
+                UpdateAlbumListCache(photo)
                 return HttpResponseRedirect(reverse('my.views.list_photos', kwargs={'id_album': photo.id}))
             except:
                 pass
@@ -289,3 +285,4 @@ def view_photo(request, **kw):
                                   context_instance=RequestContext(request,
                                   {'request': request,
                                    'photo': photo}))
+

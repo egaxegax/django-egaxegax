@@ -1,9 +1,9 @@
 /*
- * dbCartajs HTML5 SVG vector object map v2.0.2.
+ * dbCartajs HTML5 SVG vector object map. Build 170604.
  * It uses Proj4js transformations.
  *
  * Source at https://github.com/egaxegax/dbCartajs.git.
- * egax@bk.ru, 2015.
+ * egax@bk.ru, 2015-2017.
  */
 var SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -86,7 +86,7 @@ function dbCartaSvg(cfg) {
       scalebg: cfg.scalebg || 'rgba(200,200,200,0.3)',
       sbar: cfg.sbar == undefined ? true : cfg.sbar,
       sbarpos: cfg.sbarpos || 'right',
-      sbarsize: cfg.sbarsize||6
+      sbarsize: cfg.sbarsize||4
     },
     /**
      * Interval vars
@@ -139,7 +139,7 @@ function dbCartaSvg(cfg) {
     /**
     * Return meridians coords.
     */
-    createMeridians: function () {
+    createMeridians: function() {
       var lonlat = [];
       var x = -180,
           scale_x = 180;
@@ -155,15 +155,13 @@ function dbCartaSvg(cfg) {
       }
       var y = -90;
       while (y <= 90) {
-        var prev, x = -180;
-        var centerof = prev = [x, y],
-            label = y;
+        var x = -180,
+            prev = [x, y];
         while (x < scale_x) {
           x += 90;
           var lat = [prev, [x,y]],
               prev = [x, y];
           lonlat.push( lat );
-          label = centerof = undefined;
         }
         y += 30;
       }
@@ -360,6 +358,19 @@ function dbCartaSvg(cfg) {
     },
     chkPts: function(pts) {
       return (pts && !isNaN(pts[0]) && !isNaN(pts[1]));
+    },
+    resize: function(w, h) {
+      attr(root, {
+        width: w,
+        height: h
+      });
+      attr(vp, {
+        width: w,
+        height: h
+      });
+      this.m.delta = w / 360;
+      this.m.halfX = w / 2.0;
+      this.m.halfY = h / 2.0;
     },
     // - reproject ------------------------
     /**
@@ -583,7 +594,7 @@ function dbCartaSvg(cfg) {
         delta = -ev.detail / 3;
       }
       var zoom = (self.m.scale > 1 ? self.m.scale : 2-1/self.m.scale);
-      zoom += delta * 0.5;
+      zoom += delta * 0.25;
       zoom = (zoom > 1 ? zoom : 1/(2-zoom));
       self.scaleCarta(zoom);
     },
