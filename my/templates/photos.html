@@ -7,13 +7,8 @@
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
 table.cont { padding: 10px 2px; }
-#viewtab { visibility: hidden; border-collapse: collapse; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8); }
-#viewtab td div { color: rgba(255,255,255,0.8); text-align: center; font-size: 40pt; }
-#viewcol { vertical-align: center; padding:0; width: 120px; }
-#viewcol img {border:2px transparent solid} 
-#viewcol img:hover {border:2px yellow solid}
-#viewdiv { overflow: auto; }
-.pan { padding:0 margin: 0; width: 100%; height: 100%; }
+#viewtab { visibility: hidden; border-collapse: collapse; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8);
+    padding:0 margin: 0; width: 100%; height: 100%; font-size: 40pt; }
 .albcont { padding: 10px; }
 .photocont { max-width: 150px; }
 .nav { fill: rgba(255,255,255,0.6); }
@@ -36,36 +31,8 @@ if(window.addEventListener) {
 function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	var vTab = document.getElementById('viewtab'),
     	vCont = document.getElementById('viewcont'),
-    	vCol = document.getElementById('viewcol'),
-    	vDiv = document.getElementById('viewdiv'),
-      thumbPhoto = document.getElementById('thumb' + counter);
-  	var thumb, k=1;
-  	  // thumblist
-  	while(thumb = document.getElementById('thumb'+k)){
-    	var el2 = document.createElement('img');
-    	el2.style.display = 'block';
-    	el2.width = 100;
-    	el2.id = '_' + thumb.id;
-    	el2.title = thumb.title;
-    	el2.src = thumb.src;
-    	el2.onclick = function(){
-      		vPhoto.id = '_' + this.id;
-      		vPhoto.title = this.title;
-      		vPhoto.src = this.src.substr(0, this.src.length-5);
-    	};
-    	el2.onload = function(){
-    		var i;
-    		for(i=0; i<vDiv.children.length; i++){
-    			if (this.src == vDiv.children[i].src) break;
-    		}
-    		if (i==vDiv.children.length){
-      			vDiv.style.maxHeight = vCol.offsetHeight + 'px';
-      			vDiv.appendChild(this);
-    		}
-    	};
-		k++;
-  	}
-	// add img
+     thumbPhoto = document.getElementById('thumb' + counter); 
+	  // add img
 	var vPhoto = new Image();
 	vPhoto.src = thumbPhoto.src.substr(0, thumbPhoto.src.length-5);
 	vPhoto.id = '__' + thumbPhoto.id;
@@ -91,6 +58,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	    link.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
 	    var text = dw.append(link, 'text', {
 	    	class: 'nav',
+	    	'font-size':'150%',
 	    	x:mapWidth, y:0, dy:'0.8em', 
 	    	'text-anchor': 'end'
 	    });
@@ -100,7 +68,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	    var text = dw.append(dw.prevlink, 'text', {
 	    	class: 'nav',
 	    	x:0, y:mapHeight/2, dy: '0.25em',
-	    	'font-size':'200%',
+	    	'font-size':'500%',
 	    	'text-anchor': 'start'
 	    });
 	    text.appendChild(document.createTextNode('\u2039'));
@@ -109,7 +77,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	    var text = dw.append(dw.nextlink, 'text', {
 	    	class: 'nav',
 	    	x:mapWidth, y:mapHeight/2, dy:'0.25em',
-	    	'font-size':'200%',
+	    	'font-size':'500%',
 	    	'text-anchor': 'end'
 	    });
 	    text.appendChild(document.createTextNode('\u203A'));
@@ -118,33 +86,36 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
       dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Click to view full size' %}");
 	    var text = dw.append(dw.viewfull, 'text', {
 	    	class: 'nav',
-	    	x:mapWidth, y:mapHeight, dy:'-0.25em',
+	    	'font-size':'150%',
+	    	x:mapWidth, y:mapHeight, dy:'-0.2em',
 	    	'text-anchor': 'end'
 	    });
 	    text.appendChild(document.createTextNode('\u2750'));
 	      // caption
 	    dw.caption = dw.append(dw.root, 'text', {
 	    	class: 'nav',
-	    	x:mapWidth/2, y:mapHeight, dy:'-0.2em',
-	    	'font-size': '10pt',
+	    	x:mapWidth/2, y:mapHeight, dy:'-0.25em',
+	    	'font-size': '50%',
 	    	'text-anchor': 'middle'
 	    });
 		    // img
  	    dw.img = dw.append('image', {});
 	    if ('{{ request.user.id }}' == photo_user_id || '{{ request.user.is_superuser }}'=='True') {
-		    // viewedit
+		      // viewedit
 		    dw.viewedit = dw.append(dw.root, 'a', {});
 		    var text = dw.append(dw.viewedit, 'text', {
 		    	class: 'nav',
+		    	'font-size':'150%',
 		    	x:0, y:0, dy:'0.8em', 
 		    	'text-anchor': 'start'
 		    });
 		    text.appendChild(document.createTextNode('\u2710'));
-		    // viewdel
+		      // viewdel
 		    dw.viewdel = dw.append(dw.root, 'a', {});
 		    var text = dw.append(dw.viewdel, 'text', {
 		    	class: 'nav',
-		    	x:0, y:mapHeight, dy:'-0.25em',
+		      'font-size':'150%',	
+		    	x:0, y:mapHeight, dy:'-0.2em',
 		    	'text-anchor': 'start'
 		    });
 		    text.appendChild(document.createTextNode('\u2672'));
@@ -157,8 +128,8 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
 		for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
 		dw.caption.appendChild(document.createTextNode(this.title));
-		var ratio = this.width/this.height;
-		var vs = dw.viewsizeOf();
+		var ratio = dw.root.getAttribute('width')/dw.root.getAttribute('height'),
+		    vs = dw.viewsizeOf();  // map sizes
 		var crds = [[-vs[1]*ratio,vs[1]],[-vs[3]*ratio,vs[3]]],
 			  pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
 		dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
@@ -246,11 +217,8 @@ function viewchange(counter) {
   <p class="smaller">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
 <!-- viewphoto -->
-<table id="viewtab" class="pan">
+<table id="viewtab">
 <tr>
-<td id="viewcol">
-  <div id="viewdiv"></div>
-</td>
 <td id="viewcont"></td>
 </tr>
 </table>
