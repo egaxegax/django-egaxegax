@@ -131,8 +131,8 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		var ratio = dw.root.getAttribute('width')/dw.root.getAttribute('height'),
 		    vs = dw.viewsizeOf();  // map sizes
 		var crds = [[-vs[1]*ratio,vs[1]],[-vs[3]*ratio,vs[3]]],
-	        pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
-		dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
+			  pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
+		dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src+'=s800');
 		dw.attr(dw.img, {
 			width:  pts[0][0]-pts[1][0],
 			height: pts[0][1]-pts[1][1],
