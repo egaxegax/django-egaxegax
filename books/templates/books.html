@@ -125,7 +125,8 @@ dt .cont { display: table; width: 100%; }
 {% else %}
 
   {% if subjects.object_list %}
-    <div class="lfloat lside">Жанры:
+    <div class="lfloat lside">
+      <div class="wrap wrap_header wrapbg">Жанры</div>
     <div class="wrap">
   {% for subj in subjects.object_list %}
     <dl class="msgtext">
@@ -139,7 +140,8 @@ dt .cont { display: table; width: 100%; }
   {% endif %}
   
   {% if last_count %}
-    <div class="lfloat rside">Последние добавления:
+    <div class="lfloat rside">
+      <div class="wrap wrap_header wrapbg">Последние добавления</div>
   {% endif %}
   
   {% if last_count %}

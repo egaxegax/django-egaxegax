@@ -152,29 +152,29 @@ def GetBookContent(book, part='0'):
                 # get content from zip archive by name or num part
                 for f in za.namelist():
                     mpart = re.findall('(\d+)', f)
-                    if (part.isdigit() and f.endswith('.xhtml') and len(mpart) and int(part) == int(mpart[0])) or (part == f) or (part == '0' and f == 'index.xhtml') or (part.startswith('cover') and (part in f)):
-                        try:
-                            ft = za.read(f)
-                            if f.startswith('index') and f.endswith('.xhtml'):
-                                try:
-                                    content = re.findall('<body[^>]*>(.*)</body>', ft, re.M | re.S)[0]
-                                except:
-                                    content = ''
-                            elif f.startswith('content.opf'):
-                                try:
-                                    title = re.findall('>(.*)</dc:title>', ft)[0]
-                                    writer = re.findall('>(.*)</dc:creator>', ft)[0]
-                                    content = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)
-                                    if len(content):
-                                        content = content[0]
-                                    else:
-                                        content = writer + ' ' + title
-                                except:
-                                    content = ''
-                            elif f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png'):
-                                content = base64.b64encode(ft)
-                        except:
-                            continue
+                    try:
+                        ft = za.read(f)
+                        if ((part.isdigit() and len(mpart) and int(part) == int(mpart[0])) or (part == f) or (part == '0' and f == 'index.xhtml')) and f.startswith('index') and f.endswith('.xhtml'):
+                            try:
+                                content = re.findall('<body[^>]*>(.*)</body>', ft, re.M | re.S)[0]
+                            except:
+                                content = ''
+                        elif (part == f) and f.startswith('content.opf'):
+                            try:
+                                title = re.findall('>(.*)</dc:title>', ft)[0]
+                                writer = re.findall('>(.*)</dc:creator>', ft)[0]
+                                content = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)
+                                if len(content):
+                                    content = content[0]
+                                else:
+                                    content = writer + ' ' + title
+                            except:
+                                content = ''
+                        elif part.startswith('cover') and (f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png')):
+                            content = base64.b64encode(ft)
+                    except:
+                        continue
+                    if content:
                         break
         return content
 

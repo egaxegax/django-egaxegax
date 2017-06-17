@@ -68,8 +68,11 @@ for root, dirs, files in os.walk(path, topdown=False):
 
       register_openers()
       datagen, headers = multipart_encode(param)
+
+      uri = "http://egaxegax.appspot.com/books/add"
+#      uri = "http://127.0.0.1:8800/books/add"
  
-      request = urllib2.Request("http://egaxegax.appspot.com/books/add")
+      request = urllib2.Request(uri)
       uri = re.findall(r'form action="([^\"]*)"', urllib2.urlopen(request).read())
       if uri:
           print mcount, uri
