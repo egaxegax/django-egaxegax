@@ -53,7 +53,7 @@ dt .cont { display: table; width: 100%; }
   {% if subject %}<span class="hspace">Жанр <b>{{ subject.subject }}</b></span>{% endif %}
   {% if writer %}
     <h2 class="inl nomarg"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=writer.id %}">
-      <span class="hspace">{{ writer.writer }}</span></a></h2>
+      <span class="hspace">{{ writer.writer|strans }}</span></a></h2>
   {% endif %}
 {% endif %}
 {% if book_count or wrt_count %}
@@ -83,7 +83,7 @@ dt .cont { display: table; width: 100%; }
   	  <div class="lfloat lside2 cfloat">
   	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
   	    {% if subject or search_count %}
-  	      <div class="gray smaller">{{ book.writer.writer }}</div></a>
+  	      <div class="gray smaller">{{ book.writer.writer|strans }}</div></a>
   	    {% endif %}
   	      <img id="thumb{{ forloop.counter }}" title="{{ book.writer.writer }} {{ book.title }}" alt="{{ book.writer.writer }} {{ book.title }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" width="160px"/><br/>
   	      <div class="gray smaller">{{ book.title }}</div></a>
@@ -176,7 +176,7 @@ dt .cont { display: table; width: 100%; }
           <img id="thumb{{ forloop.counter }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" title="{{ book.title }}" alt="{{ book.title }}" width="100px"/></a>
       </div>
       <div class="lfloat rside2">
-        <br/><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer }}</a>
+        <br/><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer|strans }}</a>
           <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
       </div>
       <div class="bbar smaller">

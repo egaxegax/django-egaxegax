@@ -10,3 +10,9 @@ def time_since(strval):
         return timesince(strval)
     except:
         return strval
+
+@register.filter
+def strans(strval):
+    s = strval.split(',')
+    s.reverse()
+    return ' '.join(s)
