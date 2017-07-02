@@ -64,9 +64,10 @@ def AddSongCache(song):
 
 def AddSongListCache(mkey, song_list):
     cache_list = []
-    for song in song_list:
+    for i, song in enumerate(song_list):
         cache_list.append({
            'id': song.id,
+           'index': i+1,
            'artist': song.artist,
            'art_id': GetArtId(song.artist),
            'title': song.title,

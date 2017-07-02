@@ -63,9 +63,6 @@
   {% if last_count or search_count%}
     <a class="nodecor pink" href="{% url 'songs.views.list_songs' id_art=song.art_id %}">{{ song.artist }}</a>
   {% endif %}
-  {% if not art_count and not last_count and not search_count %}
-    <span class="smaller gray hspace">{{ forloop.counter }}</span>
-  {% endif %}
   {% if song.count %}
     <span class="smaller">[{{ song.count }}]</span>
   {% else %}
@@ -73,6 +70,9 @@
   {% endif %}
   {% if not art_count and song.audio %}
     <span class="smaller">[<a class="nodecor" title="{% trans 'Listen' %}" href="{% url 'songs.views.get_song' id=song.id %}?a=1">{% trans 'Listen' %}</a>]</span>
+  {% endif %}
+  {% if not art_count and not last_count and not search_count %}
+    <span class="rfloat smaller gray hspace">{{ song.index }}</span>
   {% endif %}
   </dt>
   {% if last_count %}
