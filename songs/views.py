@@ -42,9 +42,10 @@ def PageList(request, qst, per_page=5):
 
 def AddArtListCache(artkey, art_list):
     cache_list = []
-    for art in art_list:
+    for i, art in enumerate(art_list):
         cache_list.append({
            'id': art.id,
+           'index': i+1,
            'artist': art.artist,
            'count': art.count,
            'ref_id': art.id })

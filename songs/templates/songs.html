@@ -71,7 +71,7 @@
   {% if not art_count and song.audio %}
     <span class="smaller">[<a class="nodecor" title="{% trans 'Listen' %}" href="{% url 'songs.views.get_song' id=song.id %}?a=1">{% trans 'Listen' %}</a>]</span>
   {% endif %}
-  {% if not art_count and not last_count and not search_count %}
+  {% if not last_count and not search_count %}
     <span class="rfloat smaller gray hspace">{{ song.index }}</span>
   {% endif %}
   </dt>
