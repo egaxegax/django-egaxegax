@@ -88,7 +88,7 @@ def AddBookCache(book, part, content):
     cache.add('book:' + str(book.index) + '.' + str(part), str(cache_book))
     return cache_book
 
-def AddBookListCache(mkey, book_list):
+def AddBookListCache(mkey, book_list, **kw):
     cache_list = []
     dlist = []
     for book in book_list:
@@ -109,7 +109,7 @@ def AddBookListCache(mkey, book_list):
             dlist.append(dkey)
             cache_list.append({
                'id': book.id,
-               'counter': len(cache_list)+1,
+               'counter': (kw.get('page_num', 1)-1) * kw.get('per_page', 0) + (len(cache_list)+1),
                'writer': {'id': book.writer.id, 'writer': book.writer.writer, 'count': book.writer.count},
                'subject': {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count},
                'title': book.title,
@@ -272,7 +272,7 @@ def list_books(request, **kw):
         wrt_key = str(wrt_id) + '.' + str(page_num)
         if not cache.has_key('books:' + wrt_key):
             book_list = Book.objects.filter(Q(writer=wrt_id)&Q(part=0)).order_by('title')[page_bottom:page_top]
-            AddBookListCache(wrt_key, book_list)
+            AddBookListCache(wrt_key, book_list, page_num=page_num, per_page=per_page)
         book_list = eval(cache.get('books:' + wrt_key))
         if len(book_list):
             book_count = book_list[0]['writer']['count']
@@ -282,7 +282,7 @@ def list_books(request, **kw):
         subj_key = '.subj' + str(subj_id) + '.' + str(page_num)
         if not cache.has_key('books:' + subj_key):
             book_list = Book.objects.filter(Q(subject=subj_id)&Q(part=0))[page_bottom:page_top]
-            AddBookListCache(subj_key, book_list)
+            AddBookListCache(subj_key, book_list, page_num=page_num, per_page=per_page)
         book_list = eval(cache.get('books:' + subj_key))
         if len(book_list):
             book_count = book_list[0]['subject']['count']
@@ -292,7 +292,7 @@ def list_books(request, **kw):
         search_key = '.search' + transliterate.translit(st, 'ru', reversed=True) + '.' + str(page_num)
         if not cache.has_key('books:' + search_key):
             book_list = Book.objects.filter(Q(title__startswith=st)&Q(part=0))[page_bottom:page_top]
-            AddBookListCache(search_key, book_list)
+            AddBookListCache(search_key, book_list, page_num=page_num, per_page=per_page)
         book_list = eval(cache.get('books:' + search_key))
         book_count = len(book_list)
         search_count = book_count
@@ -304,7 +304,7 @@ def list_books(request, **kw):
         page_top = page_bottom+per_page
         if not cache.has_key('books:' + wrt_key):
             book_list = Book.objects.filter(Q(part=0)).order_by('-date')[page_bottom:page_top]
-            AddBookListCache(wrt_key, book_list)
+            AddBookListCache(wrt_key, book_list, page_num=page_num, per_page=per_page)
         book_list = eval(cache.get('books:' + wrt_key))
         last_count = len(book_list)
         # subjects
