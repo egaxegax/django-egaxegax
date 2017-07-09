@@ -109,6 +109,7 @@ def AddBookListCache(mkey, book_list):
             dlist.append(dkey)
             cache_list.append({
                'id': book.id,
+               'counter': len(cache_list)+1,
                'writer': {'id': book.writer.id, 'writer': book.writer.writer, 'count': book.writer.count},
                'subject': {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count},
                'title': book.title,
