@@ -17,4 +17,4 @@ class Song(models.Model):
     content = models.TextField(verbose_name=_('content'))
     audio = models.FileField(upload_to='audio', null=True, blank=True, verbose_name=_('audio'))
     author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
-    date = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_('date'))
+    date = models.DateTimeField(null=True, blank=True, verbose_name=_('date'))

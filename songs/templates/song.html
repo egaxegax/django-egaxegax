@@ -49,17 +49,21 @@
 
 <div class="wrap">
   <div class="msgtext msgcont">{{ song.content|safe }}</div>
+  <div class="msgfooter gray">
+    {% if songs.author %}
+      <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> {% trans 'wrote' %}
+    {% else %}
+      {% trans 'An anonymous person' %} {% trans 'wrote' %}
+    {% endif %}
+    {% if song.date %}
+      <acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}
+    {% endif %}
+    {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
+      <a class="nodecor" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
+      <a class="nodecor" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
+    {% endif %}
+  </div>
 </div>
-
-<p class="smaller hspace">{% trans 'Added' %} <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> 
-  <acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}</p>
-{% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
-  <p class="smaller hspace">
-    <a href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
-    <a class="hspace2" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
-    <a class="hspace" href="{% url 'songs.views.edit_song_file' id=song.id %}">{% trans 'Audio' %}</a>
-  </p>
-{% endif %}
 
 <!--google+ comments-->
 <div id="comments"></div>

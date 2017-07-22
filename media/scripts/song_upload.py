@@ -17,12 +17,16 @@ def E_OS(text):
 path = u'.'
 mcount = 0 # files uploaded counter
 nstart = 0 # start counter
+ncount = 0 # count 
 
 if len(sys.argv) > 1:
   path = os.path.abspath(sys.argv[1])
 
 if len(sys.argv) > 2:
   nstart = int(sys.argv[2])
+
+if len(sys.argv) > 3:
+  ncount = int(sys.argv[3])
 
 uplog = file(os.path.join(path, 'up.log'), 'w')
 
@@ -37,6 +41,9 @@ for root, dirs, files in os.walk(path, topdown=False):
 
       if mcount < nstart:
           continue
+
+      if ncount and (mcount - nstart) >= ncount:
+          break
 
       artist = os.path.basename(root)
       title = fname
@@ -54,6 +61,7 @@ for root, dirs, files in os.walk(path, topdown=False):
       datagen, headers = multipart_encode(param)
 
       uri = "http://egaxegax.appspot.com/songs/add"
+#      uri = "http://127.0.0.1:8800/songs/add"
 
       request = urllib2.Request(uri)
       print mcount, uri

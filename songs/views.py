@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.context import RequestContext
 from django.db.models import Q
+from django.utils import timezone
 from songs.forms import *
 from songs.models import *
 from filetransfers.api import prepare_upload
@@ -65,15 +66,25 @@ def AddSongCache(song):
 
 def AddSongListCache(mkey, song_list):
     cache_list = []
-    for i, song in enumerate(song_list):
-        cache_list.append({
-           'id': song.id,
-           'index': i+1,
-           'artist': song.artist,
-           'art_id': GetArtId(song.artist),
-           'title': song.title,
-           'audio': hasattr(song.audio, 'file'),
-           'date': song.date })
+    i = 0
+    for song in song_list:
+        if song.date is None: # nulls date first
+            cache_list = [{
+               'id': song.id,
+               'artist': song.artist,
+               'content': UnpackContent(song),
+               'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
+               'title': song.title }] + cache_list
+        else:
+            i += 1
+            cache_list.append({
+               'id': song.id,
+               'index': i,
+               'artist': song.artist,
+               'art_id': GetArtId(song.artist),
+               'title': song.title,
+               'audio': hasattr(song.audio, 'file'),
+               'date': song.date })
     cache.add('songs:' + mkey, str(cache_list))
 
 def ClearArtListCache(artkey):
@@ -248,10 +259,12 @@ def add_song(request):
             song_list = Song.objects.filter(Q(artist=request.POST['artist'])&Q(title=song.title))
             if len(song_list) == 0:
                 song.content = PackContent(song)
-                if isinstance(request.user, User):
-                    song.author = request.user
                 art = IncArtCount(artist=request.POST['artist'])
                 song.artist = art.artist
+                if isinstance(request.user, User):
+                    song.author = request.user
+                if song.date is None and song.title[:5] != 'about':
+                    song.date = timezone.now()
                 song.save()
                 ClearArtListCache(song.artist[0].capitalize())
                 ClearSongListCache(song.artist)
@@ -278,7 +291,7 @@ def edit_song(request, **kw):
             song.content = PackContent(song)
             if isinstance(request.user, User):
                 song.author = request.user
-            #-- song.date = datetime.datetime.today()
+            # song.date = datetime.datetime.today()
             song.save(force_update=True)
             ClearSongListCache(song.artist)
             ClearSongCache(song)
@@ -287,6 +300,7 @@ def edit_song(request, **kw):
         form = AddSongForm(initial={
                            'id': song.id,
                            'title': song.title,
+                           'date': song.date,
                            'content': UnpackContent(song)})
     return render_to_response('edit_song.html', 
                               context_instance=RequestContext(request,
@@ -333,14 +347,15 @@ def get_song(request, **kw):
         if not cache.has_key('song:' + song_id):
             song = get_object_or_404(Song, id=ZI(song_id))
             t = UnpackContent(song)
-            t = re.sub(r"(^|\n)>(.*)","\g<1>*#*\g<2>*##*", t)
-            t = re.sub(r"(^|\n)!(.*)","\g<1>*_*\g<2>*__*", t)
-            t = re.sub(r"<([^>]*)>", ' *#*\g<1>*##* ', t)
-            t = t.replace('*#*', '<b>').replace('*##*', '</b>')
-            t = t.replace('*_*', '<i>').replace('*__*', '</i>')
-            t = t.replace('\t', ' ')
-            t = t.replace(' ', '&nbsp;')
-            t = t.replace('\n','<br/>')
+            if song.title[:5] != 'about':
+                t = re.sub(r"(^|\n)>(.*)","\g<1>*#*\g<2>*##*", t)
+                t = re.sub(r"(^|\n)!(.*)","\g<1>*_*\g<2>*__*", t)
+                t = re.sub(r"<([^>]*)>", ' *#*\g<1>*##* ', t)
+                t = t.replace('*#*', '<b>').replace('*##*', '</b>')
+                t = t.replace('*_*', '<i>').replace('*__*', '</i>')
+                t = t.replace('\t', ' ')
+                t = t.replace(' ', '&nbsp;')
+                t = t.replace('\n','<br/>')
             song.content = t
             AddSongCache(song)
         song = eval(cache.get('song:' + song_id))
