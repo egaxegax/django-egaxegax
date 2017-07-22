@@ -16,4 +16,4 @@ class Greeting(models.Model):
     subject = models.ForeignKey(Greeting_Subject, null=True, blank=True, verbose_name=_('subject'))
     title = models.CharField(max_length=150, null=True, blank=True, verbose_name=_('title'))
     content = models.TextField(verbose_name=_('content'))
-    date = models.DateTimeField(auto_now_add=True, verbose_name=_('date'))
+    date = models.DateTimeField(null=True, blank=True, verbose_name=_('date'))

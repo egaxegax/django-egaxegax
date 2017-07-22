@@ -66,6 +66,20 @@ indexes:
   - name: date
     direction: desc
 
+- kind: guestbook_greeting
+  properties:
+  - name: subject_id
+  - name: date
+    direction: desc
+  - name: title
+
+- kind: guestbook_greeting
+  properties:
+  - name: subject_id
+  - name: title
+  - name: date
+    direction: desc
+
 - kind: guestbook_greeting_subject
   properties:
   - name: __key__

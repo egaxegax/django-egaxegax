@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.context import RequestContext
+from django.utils import timezone
 from posts.forms import *
 from posts.models import *
 import datetime, time, sys
@@ -58,13 +59,17 @@ def AddPostCache(post):
 def AddPostListCache(subj_id, posts_list):
     cache_list = []
     for post in posts_list:
-        cache_list.append({
+        cache_post = {
            'id': post.id,
            'author': (hasattr(post, 'author') and {'id': post.author.id, 'username': post.author.username}) or {},
            'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
            'title': post.title,
            'content': post.content,
-           'date': post.date })
+           'date': post.date }
+        if cache_post['date'] is None:
+            cache_list = [cache_post] + cache_list # nulls first
+        else:
+            cache_list.append(cache_post)
     cache.add('posts:' + str(subj_id), str(cache_list))
 
 def ClearSubjListCache():
@@ -168,6 +173,7 @@ def add_post(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
+            post.date = timezone.now()
             if form_subject.is_valid():
                 subject = IncSubjCount(subject=request.POST['subject'])
                 post.subject = subject
@@ -183,7 +189,7 @@ def edit_post(request, **kw):
     post_id = ZI(kw.get('id'))
     post = get_object_or_404(Greeting, id=post_id)
     if request.method == 'POST':
-        form = AddPostForm(request.POST, instance=post)
+        form = EditPostForm(request.POST, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -200,10 +206,11 @@ def edit_post(request, **kw):
             else:
                 return HttpResponseRedirect(reverse('posts.views.list_posts', kwargs={'id_subj': post.subject.id}))
     else:
-        form = AddPostForm(initial={
+        form = EditPostForm(initial={
                           'id': post.id,
                           'subject': post.subject,
                           'title': post.title,
+                          'date': post.date,
                           'content': post.content}) 
     return render_to_response('edit_post.html', 
                               context_instance=RequestContext(request,

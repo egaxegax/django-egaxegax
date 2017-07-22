@@ -29,7 +29,7 @@
       {{ post.content|markdown:"codehilite,extra" }}
     </div>
     <div class="msgfooter">
-      {% if post.subject %}
+      {% if not subject.subject and post.subject %}
         <div><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a></div>
       {% endif %}
       <div class="gray">
@@ -38,7 +38,9 @@
         {% else %}
           {% trans 'An anonymous person' %} {% trans 'wrote' %}
         {% endif %}
-        <acronym title="{{ post.date }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
+        {% if post.date %}
+          <acronym title="{{ post.date }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
+        {% endif %}
         {% if request.user.is_authenticated and request.user.id == post.author.id or request.user.is_superuser %}
           <a class="nodecor" href="{% url 'posts.views.edit_post' id=post.id %}">{% trans 'Edit' %}</a>
           <a class="nodecor" href="{% url 'posts.views.delete_post' id=post.id %}{% if subject.subject %}?id_subj={{ post.subject.id }}{% endif %}">{% trans 'Delete' %}</a>

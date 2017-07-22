@@ -11,6 +11,15 @@ class AddPostForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'rows': 10}),
         }
 
+class EditPostForm(forms.ModelForm):
+    class Meta:
+        model = Greeting
+        exclude = ['author', 'subject']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'formtext'}),
+            'content': forms.Textarea(attrs={'rows': 10}),
+        }
+
 class AddSubjForm(forms.ModelForm):
     class Meta:
         model = Greeting_Subject
