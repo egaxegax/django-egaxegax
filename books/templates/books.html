@@ -143,7 +143,7 @@ dt .cont { display: table; width: 100%; }
     <div class="wrap2">
       <dl class="msgtext"><dt>
       {% if wrt_count %}
-        <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer }}</a>
+        <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer|strans }}</a>
       {% endif %}
       {% if book.count %}
         <span class="smaller">[{{ book.count }}]</span>
