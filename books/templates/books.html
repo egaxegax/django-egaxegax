@@ -5,21 +5,13 @@
 {% block keywords %}{% if book_count %}, {% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}, {% trans 'books' %}{% endblock %}
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if book_count and not search_count %}{% if subject %}Жанр {{ subject.subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}{% endif %}{% endif %}
+{% if book_count and not search_count %}{% if subject %}Жанр {% trans subject.subject %}, {{ subject.subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}{% endif %}{% endif %}
 {% if not book_count and not search_count %}{% trans 'Books' %}{% endif %}
  - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
-table.cont { width: 100%; border-collapse: collapse; }
-table.cont td.cont { text-align: left; vertical-align: top; }
-table.cont td.prev { text-align: left; width: 32px; }
-table.cont td.next { text-align: right; width: 32px; }
-table.cont td.cover { text-align: center; width: 140px; }
-.lside { width:30%; }
-.cside { width: 1%; }
-.rside { width:69%; }
 .lside2 { min-width:20%; max-width:200px; }
 .rside2 { min-width:70%; max-width: 200px; overflow: hidden; }
-.msgtext dt.cont { border:0; padding:0; }
+.msgtext dt { border:0; }
 dt .cont { display: table; width: 100%; }
 .bbar .button { padding: 20px 40px; margin: 10px 20px; border: 1px solid transparent; }
 .bbar .button:hover { border: 1px dashed lightgray; }
@@ -31,7 +23,8 @@ dt .cont { display: table; width: 100%; }
 {% block content %}
 
 <div class="indexlist wrap">
-  <a class="hspaced" href="{% url 'books.views.list_wrt' %}">{% trans 'Full list' %}</a>
+  <a class="hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
+  <a class="hspaced" href="{% url 'books.views.list_wrt' %}">Авторы</a>
   {% for i, v in wrt_index.items %}
     <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
   {% endfor %}
@@ -43,14 +36,13 @@ dt .cont { display: table; width: 100%; }
 
 {% if not book_count and not search_count %}
 <p>
-Коллекция электронных книг различных жанров отечественных и зарубежных авторов. 
-Все тексты взяты из свободных источников и представлены исключительно для ознакомления.
+Коллекция книг различных жанров отечественных и зарубежных авторов, взятых из свободных источников.
 </p>
 {% endif %}
 
 <p>
 {% if book_count and not search_count %}
-  {% if subject %}<span class="hspace">Жанр <b>{{ subject.subject }}</b></span>{% endif %}
+  {% if subject %}<span class="hspace">Жанр <b>{% trans subject.subject %}</b></span>{% endif %}
   {% if writer %}
     <h2 class="inl nomarg"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=writer.id %}">
       <span class="hspace">{{ writer.writer|strans }}</span></a></h2>
@@ -78,7 +70,7 @@ dt .cont { display: table; width: 100%; }
 
   {% for book in books.object_list %}
     <div class="wrap">
-    <dl class="msgtext"><dt class="cont">
+    <dl class="msgtext"><dt>
       <div class="cont">
   	  <div class="lfloat lside2 cfloat">
   	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
@@ -89,7 +81,8 @@ dt .cont { display: table; width: 100%; }
   	      <div class="gray smaller">{{ book.title }}</div></a>
 	    </div>
 	    <div class="lfloat rside2 smaller">
-	      <br/>{{ book.content }}
+	      <p>{{ book.content }}</p>
+        <div class="smaller gray">Жанр: <a class="nodecor" href="{% url 'books.views.list_books' id_subj=book.subject.id %}">{{ book.subject.subject }}</a></div>
       </div>
       <div class="bbar smaller">
         <span class="rfloat gray hspace">{{ book.counter }}</span>
@@ -124,25 +117,10 @@ dt .cont { display: table; width: 100%; }
   {% endif %}
 
 {% else %}
-
-  {% if subjects.object_list %}
-    <div class="lfloat lside">
-      <div class="wrap wrap_header wrapbg">Жанры</div>
-    <div class="wrap">
-  {% for subj in subjects.object_list %}
-    <dl class="msgtext">
-      <dt><a class="nodecor" href="{% url 'books.views.list_books' id_subj=subj.id %}">{{ subj.subject }}</a>
-        <span class="smaller">[{{ subj.count }}]</span></dt>
-    </dl>
-  {% endfor %}
-    </div>
-    </div>
-    <div class="lfloat cside">&nbsp;</div>
-  {% endif %}
-  
+ 
   {% if last_count %}
-    <div class="lfloat rside">
-      <div class="wrap wrap_header wrapbg">Последние добавления</div>
+   <p>Последние добавления:</p>
+    <div>
   {% endif %}
   
   {% if last_count %}
@@ -161,38 +139,39 @@ dt .cont { display: table; width: 100%; }
     {% endif %}
   {% endif %}
 
-    <div class="wrap">
   {% for book in books.object_list %}
-    <dl class="msgtext"><dt>
-    {% if wrt_count %}
-      <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer }}</a>
-    {% endif %}
-    {% if book.count %}
-      <span class="smaller">[{{ book.count }}]</span>
-    {% endif %}
-    {% if last_count or search_count%}
-      <div class="cont">
-      <div class="lfloat lside2 cfloat">
-        <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
-          <img id="thumb{{ forloop.counter }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" title="{{ book.title }}" alt="{{ book.title }}" width="100px"/></a>
-      </div>
-      <div class="lfloat rside2">
-        <br/><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer|strans }}</a>
-          <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a>
-      </div>
-      <div class="bbar smaller">
-        <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="pink button lfloat">Скачать</div></a>&nbsp;
-        <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="pink button lfloat">Читать</div></a>
-      </div>
-      </div>
-    {% endif %}
-    </dt>
-    {% if last_count %}
-      <dd class="smaller">{{ book.date|time_since }} {% trans 'ago' %}</dd>
-    {% endif %}
-    </dl>
-  {% endfor %}
+    <div class="wrap2">
+      <dl class="msgtext"><dt>
+      {% if wrt_count %}
+        <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer }}</a>
+      {% endif %}
+      {% if book.count %}
+        <span class="smaller">[{{ book.count }}]</span>
+      {% endif %}
+      {% if last_count or search_count%}
+        <div class="cont">
+          <div class="lfloat lside2 cfloat">
+            <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
+              <img id="thumb{{ forloop.counter }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" title="{{ book.title }}" alt="{{ book.title }}" width="100px"/></a>
+          </div>
+          <div class="lfloat rside2">
+            <p><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer|strans }}</a>
+              <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a></p>
+                <div class="smaller gray">Жанр: <a class="nodecor" href="{% url 'books.views.list_books' id_subj=book.subject.id %}">{{ book.subject.subject }}</a></div>
+          </div>
+          <div class="bbar smaller">
+            <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="pink button lfloat">Скачать</div></a>&nbsp;
+            <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="pink button lfloat">Читать</div></a>
+          </div>
+        </div>
+      {% endif %}
+      </dt>
+      {% if last_count %}
+        <dd class="hspace2 smaller">{{ book.date|time_since }} {% trans 'ago' %}</dd>
+      {% endif %}
+      </dl>
     </div>
+  {% endfor %}
     
   {% if last_count %}
     <a href="?page={{ books.next_page_number }}"><div class="wrap cfloat">

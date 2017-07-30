@@ -18,29 +18,12 @@ indexes:
 
 - kind: books_book
   properties:
-  - name: index
-  - name: part
-
-- kind: books_book
-  properties:
-  - name: part
-  - name: date
-    direction: desc
-
-- kind: books_book
-  properties:
-  - name: part
-  - name: title
-
-- kind: books_book
-  properties:
-  - name: part
   - name: writer_id
   - name: title
 
 - kind: books_book
   properties:
-  - name: writer_id
+  - name: subject_id
   - name: title
 
 - kind: captcha_captchastore
@@ -105,18 +88,6 @@ indexes:
   properties:
   - name: writer
   - name: title
-
-- kind: my_greeting
-  properties:
-  - name: subject
-  - name: date
-    direction: desc
-
-- kind: my_greeting
-  properties:
-  - name: subject_id
-  - name: date
-    direction: desc
 
 - kind: my_photo
   properties:

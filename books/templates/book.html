@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load myfilter %}
-{% block description %}. {{ book.writer.writer }}, {{ book.title }}, {% trans 'books' %}{% endblock %}
-{% block keywords %}, {{ book.writer.writer }}, {{ book.title }}, {% trans 'books' %}{% endblock %}
-{% block title %}{{ book.writer.writer }} - {{ book.title }}, {% trans 'books' %} - {% endblock %}
+{% block description %}. {{ book.writer.writer|strans }}, {{ book.title }}, {% trans 'books' %}{% endblock %}
+{% block keywords %}, {{ book.writer.writer|strans }}, {{ book.title }}, {% trans 'books' %}{% endblock %}
+{% block title %}{{ book.writer.writer|strans }} - {{ book.title }}, {% trans 'books' %} - {% endblock %}
 {% block pagestylelink %}
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/books/stylesheet.css" type="text/css" />
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/books/page_styles.css" type="text/css" />

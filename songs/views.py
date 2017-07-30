@@ -263,7 +263,7 @@ def add_song(request):
                 song.artist = art.artist
                 if isinstance(request.user, User):
                     song.author = request.user
-                if song.date is None and song.title[:5] != 'about':
+                if song.title[:5] != 'about':
                     song.date = timezone.now()
                 song.save()
                 ClearArtListCache(song.artist[0].capitalize())
@@ -291,7 +291,8 @@ def edit_song(request, **kw):
             song.content = PackContent(song)
             if isinstance(request.user, User):
                 song.author = request.user
-            # song.date = datetime.datetime.today()
+            if song.date is None:
+                song.date = datetime.datetime.today()
             song.save(force_update=True)
             ClearSongListCache(song.artist)
             ClearSongCache(song)

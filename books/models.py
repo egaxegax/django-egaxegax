@@ -12,12 +12,11 @@ class Subject(models.Model):
 
 class Book(models.Model):
     class Meta:
-        unique_together = ('writer', 'title', 'part') # not worked for gae
-    writer = models.ForeignKey(Writer)
+        unique_together = ('writer', 'title') # not worked for gae
+    writer = models.ForeignKey(Writer, db_index=True)
     title = models.CharField(max_length=150, verbose_name=_('title'))
-    subject = models.ForeignKey(Subject, null=True, blank=True)
-    index = models.IntegerField(null=True, blank=True) # unique writer, title
-    part = models.IntegerField(verbose_name=_('part'))
+    subject = models.ForeignKey(Subject, db_index=True)
+    index = models.IntegerField() # unique writer+title
     content = models.TextField(verbose_name=_('content'))
     author = models.ForeignKey(User, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_('date'))

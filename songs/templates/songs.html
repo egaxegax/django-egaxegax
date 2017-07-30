@@ -44,19 +44,15 @@
 </p>
 {% endif %}
 
-<p>
 {% if song_count %}
-
-{% if song_count and not search_count %}{% if art_key %}{% else %}{% with songs.object_list|first as f %}
+<p>
+{% if not search_count %}{% if art_key %}{% else %}{% with songs.object_list|first as f %}
   <h2 class="inl nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' id_art=f.art_id %}">
     <span class="hspace">{{ f.artist }}</span></a></h2>
 {% endwith %}{% endif %}{% endif %}
-{% if song_count %}
   <span class="hspace"></span> Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов
-{% endif %}
-
-{% endif %}
 </p>
+{% endif %}
 
 {% if last_count %}
   <p>Последние обновления:</p>

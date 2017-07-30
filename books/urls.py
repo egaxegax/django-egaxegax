@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^wrt/i/(?P<ind_wrt>[0-9]*)/?$', views.list_wrt),
     url(r'^wrt/?$', views.list_wrt),
     url(r'^wrt/(?P<id_wrt>[0-9]*)/?$', views.list_books),
+    url(r'^subj/?$', views.list_subj),
     url(r'^subj/(?P<id_subj>[0-9]*)/?$', views.list_books),
     url(r'^add/?$', views.add_book),
     url(r'^del/(?P<id>[0-9]*)/?$', views.delete_book),

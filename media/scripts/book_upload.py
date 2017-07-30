@@ -39,38 +39,36 @@ for root, dirs, files in os.walk(path, topdown=False):
           continue
 
       ss = fname.split('@')
-      mname, writer, title, subject, part = ss
+      mname, writer, title, subject = ss
       
-      print mname, writer, title, subject, part
+      print mname, writer, title, subject
 
       os.chdir(root)
       param = []
  
-      if int(part) == 0:
-          try:
-            param += [('img', open(mname + '.jpg', "rb"))]
-          except:
-            pass
-     
-          try:
-            prev = os.getcwd()
-            os.chdir('..')
-            param += [('file', open(mname, "rb"))]
-            os.chdir(prev)
-          except:
-            pass
+      try:
+        param += [('img', open(mname + '.jpg', "rb"))]
+      except:
+        pass
+ 
+      try:
+        prev = os.getcwd()
+        os.chdir('..')
+        param += [('file', open(mname, "rb"))]
+        os.chdir(prev)
+      except:
+        pass
  
       param += [("title", E_OS(title))]
       param += [("writer", E_OS(writer))]
       param += [("subject", E_OS(subject))]
       param += [("content", file(name).read())]
-      param += [("part", part)]
 
       register_openers()
       datagen, headers = multipart_encode(param)
 
-      uri = "http://127.0.0.1:8800/books/add"
-#      uri = "http://127.0.0.1:8800/books/add"
+#       uri = "http://127.0.0.1:8800/books/add"
+      uri = "http://egaxegax.appspot.com/books/add"
  
       request = urllib2.Request(uri)
       uri = re.findall(r'form action="([^\"]*)"', urllib2.urlopen(request).read())

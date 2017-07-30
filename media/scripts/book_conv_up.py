@@ -74,9 +74,7 @@ for root, dirs, files in os.walk(path, topdown=False):
 #             os.remove(newname)
 #           os.rename(f, newname)
 
-        if (f.startswith('index') and f.endswith('html') and part == 0):
-          fn = name + '@' + writer.decode('utf-8').strip() + '@' + title.decode('utf-8').strip() + '@' + subj.decode('utf-8').strip() + '@' + str(part) + '.txt'
+          fn = name + '@' + writer.decode('utf-8').strip() + '@' + title.decode('utf-8').strip() + '@' + subj.decode('utf-8').strip() + '.txt'
           fbook = file(fn, 'w')
           fbook.write(E_OS(desc))
           fbook.close()
-          part += 1

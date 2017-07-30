@@ -61,7 +61,7 @@ for root, dirs, files in os.walk(path, topdown=False):
       datagen, headers = multipart_encode(param)
 
       uri = "http://egaxegax.appspot.com/songs/add"
-#      uri = "http://127.0.0.1:8800/songs/add"
+#       uri = "http://127.0.0.1:8800/songs/add"
 
       request = urllib2.Request(uri)
       print mcount, uri
