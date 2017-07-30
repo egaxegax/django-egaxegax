@@ -219,6 +219,12 @@ msgstr "Исторические любовные романы"
 msgid "love_short"
 msgstr "Короткие любовные романы"
 
+msgid "love_sf"
+msgstr "Любовная фантастика"
+
+msgid "love"
+msgstr "Любовные романы"
+
 # Приключения
 
 msgid "adv_animal"
@@ -525,6 +531,3 @@ msgstr "Литература 19 века"
 
 msgid "literature_20"
 msgstr "Литература 20 века"
-
-msgid "literature"
-msgstr "Литература"
