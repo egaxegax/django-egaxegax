@@ -81,7 +81,8 @@ dt .cont { display: table; width: 100%; }
   	      <div class="gray smaller">{{ book.title }}</div></a>
 	    </div>
 	    <div class="lfloat rside2 smaller">
-	      <p>{{ book.content }}</p>
+        <p><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer|strans }}</a>
+          <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a></p>
         <div class="smaller gray">Жанр: <a class="nodecor" href="{% url 'books.views.list_books' id_subj=book.subject.id %}">{{ book.subject.subject }}</a></div>
       </div>
       <div class="bbar smaller">
