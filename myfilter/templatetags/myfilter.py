@@ -13,6 +13,9 @@ def time_since(strval):
 
 @register.filter
 def strans(strval):
-    s = strval.split(',')
-    s.reverse()
-    return ' '.join(s)
+    ss = strval.split(';')
+    for i, strval in enumerate(ss):
+        s = strval.split(',')
+        s.reverse()
+        ss[i] = ' '.join(s)
+    return ';'.join(ss)

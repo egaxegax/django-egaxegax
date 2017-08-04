@@ -18,12 +18,12 @@ indexes:
 
 - kind: books_book
   properties:
-  - name: writer_id
+  - name: subject_id
   - name: title
 
 - kind: books_book
   properties:
-  - name: subject_id
+  - name: writer_id
   - name: title
 
 - kind: captcha_captchastore

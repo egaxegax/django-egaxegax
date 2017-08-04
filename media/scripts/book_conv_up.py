@@ -50,9 +50,9 @@ for root, dirs, files in os.walk(path, topdown=False):
 
         ft = za.read(f)
         if (f == 'content.opf'):
-          title = re.findall('>(.*)</dc:title>', ft)[0]
-          writer = re.findall('opf:file-as="([^"]*)".*>.*</dc:creator>', ft)[0].replace(' &amp', '')
-          subj = re.findall('>(.*)</dc:subject>', ft) 
+          title = re.findall('>([^><]*)</dc:title>', ft)[0]
+          writer = re.findall('opf:file-as="([^"]*)"', ft)[0].replace(' &amp', '')
+          subj = re.findall('>([^><]*)</dc:subject>', ft) 
           try:
               desc = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)[0]
           except:
@@ -61,7 +61,7 @@ for root, dirs, files in os.walk(path, topdown=False):
               subj = subj[0]
           else:
               print "!! Subj is not defined !!"
-              subj = 'prose_classic'
+              subj = 'adv_history'
           index = abs(zlib.crc32(name))
           if (pindex != index):
             pindex = index

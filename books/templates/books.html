@@ -86,8 +86,8 @@ dt .cont { display: table; width: 100%; }
       </div>
       <div class="bbar smaller">
         <span class="rfloat gray hspace">{{ book.counter }}</span>
-        <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="pink button lfloat">Скачать</div></a>&nbsp;
-        <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="pink button lfloat">Читать</div></a>
+        <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="pink button lfloat bigger">Скачать</div></a>&nbsp;
+        <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="pink button lfloat bigger">Читать</div></a>
       </div>
 	    </div>
     </dt></dl>
@@ -143,7 +143,7 @@ dt .cont { display: table; width: 100%; }
     <div class="wrap2">
       <dl class="msgtext"><dt>
       {% if wrt_count %}
-        <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer|strans }}</a>
+        <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer }}</a>
       {% endif %}
       {% if book.count %}
         <span class="smaller">[{{ book.count }}]</span>
@@ -160,8 +160,8 @@ dt .cont { display: table; width: 100%; }
                 <div class="smaller gray">Жанр: <a class="nodecor" href="{% url 'books.views.list_books' id_subj=book.subject.id %}">{{ book.subject.subject }}</a></div>
           </div>
           <div class="bbar smaller">
-            <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="pink button lfloat">Скачать</div></a>&nbsp;
-            <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="pink button lfloat">Читать</div></a>
+            <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="pink button lfloat bigger">Скачать</div></a>&nbsp;
+            <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="pink button lfloat bigger">Читать</div></a>
           </div>
         </div>
       {% endif %}
