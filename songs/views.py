@@ -291,7 +291,7 @@ def edit_song(request, **kw):
             song.content = PackContent(song)
             if isinstance(request.user, User):
                 song.author = request.user
-            if song.date is None:
+            if song.date is None and song.title[:5] != 'about':
                 song.date = datetime.datetime.today()
             song.save(force_update=True)
             ClearSongListCache(song.artist)
