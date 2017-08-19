@@ -84,7 +84,7 @@ msgid "Audio"
 msgstr "Аудио"
 
 msgid "Listen"
-msgstr "Послушать"
+msgstr "Слушать"
 
 msgid "Full list"
 msgstr "Весь список"

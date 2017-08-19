@@ -90,7 +90,7 @@
         <span class="smaller">[<a class="nodecor" title="{% trans 'Listen' %}" href="{% url 'songs.views.get_song' id=song.id %}?a=1">{% trans 'Listen' %}</a>]</span>
       {% endif %}
       {% if not last_count and not search_count %}
-        <span class="rfloat smaller gray hspace">{{ song.index }}</span>
+        <span class="rfloat smaller lightgray hspace">{{ song.index }}</span>
       {% endif %}
       </dt>
       {% if last_count %}

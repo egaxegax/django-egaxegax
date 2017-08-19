@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load markup %}
 {% load myfilter %}
 {% block description %}. {{ song.artist }}, {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
 {% block keywords %}, {{ song.artist }}, {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
@@ -35,35 +36,55 @@
   <h2 class="nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.art_id %}"><span class="hspace">{{ song.artist }} </span></a>{{ song.title }}</h2>
 </p>
 
-{% if song.audio %}
-<p>
-  <table>
-  <tr><td align="center" valign="center">
-  {% trans 'Listen' %}: &nbsp; 
-  </td><td>
-    <audio src="{% url 'songs.views.get_song_file' id=song.id %}" controls></audio>
-  </td></tr>
-  </table>
-</p>
-{% endif %}
+{% for song in songs %}
 
-<div class="wrap">
-  <div class="msgtext msgcont">{{ song.content|safe }}</div>
-  <div class="msgfooter gray">
-    {% if songs.author %}
-      <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> {% trans 'wrote' %}
-    {% else %}
-      {% trans 'An anonymous person' %} {% trans 'wrote' %}
+  {% if not song.date and song.content %}
+    <div class="wrap">
+      <div class="msgtext smaller">
+        {{ song.content|markdown:"codehilite,extra" }}
+      </div>
+      <div class="msgfooter gray">
+        {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
+          <a class="nodecor" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    {% if song.audio %}
+      <p>
+        <table>
+        <tr><td align="center" valign="center"> {% trans 'Listen' %}: &nbsp; </td>
+          <td> <audio src="{% url 'songs.views.get_song_file' id=song.id %}" controls></audio> </td></tr>
+        </table>
+      </p>
     {% endif %}
-    {% if song.date %}
-      <acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}
-    {% endif %}
-    {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
-      <a class="nodecor" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
-      <a class="nodecor" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
-    {% endif %}
-  </div>
-</div>
+    <div class="wrap">
+      <div class="msgtext msgcont">{{ song.content|safe }}</div>
+      <div class="msgfooter gray">
+        {% if songs.author %}
+          <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> {% trans 'wrote' %}
+        {% else %}
+          {% trans 'An anonymous person' %} {% trans 'wrote' %}
+        {% endif %}
+        {% if song.date %}
+          <acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}
+        {% endif %}
+        {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
+          <a class="nodecor" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+{% endfor %}
+
+{% if request.user.is_authenticated %}
+  <p class="smaller hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
+{% else %}
+  <p class="smaller hspace">{% trans 'Please authorize to add songs' %}.</p>
+{% endif %}
 
 <!--google+ comments-->
 <div id="comments"></div>

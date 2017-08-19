@@ -53,12 +53,22 @@ def AddArtListCache(artkey, art_list):
     cache.add('arts:' + artkey, str(cache_list))
 
 def AddSongCache(song):
+    t = UnpackContent(song)
+    if song.title[:5] != 'about':
+        t = re.sub(r"(^|\n)>(.*)","\g<1>*#*\g<2>*##*", t)
+        t = re.sub(r"(^|\n)!(.*)","\g<1>*_*\g<2>*__*", t)
+        t = re.sub(r"<([^>]*)>", ' *#*\g<1>*##* ', t)
+        t = t.replace('*#*', '<b>').replace('*##*', '</b>')
+        t = t.replace('*_*', '<i>').replace('*__*', '</i>')
+        t = t.replace('\t', ' ')
+        t = t.replace(' ', '&nbsp;')
+        t = t.replace('\n','<br/>')
     cache_song = {
         'id': song.id,
         'artist': song.artist,
         'art_id': GetArtId(song.artist),
         'title': song.title,
-        'content': song.content,
+        'content': t,
         'audio': hasattr(song.audio, 'file'),
         'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
         'date': song.date }
@@ -94,7 +104,7 @@ def ClearSongCache(song):
     cache.delete_many(['song:' + str(song.id)])
 
 def ClearSongListCache(artist):
-    cache.delete_many(['songs:.last_update', 'songs:' + artist])
+    cache.delete_many(['songs:.last_update', 'songs:.about' + artist, 'songs:' + artist])
 
 def GetArtId(artist):
     if not cache.has_key('arts:.art' + artist):
@@ -347,24 +357,21 @@ def get_song(request, **kw):
         song_id = kw.get('id', '')
         if not cache.has_key('song:' + song_id):
             song = get_object_or_404(Song, id=ZI(song_id))
-            t = UnpackContent(song)
-            if song.title[:5] != 'about':
-                t = re.sub(r"(^|\n)>(.*)","\g<1>*#*\g<2>*##*", t)
-                t = re.sub(r"(^|\n)!(.*)","\g<1>*_*\g<2>*__*", t)
-                t = re.sub(r"<([^>]*)>", ' *#*\g<1>*##* ', t)
-                t = t.replace('*#*', '<b>').replace('*##*', '</b>')
-                t = t.replace('*_*', '<i>').replace('*__*', '</i>')
-                t = t.replace('\t', ' ')
-                t = t.replace(' ', '&nbsp;')
-                t = t.replace('\n','<br/>')
-            song.content = t
             AddSongCache(song)
         song = eval(cache.get('song:' + song_id))
+        if song['title'] != 'about':
+            mkey = '.about' + song['artist']
+            if not cache.has_key('songs:' + mkey):
+                song_list = Song.objects.filter(Q(title='about')&Q(artist=song['artist']))
+                AddSongListCache(mkey, song_list)
+            song_list = eval(cache.get('songs:' + mkey))
+        song_list.append( song )
         return render_to_response('song.html', 
                                   context_instance=RequestContext(request,
                                   {'request': request,
                                    'art_index': art_index,
                                    'form': SearchForm(initial={'search':request.GET.get('search')}),
+                                   'songs': song_list,
                                    'song': song,
                                    'autoplay': request.GET.get('a', 0),
                                    'logback': reverse('songs.views.get_song', kwargs={'id': song_id}) }))
