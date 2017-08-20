@@ -18,12 +18,16 @@ path = u'.'
 mcount = 0 # files uploaded counter
 nstart = 0 # start counter
 ncount = 0 # count 
+nname = '' # search name
 
 if len(sys.argv) > 1:
   path = os.path.abspath(sys.argv[1])
 
 if len(sys.argv) > 2:
-  nstart = int(sys.argv[2])
+  if sys.argv[2].isdigit():
+    nstart = int(sys.argv[2])
+  else:
+    nname = sys.argv[2]
 
 if len(sys.argv) > 3:
   ncount = int(sys.argv[3])
@@ -45,6 +49,10 @@ for root, dirs, files in os.walk(path, topdown=False):
       if ncount and (mcount - nstart) >= ncount:
           break
 
+      # search name
+      if nname and nname not in fname:
+          continue
+
       artist = os.path.basename(root)
       title = fname
 
@@ -62,8 +70,7 @@ for root, dirs, files in os.walk(path, topdown=False):
 
       uri = "http://egaxegax.appspot.com/songs/add"
 #       uri = "http://127.0.0.1:8800/songs/add"
-
-      request = urllib2.Request(uri)
+#       request = urllib2.Request(uri)
       print mcount, uri
       request = urllib2.Request(uri, datagen, headers)
       print >> uplog, urllib2.urlopen(request).read()

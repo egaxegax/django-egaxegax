@@ -354,6 +354,7 @@ def delete_song(request, **kw):
 
 def get_song(request, **kw):
     if request.method == 'GET':
+        song_list = []
         song_id = kw.get('id', '')
         if not cache.has_key('song:' + song_id):
             song = get_object_or_404(Song, id=ZI(song_id))

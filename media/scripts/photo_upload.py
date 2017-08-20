@@ -1,34 +1,58 @@
 #!python
 # -*- coding: utf-8 -*-
 #
-# Upload file to GAE BlobStore.
+# Upload images to GAE
 #
+# photo_upload.py <path_to_files>
 
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
-import urllib2, re, sys
+import urllib2, re, sys, os, time, zlib
 
-# Register the streaming http handlers with urllib2
-register_openers()
+def E_OS(text):
+  if os.name == 'nt':
+    return text.decode('cp1251')
+  return text
 
-# Start the multipart/form-data encoding of the file "DSC0001.jpg"
-# "image1" is the name of the parameter, which is normally set
-# via the "name" parameter of the HTML <input> tag.
+path = u'.'
+if (len(sys.argv) > 1):
+  path = os.path.abspath(sys.argv[1])
 
-# headers contains the necessary Content-Type and Content-Length
-# datagen is a generator object that yields the encoded parameters
-datagen, headers = multipart_encode({
-  "img": open(sys.argv[1], "rb"),
-  "title":sys.argv[2],
-  "title1":sys.argv[2],
-  "album":sys.argv[3],
-  "album1":sys.argv[3] })
+uplog = file(os.path.join(path, 'up.log'), 'w')
 
-request = urllib2.Request("http://egaxegax.appspot.com/photos/add")
-uri = re.findall(r'form action="([^\"]*)"',urllib2.urlopen(request).read())
-if uri:
-    print uri
-    # Create the Request object
-    request = urllib2.Request(uri[0], datagen, headers)
-    # Actually do the request, and get the response
-    print urllib2.urlopen(request).read()
+for root, dirs, files in os.walk(path, topdown=False):
+
+  cwd = os.getcwd()
+  os.chdir(root)
+
+  for name in files:
+
+    fname, ext = os.path.splitext(name)
+
+    if ext.lower() in ('.gif','.jpg','.png',):
+
+      param = []
+
+      try:
+        param += [('img', open(name, "rb"))]
+      except:
+        print 'Error: ', sys.exc_info()[0], sys.exc_info()[1]
+
+      param += [("album", E_OS(os.path.basename(cwd)))]
+      param += [("title", E_OS(fname))]
+
+      print os.path.basename(cwd), fname
+
+      register_openers()
+      datagen, headers = multipart_encode(param)
+
+      url = "http://egaxegax.appspot.com/photos/add"
+#       url = "http://127.0.0.1:8800/photos/add"
+
+      request = urllib2.Request(url)
+      uri = re.findall(r'form action="([^\"]*)"', urllib2.urlopen(request).read())
+      if uri:
+          print uri
+          request = urllib2.Request(uri[0], datagen, headers)
+          print >> uplog, urllib2.urlopen(request).read()
+          time.sleep(3)

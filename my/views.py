@@ -55,8 +55,6 @@ def AddAlbumListCache(allkey, photos_list):
                'id': photo.id,
                'title': photo.title,
                'album': photo.album,
-               'width': photo.width,
-               'height': photo.height,
                'thumb_url': photo.thumb_url,
                'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
                'date': photo.date }
@@ -78,8 +76,6 @@ def UpdateAlbumListCache(photo):
            'id': photo.id,
            'title': photo.title,
            'album': photo.album,
-           'width': photo.width,
-           'height': photo.height,
            'thumb_url': photo.thumb_url,
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
            'date': photo.date }
@@ -102,8 +98,6 @@ def AddPhotosListCache(album, photos_list):
            'id': photo.id,
            'title': photo.title,
            'album': photo.album,
-           'width': photo.width,
-           'height': photo.height,
            'thumb_url': photo.thumb_url,
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
            'date': photo.date })
@@ -199,21 +193,23 @@ def get_avatar(request, **kw):
 
 def add_photo(request):
     if request.method == 'POST':
-        if not 'title' in request.POST or not request.POST['title']: # title as filename
-            request.POST['title'] = ' '.join(os.path.splitext(str(request.FILES['img']))[0].split('_'))
-            request.POST['title1'] = '' 
         form = AddPhotoForm(request.POST, request.FILES)
         if form.is_valid():
             photo = form.save(commit=False)
-            blob_key = request.FILES['img'].blobstore_info._BlobInfo__key
-            data = blobstore.BlobReader(blob_key).read()
             try:
+                blob_key = request.FILES['img'].blobstore_info._BlobInfo__key
+                data = blobstore.BlobReader(blob_key).read()
                 img = images.Image(image_data=data)
-                photo.title = FromTranslit(form.data['title1']) or request.POST['title']
-                photo.album = FromTranslit(form.data['album1'])
-                photo.width = img.width
-                photo.height = img.height
                 photo.thumb_url = images.get_serving_url(blob_key)
+                for f in ['img']:
+                    if f in request.FILES: # check duplicates
+                        o = request.FILES[f]
+                        for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (o.name.replace("'","''"),)):
+                            if blob.key() != o.blobstore_info.key(): blob.delete()
+                if 'title1' in form.data:
+                    photo.title = FromTranslit(form.data['title1'])
+                if 'album1' in form.data:
+                    photo.album = FromTranslit(form.data['album1'])
                 if isinstance(request.user, User):
                     photo.author = request.user
                 photo = form.save()

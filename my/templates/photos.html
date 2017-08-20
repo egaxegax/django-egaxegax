@@ -212,9 +212,9 @@ function viewchange(counter) {
 
 {% endif %}
 {% if request.user.is_authenticated %}
-  <p class="smaller"><a href="{% url 'my.views.add_photo' %}">{% trans 'Add photo' %}</a></p>
+  <p class="smaller hspace"><a href="{% url 'my.views.add_photo' %}">{% trans 'Add photo' %}</a></p>
 {% else %}
-  <p class="smaller">{% trans 'Please authorize to upload photos' %}.</p>
+  <p class="smaller hspace">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
 <!-- viewphoto -->
 <table id="viewtab">

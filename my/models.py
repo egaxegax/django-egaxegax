@@ -8,8 +8,6 @@ class Photo(models.Model):
     title = models.CharField(max_length=50, verbose_name=_('title'))
     album = models.CharField(max_length=50, null=True, verbose_name=_('album'))
     img = models.FileField(upload_to='img', verbose_name=_('img'))
-    width = models.IntegerField(null=True, verbose_name=_('width'))
-    height = models.IntegerField(null=True, verbose_name=_('height'))
     thumb_url = models.CharField(max_length=255, null=True, verbose_name=_('thumb_url'))
     author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
     date = models.DateTimeField(auto_now_add=True, verbose_name=_('date'))

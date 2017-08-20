@@ -77,4 +77,3 @@ for root, dirs, files in os.walk(path, topdown=False):
           request = urllib2.Request(uri[0], datagen, headers)
           print >> uplog, urllib2.urlopen(request).read()
           time.sleep(3)
-
