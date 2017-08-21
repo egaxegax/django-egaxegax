@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css" type="text/css" />
 {% block pagestylelink %}{% endblock %}
 <style type="text/css">
-#main_header { height: 60px; margin: 0 auto 10px auto; padding: 0; background-color: rgb(230,240,242) !important; }
+#main_header { height: 60px; margin: 0 auto 10px auto; padding: 0; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
 #top_logo { width: 240px; margin-top: 10px; text-align: center; }
@@ -37,7 +37,7 @@
 {% block pagescript %}{% endblock %}
 </head>
 <body class="nomarg">
-<div id="main_header" class="main wrap wrapbg">
+<div id="main_header" class="main wrap bg">
   <div id="top_logo" class="lfloat">
     <a class="nodecor" href="/">
       <img src="{{ MEDIA_URL }}img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
