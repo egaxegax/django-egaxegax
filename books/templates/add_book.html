@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load filetransfers %}
-{% block keywords %}, {% trans 'books' %}{% endblock %}
+{% block description %}{% trans 'Add book' %}. {% endblock %}
+{% block keywords %}{% trans 'Add book' %}. {% endblock %}
 {% block title %}{% trans 'Add book' %} - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
 #id_title { width:100%; }

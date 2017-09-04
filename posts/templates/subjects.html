@@ -2,8 +2,8 @@
 {% load i18n %}
 {% load markup %}
 {% load myfilter %}
-{% block description %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
-{% block keywords %}, {% trans 'notes' %}, {% trans 'posts' %}{% endblock %}
+{% block description %}{% trans 'Posts and notes' %}. {% endblock %}
+{% block keywords %}{% trans 'notes' %}, {% trans 'posts' %}. {% endblock %}
 {% block title %}{% trans 'Posts and notes' %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block postsclass %}wrap{% endblock %}
 {% block pageheader %}{# trans 'Posts and notes' #}{% endblock %}

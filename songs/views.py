@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.context import RequestContext
+from django.template.defaultfilters import escapejs, truncatewords
 from django.db.models import Q
 from django.utils import timezone
 from songs.forms import *
@@ -53,7 +54,7 @@ def AddArtListCache(artkey, art_list):
     cache.add('arts:' + artkey, str(cache_list))
 
 def AddSongCache(song):
-    t = UnpackContent(song)
+    s = t = UnpackContent(song)
     if song.title[:5] != 'about':
         t = re.sub(r"(^|\n)>(.*)","\g<1>*#*\g<2>*##*", t)
         t = re.sub(r"(^|\n)!(.*)","\g<1>*_*\g<2>*__*", t)
@@ -68,6 +69,7 @@ def AddSongCache(song):
         'artist': song.artist,
         'art_id': GetArtId(song.artist),
         'title': song.title,
+        'desc': truncatewords(s, 200),
         'content': t,
         'audio': hasattr(song.audio, 'file'),
         'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},

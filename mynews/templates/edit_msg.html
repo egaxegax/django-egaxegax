@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load markup %}
-{% block keywords %}, {% trans 'updates, comments, news' %}{% endblock %}
+{% block description %}{% trans 'News' %}, {% trans 'updates, comments, news' %}. {% endblock %}
+{% block keywords %}{% trans 'News' %}, {% trans 'updates, comments, news' %}. {% endblock %}
 {% block title %}{% trans 'News' %} - {% trans 'updates, comments, news' %} - {% endblock %}
 {% block newsclass %}wrap{% endblock %}
 {% block pageheader %}{# trans 'News' #}{% endblock %}

@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load myfilter %}
-{% block description %}{% if album %}. {{ album }}{% endif %}, {% trans 'images, pictures, photos' %}{% endblock %}
-{% block keywords %}, {% if album %}{{ album }}, {% endif %}{% trans 'images, pictures, photos' %}{% endblock %}
+{% block description %}{% if album %}{{ album }}{% endif %}, {% trans 'images, pictures, photos' %}. {% endblock %}
+{% block keywords %}{% if album %}{{ album }}, {% endif %}{% trans 'images, pictures, photos' %}. {% endblock %}
 {% block title %}
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
@@ -186,13 +186,13 @@ function viewchange(counter) {
       {% if album %}
         <td class="photocont" align="center">
           <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.title }}','{{ photo.author.id }}');">
-            <img id="thumb{{ forloop.counter }}" src="{{ photo.thumb_url }}=s128" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
+            <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser or request.user.id == photo.author.id %}{{ photo.thumb_url }}=s128{% endif %}" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
             <span class="gray smaller">{{ photo.title }}</span></a>
         </td>
       {% else %}
-        <td class="albcont" align="center" valign="bottom">
+        <td class="albcont" align="center">
           <a class="nodecor" href="{% url 'my.views.list_photos' id_album=photo.id %}">
-            <img id="thumb{{ forloop.counter }}" src="{{ photo.thumb_url }}=s400" title="" alt="{{ photo.album }}"/><br/>
+            <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser or request.user.id == photo.author.id %}{{ photo.thumb_url }}{% endif %}=s400" title="" alt="{{ photo.title }}"/><br/>
           {{ photo.album }}</a><span class="smaller"> [{{ photo.album_count }}]</span><br/>
             <span class="gray smaller">{{ photo.date|time_since }}</span>
         </td>

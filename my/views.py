@@ -57,7 +57,8 @@ def AddAlbumListCache(allkey, photos_list):
                'album': photo.album,
                'thumb_url': photo.thumb_url,
                'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-               'date': photo.date }
+               'date': photo.date,
+               'memberonly': photo.memberonly }
         else:
             album_list[photo.album]['album_count'] += 1
             if photo.date > album_list[photo.album]['date']:
@@ -78,7 +79,8 @@ def UpdateAlbumListCache(photo):
            'album': photo.album,
            'thumb_url': photo.thumb_url,
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-           'date': photo.date }
+           'date': photo.date,
+           'memberonly': photo.memberonly }
         ClearPhotosFullListCache()
         cache.add(cache_id, str(album_list))
 
@@ -88,7 +90,9 @@ def AddPhotoCache(photo):
         'title': photo.title,
         'album': photo.album,
         'thumb_url': photo.thumb_url,
-        'date': photo.date }
+        'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
+        'date': photo.date,
+        'memberonly': photo.memberonly }
     cache.add('photo:' + str(photo.id), str(cache_photo))
 
 def AddPhotosListCache(album, photos_list):
@@ -100,7 +104,8 @@ def AddPhotosListCache(album, photos_list):
            'album': photo.album,
            'thumb_url': photo.thumb_url,
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-           'date': photo.date })
+           'date': photo.date,
+           'memberonly': photo.memberonly })
     cache.add('photos:' + album, str(cache_list))
 
 def ClearPhotoCache(photo):
@@ -113,6 +118,13 @@ def ClearPhotosFullListCache():
     cache.delete_many(['photos:.full_list'])
 
 # Controllers
+
+def get_avatar(request, **kw):
+    profile = get_object_or_404(Profile, user__exact=ZI(kw.get('id')))
+    if profile.avatar:
+        return serve_file(request, profile.avatar)
+    else:
+        return HttpResponseRedirect('/media/img/anon.png')
 
 def index(request):
     return render_to_response('index.html', 
@@ -183,13 +195,6 @@ def create_new_user(request):
                                'form_profile': form_profile,
                                'upload_url': upload_url,
                                'upload_data': upload_data}))
-
-def get_avatar(request, **kw):
-    profile = get_object_or_404(Profile, user__exact=ZI(kw.get('id')))
-    if profile.avatar:
-        return serve_file(request, profile.avatar)
-    else:
-        return HttpResponseRedirect('/media/img/anon.png')
 
 def add_photo(request):
     if request.method == 'POST':

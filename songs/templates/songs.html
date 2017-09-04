@@ -3,8 +3,8 @@
 {% load markup %}
 {% load myfilter %}
 {% load mathfilters %}
-{% block description %}{% if song_count %}. {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
-{% block keywords %}{% if song_count %}, {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}{% endblock %}
+{% block description %}{% if song_count %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %} {{ song_count }} текстов{% endif %}, {% trans 'songs' %}, {% trans 'chords' %} {% endblock %}
+{% block keywords %}{% if song_count %}, {% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}, {% trans 'songs' %}, {% trans 'chords' %}, {% endblock %}
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
 {% if song_count and not search_count %}{% if art_key %}Список исполнителей{% else %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}{% endif %}

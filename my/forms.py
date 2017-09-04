@@ -15,7 +15,7 @@ class CreateProfileForm(forms.ModelForm):
 class AddPhotoForm(forms.ModelForm):
     class Meta:
         model = Photo
-        exclude = ['author', 'date', 'width', 'height', 'thumb_url']
+        exclude = ['author', 'date', 'thumb_url']
         widgets = {
             'title': forms.TextInput(attrs={'onkeyup': 'document.getElementById(this.id+1).value=toTranslit(this.value);'}),
             'album': forms.TextInput(attrs={'onkeyup': 'document.getElementById(this.id+1).value=toTranslit(this.value);'}),
@@ -26,4 +26,4 @@ class AddPhotoForm(forms.ModelForm):
 class EditPhotoForm(forms.ModelForm):
     class Meta:
         model = Photo
-        exclude = ['author', 'date', 'width', 'height', 'thumb_url', 'img']
+        exclude = ['author', 'date', 'thumb_url', 'img']

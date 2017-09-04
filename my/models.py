@@ -11,6 +11,7 @@ class Photo(models.Model):
     thumb_url = models.CharField(max_length=255, null=True, verbose_name=_('thumb_url'))
     author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
     date = models.DateTimeField(auto_now_add=True, verbose_name=_('date'))
+    memberonly = models.NullBooleanField(null=True, blank=True)
 
 class Profile(models.Model):
     user = models.ForeignKey(User, null=True, unique=True, verbose_name=_('user'))

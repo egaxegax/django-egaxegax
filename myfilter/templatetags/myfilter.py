@@ -19,3 +19,12 @@ def strans(strval):
         s.reverse()
         ss[i] = ' '.join(s)
     return ';'.join(ss)
+
+@register.filter
+def strip_text(s):
+    s = s.replace('"','')
+    s = s.replace("'",'')
+    s = s.replace(">",'')
+    s = s.replace("<",'')
+    s = s.replace("!",'')
+    return s
