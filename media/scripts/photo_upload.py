@@ -40,6 +40,7 @@ for root, dirs, files in os.walk(path, topdown=False):
 
       param += [("album", E_OS(os.path.basename(cwd)))]
       param += [("title", E_OS(fname))]
+      param += [("memberonly", False)]
 
       print os.path.basename(cwd), fname
 

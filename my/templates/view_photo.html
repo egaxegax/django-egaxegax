@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="viewcontent">
-<img src="{% url 'my.views.get_photo' id=photo.id %}" title="{{ photo.title }} | {{ photo.album }}" alt="{{ photo.album }}"/>
+<img src="{% if not photo.memberonly or request.user.is_superuser%}{% url 'my.views.get_photo' id=photo.id %}{% endif %}" title="{{ photo.title }}" alt="{{ photo.title }}"/>
 </div>
 </body>
 </html>
