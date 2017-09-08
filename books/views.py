@@ -300,14 +300,15 @@ def list_books(request, **kw):
     else:  # last update
         wrt_id = '.last_update'
         wrt_key = str(wrt_id) + '.' + str(page_num)
-        per_page = 30
+        per_page = 10
         page_bottom = (page_num-1)*per_page
         page_top = page_bottom+per_page
         if not cache.has_key('books:' + wrt_key):
             book_list = Book.objects.filter().order_by('-date')[page_bottom:page_top]
             AddBookListCache(wrt_key, book_list, page_num=page_num, per_page=per_page)
         book_list = eval(cache.get('books:' + wrt_key))
-        last_count = len(book_list)
+        book_count = len(book_list)
+        last_count = book_count
         # subjects
         subj_key = '.full_list'
         if not cache.has_key('subj:' + subj_key):

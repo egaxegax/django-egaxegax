@@ -3,7 +3,7 @@
 #
 # Upload images to GAE
 #
-# photo_upload.py <path_to_files>
+# photo_upload.py <path_to_files> <memberonly>
 
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
@@ -17,6 +17,10 @@ def E_OS(text):
 path = u'.'
 if (len(sys.argv) > 1):
   path = os.path.abspath(sys.argv[1])
+
+memberonly = False
+if (len(sys.argv) > 2):
+  memberonly = len(sys.argv[2]) > 0
 
 uplog = file(os.path.join(path, 'up.log'), 'w')
 
@@ -40,7 +44,7 @@ for root, dirs, files in os.walk(path, topdown=False):
 
       param += [("album", E_OS(os.path.basename(cwd)))]
       param += [("title", E_OS(fname))]
-      param += [("memberonly", False)]
+      param += [("memberonly", memberonly)]
 
       print os.path.basename(cwd), fname
 

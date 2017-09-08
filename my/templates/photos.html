@@ -21,9 +21,9 @@ table.cont { padding: 10px 2px; }
 {% if album %}
 
 if(window.addEventListener) {
-    window.addEventListener('load', function(){ viewchange(1); }, false);
+    window.addEventListener('load', function(){ vc(1); }, false);
 } else {
-   window.attachEvent('onload', function(){ viewchange(1); });
+   window.attachEvent('onload', function(){ vc(1); });
 }
 
 {% endif %}
@@ -50,80 +50,80 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 				sbarsize:2
 			});
 			  // map size
-      var mapWidth = dw.root.getAttribute('width'),
-          mapHeight = dw.root.getAttribute('height');
-			  // close
-	    var link = dw.append(dw.root, 'a', {});
-	    link.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:cl()');
-	    link.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
-	    var text = dw.append(link, 'text', {
-	    	class: 'nav',
-	    	'font-size':'150%',
-	    	x:mapWidth, y:0, dy:'0.8em', 
-	    	'text-anchor': 'end'
-	    });
-	    text.appendChild(document.createTextNode('\u2715'));
-        // viewprev
-	    dw.prevlink = dw.append(dw.root, 'a', {});
-	    var text = dw.append(dw.prevlink, 'text', {
-	    	class: 'nav',
-	    	x:0, y:mapHeight/2, dy: '0.25em',
-	    	'font-size':'500%',
-	    	'text-anchor': 'start'
-	    });
-	    text.appendChild(document.createTextNode('\u2039'));
-        // viewnext
-	    dw.nextlink = dw.append(dw.root, 'a', {});
-	    var text = dw.append(dw.nextlink, 'text', {
-	    	class: 'nav',
-	    	x:mapWidth, y:mapHeight/2, dy:'0.25em',
-	    	'font-size':'500%',
-	    	'text-anchor': 'end'
-	    });
-	    text.appendChild(document.createTextNode('\u203A'));
-        // viewfull
-      dw.viewfull = dw.append(dw.root, 'a', {});
-      dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Click to view full size' %}");
-	    var text = dw.append(dw.viewfull, 'text', {
-	    	class: 'nav',
-	    	'font-size':'150%',
-	    	x:mapWidth, y:mapHeight, dy:'-0.2em',
-	    	'text-anchor': 'end'
-	    });
-	    text.appendChild(document.createTextNode('\u2750'));
-	      // caption
-	    dw.caption = dw.append(dw.root, 'text', {
-	    	class: 'nav',
-	    	x:mapWidth/2, y:mapHeight, dy:'-0.25em',
-	    	'font-size': '50%',
-	    	'text-anchor': 'middle'
-	    });
-		    // img
- 	    dw.img = dw.append('image', {});
-	    if ('{{ request.user.id }}' == photo_user_id || '{{ request.user.is_superuser }}'=='True') {
-		      // viewedit
-		    dw.viewedit = dw.append(dw.root, 'a', {});
-		    var text = dw.append(dw.viewedit, 'text', {
+			var mapWidth = dw.root.getAttribute('width'),
+	            mapHeight = dw.root.getAttribute('height');
+    		  // close
+		    dw.closelink = dw.append(dw.root, 'a', {});
+		    var text = dw.append(dw.closelink, 'text', {
 		    	class: 'nav',
 		    	'font-size':'150%',
-		    	x:0, y:0, dy:'0.8em', 
-		    	'text-anchor': 'start'
+		    	x:mapWidth, y:0, dy:'0.8em', 
+		    	'text-anchor': 'end'
 		    });
-		    text.appendChild(document.createTextNode('\u2710'));
-		      // viewdel
-		    dw.viewdel = dw.append(dw.root, 'a', {});
-		    var text = dw.append(dw.viewdel, 'text', {
+		    text.appendChild(document.createTextNode('\u2715'));
+	          // viewprev
+		    dw.prevlink = dw.append(dw.root, 'a', {});
+		    var text = dw.append(dw.prevlink, 'text', {
 		    	class: 'nav',
-		      'font-size':'150%',	
-		    	x:0, y:mapHeight, dy:'-0.2em',
+		    	x:0, y:mapHeight/2, dy: '0.25em',
+		    	'font-size':'500%',
 		    	'text-anchor': 'start'
 		    });
-		    text.appendChild(document.createTextNode('\u2672'));
-	    }
+		    text.appendChild(document.createTextNode('\u2039'));
+	          // viewnext
+		    dw.nextlink = dw.append(dw.root, 'a', {});
+		    var text = dw.append(dw.nextlink, 'text', {
+		    	class: 'nav',
+		    	x:mapWidth, y:mapHeight/2, dy:'0.25em',
+		    	'font-size':'500%',
+		    	'text-anchor': 'end'
+		    });
+		    text.appendChild(document.createTextNode('\u203A'));
+	          // viewfull
+	        dw.viewfull = dw.append(dw.root, 'a', {});
+	        dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Click to view full size' %}");
+		    var text = dw.append(dw.viewfull, 'text', {
+		    	class: 'nav',
+		    	'font-size':'150%',
+		    	x:mapWidth, y:mapHeight, dy:'-0.2em',
+		    	'text-anchor': 'end'
+		    });
+		    text.appendChild(document.createTextNode('\u2750'));
+		      // caption
+		    dw.caption = dw.append(dw.root, 'text', {
+		    	class: 'nav',
+		    	x:mapWidth/2, y:mapHeight, dy:'-0.25em',
+		    	'font-size': '50%',
+		    	'text-anchor': 'middle'
+		    });
+			  // img
+	 	    dw.img = dw.append('image', {});
+		    if ('{{ request.user.id }}' == photo_user_id || '{{ request.user.is_superuser }}'=='True') {
+			      // viewedit
+			    dw.viewedit = dw.append(dw.root, 'a', {});
+			    var text = dw.append(dw.viewedit, 'text', {
+			    	class: 'nav',
+			    	'font-size':'150%',
+			    	x:0, y:0, dy:'0.8em', 
+			    	'text-anchor': 'start'
+			    });
+			    text.appendChild(document.createTextNode('\u2710'));
+			      // viewdel
+			    dw.viewdel = dw.append(dw.root, 'a', {});
+			    var text = dw.append(dw.viewdel, 'text', {
+			    	class: 'nav',
+			      'font-size':'150%',
+			    	x:0, y:mapHeight, dy:'-0.2em',
+			    	'text-anchor': 'start'
+			    });
+			    text.appendChild(document.createTextNode('\u2672'));
+		    }
 		}
-		dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:viewchange(' + (-(Number(this.id.substr(7))-1)) + ')');
-		dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:viewchange(' + (Number(this.id.substr(7))+1) + ')');
-		dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/view/' + photo_id);
+	    dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:cl()');
+	    dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
+		dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (-(Number(this.id.substr(7))-1)) + ')');
+		dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (Number(this.id.substr(7))+1) + ')');
+		dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/orig/' + photo_id);
 		if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
 		if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
 		for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
@@ -147,7 +147,7 @@ function cl(){
     document.getElementById("viewtab").style.visibility="hidden";
     document.body.style.overflow='auto';
 }
-function viewchange(counter) {
+function vc(counter) {
     var nref = document.getElementById('thumbref' + String(Math.abs(counter)));
     if (nref) {
     	eval(nref.href.replace('javascript:',''));

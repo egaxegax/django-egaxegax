@@ -272,8 +272,17 @@ def delete_photo(request, **kw):
 
 def get_photo(request, **kw):
     if request.method == 'GET':
-        photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
-        return serve_file(request, photo.img)
+        idnum = kw.get('id')
+        title = request.GET.get('title','')
+        album = request.GET.get('album','')
+        if idnum:
+            photos = Photo.objects.filter(id=ZI(idnum))
+        elif title and album:
+            photos = Photo.objects.filter(Q(title=title)&Q(album=album))
+        try:
+            return serve_file(request, photos[0].img)
+        except:
+            raise Http404
 
 def view_photo(request, **kw):
     if request.method == 'GET':

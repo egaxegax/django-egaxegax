@@ -33,7 +33,7 @@
     display: block;
     font-size: 1.0em;
     font-style: italic;
-    font-weight: bold;
+    /*font-weight: bold;*/
     text-align: left;
 /*    border: Gray solid 1px;*/
     margin: 0 0 0.5em 0
@@ -43,7 +43,7 @@
     display: block;
     font-size: 1.0em;
     font-style: normal;
-    font-weight: bold;
+    /*font-weight: bold;*/
     /*line-height: 1;*/
     text-align: left;
     /*border: Black solid 1px;*/
@@ -54,8 +54,8 @@
     /*line-height: 1*/
     }
 .calibre7 {
-    /*display: block;
-    text-align: center*/
+    /*display: block;*/
+    /*text-align: center*/
     }
 .calibre8 {
     height: auto;
@@ -69,13 +69,13 @@
     /*line-height: 1*/
     }
 .calibre11 {
-    font-size: 0.75em;
-    line-height: normal;
+    /*font-size: 0.75em;*/
+    /*line-height: normal;*/
     vertical-align: sub
     }
 .calibre12 {
-    font-size: 0.75em;
-    line-height: normal;
+    /*font-size: 0.75em;*/
+    /*line-height: normal;*/
     vertical-align: super
     }
 .calibre13 {
