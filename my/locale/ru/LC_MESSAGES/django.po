@@ -49,7 +49,7 @@ msgid "About"
 msgstr "О САЙТЕ"
 
 msgid "Main"
-msgstr "О сайте"
+msgstr "Заходите, смотрите, пишите заметки, оставляйте комментарии"
 
 msgid "Photos"
 msgstr "ФОТО"
