@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load myfilter %}
-{% block description %}{% if book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %} {% endblock %}
-{% block keywords %}{% if book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}, {% trans 'books' %}. {% endblock %}
+{% block description %}{% if book_count and not wrt_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг. {% endif %}{% trans 'books' %} {% endblock %}
+{% block keywords %}{% if book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %}, {% endblock %}
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if book_count and not search_count %}{% if subject %}Жанр {% trans subject.subject %}, {{ subject.subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}{% endif %}{% endif %}
-{% if not book_count and not search_count %}{% trans 'Books' %}{% endif %}
+{% if book_count and not search_count and not last_count %}{% if subject %}Жанр {% trans subject.subject %}, {{ subject.subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}{% endif %}{% endif %}
+{% if last_count %}{% trans 'Books' %}{% endif %}
  - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
 .lside2 { min-width:20%; max-width:200px; }
@@ -36,7 +36,7 @@ dt .cont { display: table; width: 100%; }
 
 {% if last_count %}
 <p>
-Коллекция книг различных жанров отечественных и зарубежных авторов, взятых из свободных источников.
+Коллекция книг различных жанров отечественных и зарубежных авторов из свободных источников.
 </p>
 {% endif %}
 
@@ -51,7 +51,7 @@ dt .cont { display: table; width: 100%; }
   {% endif %}
 {% endif %}
 {% if not last_count and book_count %}
-  <span class="hspace"></span> Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}
+  <span class="hspace"></span> Найдено {% if search_count %} более {% endif %}{% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}
 {% endif %}
 </p>
 

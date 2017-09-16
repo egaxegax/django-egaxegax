@@ -32,10 +32,10 @@ msgstr "Название"
 #: templates/base.html
 
 msgid "songs"
-msgstr "песни, тексты"
+msgstr "Подборы гитарных аккордов к песням. Читайте, добавляйте свои подборы и тексты"
 
 msgid "chords"
-msgstr "аккорды, подборы"
+msgstr "аккорды, тексты песен"
 
 msgid "Chords"
 msgstr "АККОРДЫ"

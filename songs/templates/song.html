@@ -3,8 +3,8 @@
 {% load markup %}
 {% load myfilter %}
 {% block description %}{{ song.desc|strip_text }} {% endblock %}
-{% block keywords %}{{ song.artist }}, {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %}, {% endblock %}
-{% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'songs' %}, {% trans 'chords' %} - {% endblock %}
+{% block keywords %}{{ song.artist }}, {{ song.title }}, {% trans 'chords' %}, {% endblock %}
+{% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
 #id_search { height: 16px; margin-left: 10px; }
 .msgcont { line-height: 1.5em; }

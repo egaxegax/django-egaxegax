@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load myfilter %}
-{% block description %}Жанры, {% trans 'books' %}. {% endblock %}
-{% block keywords %}Жанры, {% trans 'books' %}. {% endblock %}
+{% block description %}Жанры, {% trans 'books' %} {% endblock %}
+{% block keywords %}Жанры, {% trans 'books' %}, {% endblock %}
 {% block title %}
 Жанры - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
@@ -15,7 +15,7 @@ dt .cont { display: table; width: 100%; }
 {% block content %}
 
 <p>
-Коллекция книг различных жанров отечественных и зарубежных авторов, взятых из свободных источников.
+Коллекция книг различных жанров отечественных и зарубежных авторов из свободных источников.
 </p>
 
 <p> Список жанров: </p>

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %}{% trans 'Profile' %} - {% endblock %}
+{% block description %}{% trans 'Profile' %} пользователя {{ record.author.username }}{% endblock %}
+{% block title %}{% trans 'Profile' %} пользователя {{ record.author.username }} - {% endblock %}
 {% block pagestyle %}
 {% endblock %}
 {% block aboutclass %}wrap{% endblock %}
