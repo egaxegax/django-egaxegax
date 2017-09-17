@@ -62,6 +62,9 @@ msgstr "Написать"
 msgid "Photogallery"
 msgstr "Фотогалерея"
 
+msgid "All photos"
+msgstr "Подборка фотографий, снятых на телефон, о природе, местах, людях"
+
 msgid "images, pictures, photos"
 msgstr "изображения, картинки, фото"
 

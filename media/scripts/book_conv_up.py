@@ -19,6 +19,8 @@ Usage: book_conv_up.py <dir with .epub>
 """
 
 def E_OS(text):
+  if os.name == 'nt':
+    return text.decode('cp1251')
   return text
 
 path = u'.'
@@ -31,7 +33,7 @@ index = part = pindex = k = 0
 for root, dirs, files in os.walk(path, topdown=False):
   for name in files:
     oldname = os.path.normpath(os.path.join(root, name))
-    name = translit(name.decode('cp1251'), 'ru', reversed=True).encode('utf-8').replace("'","").replace(" ","_").replace('«','').replace('»','')
+    name = translit(name, 'ru', reversed=True).encode('utf-8').replace("'","").replace(" ","_").replace('«','').replace('»','')
     curname = os.path.normpath(os.path.join(root, name))
     fname, ext = os.path.splitext(name)
     if (ext == '.epub'):
@@ -56,7 +58,7 @@ for root, dirs, files in os.walk(path, topdown=False):
           try:
               desc = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)[0]
           except:
-	          desc = title
+              desc = title
           if subj:
               subj = subj[0]
           else:
@@ -76,5 +78,5 @@ for root, dirs, files in os.walk(path, topdown=False):
 
           fn = name + '@' + writer.decode('utf-8').strip() + '@' + title.decode('utf-8').strip() + '@' + subj.decode('utf-8').strip() + '.txt'
           fbook = file(fn, 'w')
-          fbook.write(E_OS(desc))
+          fbook.write(desc)
           fbook.close()
