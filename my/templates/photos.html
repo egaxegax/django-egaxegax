@@ -28,108 +28,108 @@ if(window.addEventListener) {
 
 function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	var vTab = document.getElementById('viewtab'),
-    	vCont = document.getElementById('viewcont'),
-     thumbPhoto = document.getElementById('thumb' + counter); 
+		vCont = document.getElementById('viewcont'),
+		thumbPhoto = document.getElementById('thumb' + counter); 
 	  // add img
 	var vPhoto = new Image();
 	vPhoto.src = thumbPhoto.src.substr(0, thumbPhoto.src.length-5);
 	vPhoto.id = '__' + thumbPhoto.id;
 	vPhoto.title = thumbPhoto.title;
-	vPhoto.onload = function() {
-		vTab.style.visibility = 'visible';
-		document.body.style.overflow='hidden';
-		if (!window.dw){
-			dw = new dbCartaSvg({
-				id:'viewcont',
-				height: vCont.offsetHeight,
-				bg: 'transparent',
-				sbar: 0,
-				sbarpos: 'left',
-				sbarsize:2
+	vTab.style.visibility = 'visible';
+	document.body.style.overflow='hidden';
+	if (!window.dw){
+		dw = new dbCartaSvg({
+			id:'viewcont',
+			height: vCont.offsetHeight,
+			bg: 'transparent',
+			sbar: 0,
+			sbarpos: 'left',
+			sbarsize:2
+		});
+		  // map size
+		var mapWidth = dw.root.getAttribute('width'),
+			mapHeight = dw.root.getAttribute('height');
+		  // close
+		dw.closelink = dw.append(dw.root, 'a', {});
+		var text = dw.append(dw.closelink, 'text', {
+			class: 'nav',
+			'font-size':'150%',
+			x:mapWidth, y:0, dy:'0.8em', 
+			'text-anchor': 'end'
+		});
+		text.appendChild(document.createTextNode('\u2715'));
+		  // viewprev
+		dw.prevlink = dw.append(dw.root, 'a', {});
+		var text = dw.append(dw.prevlink, 'text', {
+			class: 'nav',
+			x:0, y:mapHeight/2, dy: '0.25em',
+			'font-size':'500%',
+			'text-anchor': 'start'
+		});
+		text.appendChild(document.createTextNode('\u2039'));
+		  // viewnext
+		dw.nextlink = dw.append(dw.root, 'a', {});
+		var text = dw.append(dw.nextlink, 'text', {
+			class: 'nav',
+			x:mapWidth, y:mapHeight/2, dy:'0.25em',
+			'font-size':'500%',
+			'text-anchor': 'end'
+		});
+		text.appendChild(document.createTextNode('\u203A'));
+		  // viewfull
+		dw.viewfull = dw.append(dw.root, 'a', {});
+		dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Click to view full size' %}");
+		var text = dw.append(dw.viewfull, 'text', {
+			class: 'nav',
+			'font-size':'150%',
+			x:mapWidth, y:mapHeight, dy:'-0.2em',
+			'text-anchor': 'end'
+		});
+		text.appendChild(document.createTextNode('\u2750'));
+		  // caption
+		dw.caption = dw.append(dw.root, 'text', {
+			class: 'nav',
+			x:mapWidth/2, y:mapHeight, dy:'-0.25em',
+			'font-size': '50%',
+			'text-anchor': 'middle'
+		});
+		  // img
+		dw.img = dw.append('image', {});
+		if ('{{ request.user.id }}' == photo_user_id || '{{ request.user.is_superuser }}'=='True') {
+			  // viewedit
+			dw.viewedit = dw.append(dw.root, 'a', {});
+			var text = dw.append(dw.viewedit, 'text', {
+				class: 'nav',
+				'font-size':'150%',
+				x:0, y:0, dy:'0.8em', 
+				'text-anchor': 'start'
 			});
-			  // map size
-			var mapWidth = dw.root.getAttribute('width'),
-	            mapHeight = dw.root.getAttribute('height');
-    		  // close
-		    dw.closelink = dw.append(dw.root, 'a', {});
-		    var text = dw.append(dw.closelink, 'text', {
-		    	class: 'nav',
-		    	'font-size':'150%',
-		    	x:mapWidth, y:0, dy:'0.8em', 
-		    	'text-anchor': 'end'
-		    });
-		    text.appendChild(document.createTextNode('\u2715'));
-	          // viewprev
-		    dw.prevlink = dw.append(dw.root, 'a', {});
-		    var text = dw.append(dw.prevlink, 'text', {
-		    	class: 'nav',
-		    	x:0, y:mapHeight/2, dy: '0.25em',
-		    	'font-size':'500%',
-		    	'text-anchor': 'start'
-		    });
-		    text.appendChild(document.createTextNode('\u2039'));
-	          // viewnext
-		    dw.nextlink = dw.append(dw.root, 'a', {});
-		    var text = dw.append(dw.nextlink, 'text', {
-		    	class: 'nav',
-		    	x:mapWidth, y:mapHeight/2, dy:'0.25em',
-		    	'font-size':'500%',
-		    	'text-anchor': 'end'
-		    });
-		    text.appendChild(document.createTextNode('\u203A'));
-	          // viewfull
-	        dw.viewfull = dw.append(dw.root, 'a', {});
-	        dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Click to view full size' %}");
-		    var text = dw.append(dw.viewfull, 'text', {
-		    	class: 'nav',
-		    	'font-size':'150%',
-		    	x:mapWidth, y:mapHeight, dy:'-0.2em',
-		    	'text-anchor': 'end'
-		    });
-		    text.appendChild(document.createTextNode('\u2750'));
-		      // caption
-		    dw.caption = dw.append(dw.root, 'text', {
-		    	class: 'nav',
-		    	x:mapWidth/2, y:mapHeight, dy:'-0.25em',
-		    	'font-size': '50%',
-		    	'text-anchor': 'middle'
-		    });
-			  // img
-	 	    dw.img = dw.append('image', {});
-		    if ('{{ request.user.id }}' == photo_user_id || '{{ request.user.is_superuser }}'=='True') {
-			      // viewedit
-			    dw.viewedit = dw.append(dw.root, 'a', {});
-			    var text = dw.append(dw.viewedit, 'text', {
-			    	class: 'nav',
-			    	'font-size':'150%',
-			    	x:0, y:0, dy:'0.8em', 
-			    	'text-anchor': 'start'
-			    });
-			    text.appendChild(document.createTextNode('\u2710'));
-			      // viewdel
-			    dw.viewdel = dw.append(dw.root, 'a', {});
-			    var text = dw.append(dw.viewdel, 'text', {
-			    	class: 'nav',
-			      'font-size':'150%',
-			    	x:0, y:mapHeight, dy:'-0.2em',
-			    	'text-anchor': 'start'
-			    });
-			    text.appendChild(document.createTextNode('\u2672'));
-		    }
+			text.appendChild(document.createTextNode('\u2710'));
+			  // viewdel
+			dw.viewdel = dw.append(dw.root, 'a', {});
+			var text = dw.append(dw.viewdel, 'text', {
+				class: 'nav',
+				'font-size':'150%',
+				x:0, y:mapHeight, dy:'-0.2em',
+				'text-anchor': 'start'
+			});
+			text.appendChild(document.createTextNode('\u2672'));
 		}
-	    dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:cl()');
-	    dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
-		dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (-(Number(this.id.substr(7))-1)) + ')');
-		dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (Number(this.id.substr(7))+1) + ')');
-		dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/orig/' + photo_id);
-		if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
-		if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
-		for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
-		dw.caption.appendChild(document.createTextNode(this.title));
+	}
+	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:cl()');
+	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
+	dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (-(Number(vPhoto.id.substr(7))-1)) + ')');
+	dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (Number(vPhoto.id.substr(7))+1) + ')');
+	dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/orig/' + photo_id);
+	if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
+	if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
+	for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
+	dw.caption.appendChild(document.createTextNode(vPhoto.title));
+	vPhoto.onload = function() {
 		var ratio = dw.root.getAttribute('width')/dw.root.getAttribute('height'),
 		    vs = dw.viewsizeOf();  // map sizes
 		var crds = [[-vs[1]*ratio,vs[1]],[-vs[3]*ratio,vs[3]]],
-			  pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
+			pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
 		dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src+'=s800');
 		dw.attr(dw.img, {
 			width:  pts[0][0]-pts[1][0],
@@ -140,6 +140,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 			cursor: 'pointer'
 		});
 	}
+	dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '');
 }
 function cl(){ 
     document.getElementById("viewtab").style.visibility="hidden";

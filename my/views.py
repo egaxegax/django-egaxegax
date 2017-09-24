@@ -62,8 +62,10 @@ def AddAlbumListCache(allkey, photos_list):
         else:
             album_list[photo.album]['album_count'] += 1
             if photo.date > album_list[photo.album]['date']:
-                album_list[photo.album]['date'] = photo.date
+                album_list[photo.album]['title'] = photo.title
                 album_list[photo.album]['thumb_url'] = photo.thumb_url
+                album_list[photo.album]['date'] = photo.date
+                album_list[photo.album]['memberonly'] = photo.memberonly
     cache.add('photos:' + allkey, str(album_list))
 
 def UpdateAlbumListCache(photo):
@@ -203,14 +205,12 @@ def add_photo(request):
             photo = form.save(commit=False)
             try:
                 blob_key = request.FILES['img'].blobstore_info._BlobInfo__key
-                data = blobstore.BlobReader(blob_key).read()
-                img = images.Image(image_data=data)
                 photo.thumb_url = images.get_serving_url(blob_key)
-                for f in ['img']:
-                    if f in request.FILES: # check duplicates
-                        o = request.FILES[f]
-                        for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (o.name.replace("'","''"),)):
-                            if blob.key() != o.blobstore_info.key(): blob.delete()
+#                 data = blobstore.BlobReader(blob_key).read()
+#                 img = images.Image(image_data=data)
+                o = request.FILES['img']
+                for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (o.name.replace("'","''"),)):
+                    if blob.key() != o.blobstore_info.key() and blob.md5_hash == o.blobstore_info.md5_hash : blob.delete()
                 if 'title1' in form.data:
                     photo.title = FromTranslit(form.data['title1'])
                 if 'album1' in form.data:
@@ -238,7 +238,8 @@ def add_photo(request):
 def edit_photo(request, **kw):
     id_photo = ZI(kw.get('id'))
     photo = get_object_or_404(Photo, id=id_photo)
-    if request.method == 'POST':
+    enabled = request.user.is_authenticated() and (request.user.is_superuser or hasattr(photo, 'author') and request.user.username == photo.author.username)
+    if request.method == 'POST' and enabled:
         ClearPhotosListCache(photo.album) # clear old
         form = EditPhotoForm(request.POST, instance=photo)
         if form.is_valid():
@@ -247,13 +248,13 @@ def edit_photo(request, **kw):
             ClearPhotoCache(photo)
             ClearPhotosListCache(photo.album)
             ClearPhotosFullListCache()
-            return HttpResponseRedirect(reverse('my.views.list_photos', kwargs={'id_album': kw.get('id', '')}))
+            return HttpResponseRedirect(reverse('my.views.list_photos', kwargs={'id_album': id_photo}))
     else:
         form = EditPhotoForm(initial={
                              'id': photo.id,
                              'title': photo.title,
                              'album': photo.album,
-                             'thumb_url': photo.thumb_url})
+                             'enabled': enabled})
     return render_to_response('edit_photo.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
@@ -262,27 +263,19 @@ def edit_photo(request, **kw):
 
 def delete_photo(request, **kw):
     if request.user.is_authenticated():
-        photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
+        id_photo = ZI(kw.get('id'))
+        photo = get_object_or_404(Photo, id=id_photo)
         if request.user.is_superuser or hasattr(photo, 'author') and request.user.username == photo.author.username:
             ClearPhotoCache(photo)
             ClearPhotosListCache(photo.album)
-            ClearPhotosFullListCache()
+#            ClearPhotosFullListCache()
             photo.delete()
     return HttpResponseRedirect(reverse('my.views.list_photos'))
 
 def get_photo(request, **kw):
     if request.method == 'GET':
-        idnum = kw.get('id')
-        title = request.GET.get('title','')
-        album = request.GET.get('album','')
-        if idnum:
-            photos = Photo.objects.filter(id=ZI(idnum))
-        elif title and album:
-            photos = Photo.objects.filter(Q(title=title)&Q(album=album))
-        try:
-            return serve_file(request, photos[0].img)
-        except:
-            raise Http404
+        photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
+        return serve_file(request, photo.img)
 
 def view_photo(request, **kw):
     if request.method == 'GET':

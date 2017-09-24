@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load markup %}
 {% load myfilter %}
-{% block description %}{% with posts.object_list|first as f %}{{ f.content|strip_text|truncatewords:"200" }}{% endwith %} {% endblock %}
+{% block description %}{% with posts.object_list|first as f %}{{ f.content|markdown:"codehilite,extra"|striptags|truncatewords:"200" }}{% endwith %} {% endblock %}
 {% block keywords %}{% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}, {% endblock %}
 {% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %}, {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}

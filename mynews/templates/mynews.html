@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load myfilter %}
 {% load markup %}
-{% block description %}{% with news.object_list|first as f %}{{ f.content|strip_text|truncatewords:"200" }}{% endwith %} {% endblock %}
+{% block description %}{% with news.object_list|first as f %}{{ f.content|markdown:"codehilite,extra"|striptags|truncatewords:"200" }}{% endwith %} {% endblock %}
 {% block keywords %}{% trans 'My news' %}, {% trans 'updates, comments, news' %}, {% endblock %}
 {% block title %}{% trans 'My news' %} - {% trans 'updates, comments, news' %} - {% endblock %}
 {% block pagestyle %}
