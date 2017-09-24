@@ -62,7 +62,7 @@
     <div class="wrap">
       <div class="msgtext msgcont">{{ song.content|safe }}</div>
       <div class="msgfooter gray">
-        {% if songs.author %}
+        {% if song.author %}
           <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> {% trans 'wrote' %}
         {% else %}
           {% trans 'An anonymous person' %} {% trans 'wrote' %}

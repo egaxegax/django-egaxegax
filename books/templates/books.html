@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load myfilter %}
-{% block description %}{% if book_count and not wrt_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг. {% endif %}{% trans 'books' %} {% endblock %}
-{% block keywords %}{% if book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %}, {% endblock %}
+{% block description %}{% if not last_count and book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %} {% endblock %}
+{% block keywords %}{% if not last_count and book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %}, {% endblock %}
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
 {% if book_count and not search_count and not last_count %}{% if subject %}Жанр {% trans subject.subject %}, {{ subject.subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}{% endif %}{% endif %}
