@@ -238,8 +238,7 @@ def add_photo(request):
 def edit_photo(request, **kw):
     id_photo = ZI(kw.get('id'))
     photo = get_object_or_404(Photo, id=id_photo)
-    enabled = request.user.is_authenticated() and (request.user.is_superuser or hasattr(photo, 'author') and request.user.username == photo.author.username)
-    if request.method == 'POST' and enabled:
+    if request.method == 'POST':
         ClearPhotosListCache(photo.album) # clear old
         form = EditPhotoForm(request.POST, instance=photo)
         if form.is_valid():
@@ -253,8 +252,8 @@ def edit_photo(request, **kw):
         form = EditPhotoForm(initial={
                              'id': photo.id,
                              'title': photo.title,
-                             'album': photo.album,
-                             'enabled': enabled})
+                             'author': photo.author,
+                             'album': photo.album})
     return render_to_response('edit_photo.html', 
                               context_instance=RequestContext(request,
                               {'request': request,

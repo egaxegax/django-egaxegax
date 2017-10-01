@@ -8,24 +8,28 @@
 {% block postsclass %}wrap{% endblock %}
 {% block pageheader %}{# trans 'Posts and notes' #}{% endblock %}
 {% block content %}
+
 <p>Читайте, пишите статьи и заметки, оставляйте комментарии.</p>
 <p>Темы статей:</p>
+
 {% if subjects.object_list %}
-  <div class="wrap">
   {% for subj in subjects.object_list %}
     {% if subj.subject %}
-      <dl class="msgtext">
-        <dt><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subj.id %}">{{ subj.subject|escape }}</a>
-        <span class="smaller">[{{ subj.count }}]</span></dt>
+      <div class="wrap2">
+      <dl class="msgtext"><dt>
+        <a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subj.id %}">
+          {{ subj.subject|escape }} </a><span class="smaller"> [{{ subj.count }}]</span></dt>
         <dd class="smaller">
           <acronym title="{{ subj.date }}">{{ subj.date|time_since }}</acronym> {% trans 'ago' %} {% trans 'ago' %}
         </dd>
       </dl>
+      </div>
     {% endif %}
   {% endfor %}
-  </div>
+  
   <p class="smaller hspace"><a href="{% url 'posts.views.list_posts' %}">{% trans 'All' %} {% trans 'Notes'|lower %}</a></p>
 {% endif %}
+
 {% if subjects.object_list %}
   <p class="smaller">
     {% if subjects.has_previous %}
@@ -43,6 +47,7 @@
 {% else %}
   <p>{% trans 'No subjects' %}.</p>
 {% endif %}
+
 {% if request.user.is_authenticated %}
   <p>
     <form action="{% url 'posts.views.add_post' %}" method="post">{% csrf_token %}

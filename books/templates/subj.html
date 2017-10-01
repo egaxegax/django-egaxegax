@@ -5,10 +5,6 @@
 {% block keywords %}Жанры, {% trans 'books' %}, {% endblock %}
 {% block title %}
 Жанры - {% trans 'books' %} - {% endblock %}
-{% block pagestyle %}
-.msgtext dt { border:0; }
-dt .cont { display: table; width: 100%; }
-{% endblock %}
 {% block booksclass %}wrap{% endblock %}
 {% block pageheader %}
 {% endblock %}
@@ -17,26 +13,20 @@ dt .cont { display: table; width: 100%; }
 <p>
 Коллекция книг различных жанров отечественных и зарубежных авторов из свободных источников.
 </p>
-
 <p> Список жанров: </p>
 
 {% if subjects.object_list %}
-
   {% for subj in subjects.object_list %}
     <div class="wrap2">
     <dl class="msgtext"><dt>
       <a class="nodecor" href="{% url 'books.views.list_books' id_subj=subj.id %}">
-        {% trans subj.subject%} </a><span class="smaller">[{{ subj.count }}]</span>
-        <div class="gray smaller">{{ subj.subject }}</div>
-          </dt>
+        {% trans subj.subject%} </a><span class="smaller"> [{{ subj.count }}]</span>
+        <div class="gray smaller">{{ subj.subject }}</div></dt>
       </dl>
     </div>
   {% endfor %}
-
 {% else %}
-
   <p>{% trans 'No books' %}.</p>
-
 {% endif %}
 
 {% if request.user.is_authenticated %}

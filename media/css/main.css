@@ -27,7 +27,7 @@ input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .indexlist { text-align: center; padding: 10px 4px 8px 8px; font-size: 70%; }
 .msgtext { min-height: 1em; padding: 10px; margin: 0px; }
 .msgfooter { padding: 0 10px; font-size: 70%; text-align: right; }
-.msgtext dt { padding: 5px 0; border-bottom: 1px solid #ddd; }
+.msgtext dt { padding: 5px 0; }
 .msgtext dd { padding-bottom: 5px; color: gray; }
 a, a:active, a:focus { color: #5645ad; outline:none; }
 a.nodecor { text-decoration:none; outline:none; }
