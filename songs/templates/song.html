@@ -7,17 +7,59 @@
 {% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
 #id_search { height: 16px; margin-left: 10px; }
-.msgcont { line-height: 1.5em; }
+.msgcont { line-height: 1.5em; width: 100; }
 .msgcont b { font-weight: 500; color: #5645ad; }
+.msgcell { display: table-cell; vertical-align: top; width: 50%; }
+#chordcont { text-align: center; }
 {% endblock %}
 {% block songsclass %}wrap{% endblock %}
 {% block pagescript %}
 <!--google+ comments-->
 <script src="https://apis.google.com/js/plusone.js"></script>
 <!--/google+ comments-->
+<script src="/media/js/jquery.min.js"></script>
+<script src="/media/js/rafael.min.js?v1.1.10"></script>
+<script src="/media/js/jtab.js?v1.1.10"></script>
+<script type="text/javascript">
+if(window.addEventListener) {
+   window.addEventListener('load', function(){ addSongChords('songcont'); }, false);
+} else {
+   window.attachEvent('onload', function(){ addSongChords('songcont'); });
+}
+// add icons chods by jtab.js & rafael.js
+function addSongChords(opts) {
+    var songText = document.getElementById('songcont');
+    var chordCont = document.getElementById('chordcont');
+    if (!songText || !chordCont) return;
+    // parse chords
+    var songChords = songText.innerHTML.match(/(\s|\()*([A-GH])([0-9a-z#:]{0,})(\s|\))*/gm);
+
+    songChords = songChords.reduce(function(items, chord) {
+        chord = chord.replace(/(\s|\(|\))/,'');
+        var parts = chord.split(":"),
+            fp = parts[0],
+            p1 = fp.replace(/^[A-GH#b]{1,2}/,''),
+            p2 = fp.substr(0, fp.length - p1.length),
+            bn = jtab.WesternScale.BaseNotes[p2];
+        if (bn)
+            fp = bn[0] + p1;
+        
+        if (items.indexOf(chord) < 0 && jtab.Chords[fp] != undefined) 
+            items.push(chord);
+        return items;
+    }, []);
+
+    for (var k=0; k<songChords.length; k++) {
+        var chord = songChords[k];
+        var el = document.createElement('div');
+        el.appendChild(document.createTextNode(chord));
+        chordCont.appendChild(el);
+        jtab.render(el);
+  }
+}
+</script>
 {% endblock %}
-{% block pageheader %}
-{% endblock %}
+{% block pageheader %}{% endblock %}
 
 {% block content %}
 
@@ -53,14 +95,15 @@
   {% else %}
     {% if song.audio %}
       <p>
-        <table>
-        <tr><td align="center" valign="center"> {% trans 'Listen' %}: &nbsp; </td>
-          <td> <audio src="{% url 'songs.views.get_song_file' id=song.id %}" controls></audio> </td></tr>
-        </table>
+         {% trans 'Listen' %}: &nbsp; 
+           <audio src="{% url 'songs.views.get_song_file' id=song.id %}" controls></audio> 
       </p>
     {% endif %}
     <div class="wrap">
-      <div class="msgtext msgcont">{{ song.content|safe }}</div>
+      <div class="msgtext msgcont">
+        <div class="msgcell" id="songcont">{{ song.content|safe }}</div>
+        <div class="msgcell yellow" id="chordcont"></div>
+      </div>
       <div class="msgfooter gray">
         {% if song.author %}
           <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> {% trans 'wrote' %}

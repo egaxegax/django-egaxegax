@@ -18,7 +18,7 @@ h3 { font-weight: normal; margin-top: 5px; }
 .lightgray { color: #aaa; }
 .pink { color: #900020; }
 .white { color: #eee; }
-.yellow { color: #f7be81; }
+.yellow { color: #caae81; }
 input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .formpost input[type=text] { width: 90%; }
 .formpost { width: 100%; }
