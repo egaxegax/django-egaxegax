@@ -12,15 +12,14 @@
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css" type="text/css" />
 {% block pagestylelink %}{% endblock %}
 <style type="text/css">
-#main_header { height: 60px; margin: 0 auto 10px auto; padding: 0; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
 #top_logo { width: 240px; margin-top: 10px; text-align: center; }
 #top_nav { margin: 0 10px; }
 #top_nav .vspace { margin-top: 20px; }
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
-#top_menu ul { display: table; width: 100%; max-width: 100%; }
-#top_menu ul li { display: table-cell; text-align: center; width: 17%; padding-top: 5px; border-radius: 2px 2px 2px 2px; }
+#top_menu ul { padding: 10px 0; display: table; width: 100%; max-width: 100%; }
+#top_menu ul li { display: table-cell; text-align: center; width: 17%; }
 #top_menu ul li a { height: 40px; display: table; width: 100%; }
 #top_menu ul li span { display: table-cell; vertical-align: middle; }
 {% block pagestyle %}{% endblock %}
@@ -38,7 +37,7 @@
 {% block pagescript %}{% endblock %}
 </head>
 <body class="nomarg">
-<div id="main_header" class="main wrap bg">
+<div id="main_header" class="main wrapbg">
   <div id="top_logo" class="lfloat">
     <a class="nodecor" href="/">
       <img src="{{ MEDIA_URL }}img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
@@ -71,15 +70,15 @@
     </ul>
     {% endif %}
   </div>
-</div>
-<div id="top_menu" class="main">
-  <ul class="inl nopad">
-    <li class="{% block aboutsclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.index' %}"><span>{% trans 'About' %}</span></a></li>
-    <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><span>{% trans 'News' %}</span></a></li>
-    <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><span>{% trans 'Posts' %}</span></a></li>
-    <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><span>{% trans 'Photos' %}</span></a></li>
-    <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><span>{% trans 'Chords' %}</span></a></li>
-    <li class="{% block booksclass %}{% endblock %}"><a class="nodecor" href="{% url 'books.views.list_books' %}"><span>{% trans 'Books' %}</span></a></li></ul>
+  <div id="top_menu" class="main">
+    <ul class="inl nomarg">
+      <li class="{% block aboutsclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.index' %}"><span>{% trans 'About' %}</span></a></li>
+      <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><span>{% trans 'News' %}</span></a></li>
+      <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><span>{% trans 'Posts' %}</span></a></li>
+      <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><span>{% trans 'Photos' %}</span></a></li>
+      <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><span>{% trans 'Chords' %}</span></a></li>
+      <li class="{% block booksclass %}{% endblock %}"><a class="nodecor" href="{% url 'books.views.list_books' %}"><span>{% trans 'Books' %}</span></a></li></ul>
+  </div>
 </div>
 <div id="main_content" class="main">
   <div class="view">
