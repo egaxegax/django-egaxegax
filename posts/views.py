@@ -123,7 +123,7 @@ def list_posts(request, **kw):
             AddPostCache(posts_list)
         posts_list = eval(cache.get('post:' + post_id) or [])
         if len(posts_list) and posts_list[0]['subject']:
-            initial['subject'] = posts_list[0]['subject']['subject']
+            initial = posts_list[0]['subject']
         if len(posts_list) and posts_list[0]['title']:
             initial['title'] = posts_list[0]['title']
     elif kw.get('id_subj'):
@@ -133,7 +133,7 @@ def list_posts(request, **kw):
             AddPostListCache(subj_id, posts_list)
         posts_list = eval(cache.get('posts:' + subj_id) or [])
         if len(posts_list) and posts_list[0]['subject']:
-            initial['subject'] = posts_list[0]['subject']['subject']
+            initial = posts_list[0]['subject']
     else:
         subj_id = '.full_list' 
         if not cache.has_key('posts:' + subj_id):
@@ -173,7 +173,8 @@ def add_post(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.date = timezone.now()
+            if post.title[:5] != 'about':
+                post.date = timezone.now()
             if form_subject.is_valid():
                 subject = IncSubjCount(subject=request.POST['subject'])
                 post.subject = subject

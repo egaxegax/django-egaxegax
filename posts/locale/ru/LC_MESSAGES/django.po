@@ -20,6 +20,9 @@ msgstr "Текст"
 msgid "subject"
 msgstr "Тема"
 
+msgid "date"
+msgstr "Время"
+
 #: templates/base.html
 
 msgid "Posts"

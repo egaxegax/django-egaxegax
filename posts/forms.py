@@ -5,7 +5,7 @@ from posts.models import *
 class AddPostForm(forms.ModelForm):
     class Meta:
         model = Greeting
-        exclude = ['author', 'subject', 'date']
+        exclude = ['author', 'subject']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'formtext'}),
             'content': forms.Textarea(attrs={'rows': 10}),

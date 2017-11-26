@@ -29,6 +29,9 @@ msgstr "Текст"
 msgid "title"
 msgstr "Название"
 
+msgid "date"
+msgstr "Время"
+
 #: templates/base.html
 
 msgid "songs"
