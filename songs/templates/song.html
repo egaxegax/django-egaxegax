@@ -93,12 +93,6 @@ function addSongChords(opts) {
       </div>
     </div>
   {% else %}
-    {% if song.audio %}
-      <p>
-         {% trans 'Listen' %}: &nbsp; 
-           <audio src="{% url 'songs.views.get_song_file' id=song.id %}" controls></audio> 
-      </p>
-    {% endif %}
     <div class="wrap">
       <div class="msgtext msgcont">
         <div class="msgcell" id="songcont">{{ song.content|safe }}</div>
@@ -119,15 +113,22 @@ function addSongChords(opts) {
         {% endif %}
       </div>
     </div>
+    <div class="hspace smaller">
+      <a href="{% url 'songs.views.get_song' id=song.id title=song.title %}.txt">Сохранить текст</a>
+    </div>
   {% endif %}
 
 {% endfor %}
 
+<p class="smaller hspace">
+
 {% if request.user.is_authenticated %}
-  <p class="smaller hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
+  <a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a>
 {% else %}
-  <p class="smaller hspace">{% trans 'Please authorize to add songs' %}.</p>
+  {% trans 'Please authorize to add songs' %}.
 {% endif %}
+
+</p>
 
 <!--google+ comments-->
 <div id="comments"></div>

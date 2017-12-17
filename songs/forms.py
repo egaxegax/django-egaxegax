@@ -10,11 +10,6 @@ class AddSongForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'rows': 10}),
         }
 
-class AddSongFileForm(forms.ModelForm):
-    class Meta:
-        model = Song
-        exclude = ['artist', 'title', 'author', 'content', 'date']
-
 class AddArtForm(forms.ModelForm):
     class Meta:
         model = Art

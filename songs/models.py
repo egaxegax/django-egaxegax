@@ -15,6 +15,5 @@ class Song(models.Model):
     artist = models.CharField(max_length=50, db_index=True, verbose_name=_('artist'))
     title = models.CharField(max_length=50, verbose_name=_('title'))
     content = models.TextField(verbose_name=_('content'))
-    audio = models.FileField(upload_to='audio', null=True, blank=True, verbose_name=_('audio'))
     author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
     date = models.DateTimeField(null=True, blank=True, verbose_name=_('date'))

@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.context import RequestContext
-from django.template.defaultfilters import escapejs, truncatewords
+from django.template.defaultfilters import striptags, truncatewords
 from django.db.models import Q
 from django.utils import timezone
 from songs.forms import *
@@ -71,7 +71,6 @@ def AddSongCache(song):
         'title': song.title,
         'desc': truncatewords(s, 200),
         'content': t,
-        'audio': hasattr(song.audio, 'file'),
         'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
         'date': song.date }
     cache.add('song:' + str(song.id), str(cache_song))
@@ -95,7 +94,6 @@ def AddSongListCache(mkey, song_list):
                'artist': song.artist,
                'art_id': GetArtId(song.artist),
                'title': song.title,
-               'audio': hasattr(song.audio, 'file'),
                'date': song.date })
     cache.add('songs:' + mkey, str(cache_list))
 
@@ -321,28 +319,6 @@ def edit_song(request, **kw):
                                'form': form,
                                'focus': form['content'].id_for_label}))
 
-def edit_song_file(request, **kw):
-    song_id = ZI(kw.get('id'))
-    song = get_object_or_404(Song, id=song_id)
-    if request.method == 'POST':
-        form = AddSongFileForm(request.POST, request.FILES, instance=song)
-        if form.is_valid():
-            song.save(force_update=True)
-            ClearSongListCache(song.artist)
-            ClearSongCache(song)
-            return HttpResponseRedirect(reverse('songs.views.get_song', kwargs={'id': song_id}))
-    else:
-        form = AddSongFileForm(initial={'id': song.id})
-    view_url = reverse('songs.views.edit_song_file', kwargs={'id': song_id})
-    upload_url, upload_data = prepare_upload(request, view_url)
-    return render_to_response('edit_song_file.html', 
-                              context_instance=RequestContext(request,
-                              {'request': request,
-                               'form': form, 
-                               'file_name': os.path.basename(song.audio.name),
-                               'upload_url': upload_url,
-                               'upload_data': upload_data}))
-
 def delete_song(request, **kw):
     if request.user.is_authenticated():
         song = get_object_or_404(Song, id=ZI(kw.get('id')))         
@@ -362,6 +338,12 @@ def get_song(request, **kw):
             song = get_object_or_404(Song, id=ZI(song_id))
             AddSongCache(song)
         song = eval(cache.get('song:' + song_id))
+        #
+        if kw.get('title'): # get song text only
+            rs = HttpResponse(striptags(song['content']).replace('&nbsp;',' ').encode('cp1251')
+                                  +'\n\n(source egaxegax.appspot.com)', 
+                              content_type='text/plain')
+            return rs
         if song['title'] != 'about':
             mkey = '.about' + song['artist']
             if not cache.has_key('songs:' + mkey):
@@ -378,14 +360,6 @@ def get_song(request, **kw):
                                    'song': song,
                                    'autoplay': request.GET.get('a', 0),
                                    'logback': reverse('songs.views.get_song', kwargs={'id': song_id}) }))
-
-def get_song_file(request, **kw):
-    if request.method == 'GET':
-        song = get_object_or_404(Song, id=ZI(kw.get('id')))
-        fname = os.path.basename(song.audio.name.encode('cp1251'))
-        response = HttpResponse(song.audio, mimetype='audio/mp3')
-        response['Content-Disposition'] = 'attachment; filename="'+ fname +'"'
-        return response
 
 def get_user_profile(request, **kw):
     if request.method == 'GET':
