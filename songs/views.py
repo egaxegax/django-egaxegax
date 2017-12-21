@@ -340,8 +340,10 @@ def get_song(request, **kw):
         song = eval(cache.get('song:' + song_id))
         #
         if kw.get('title'): # get song text only
-            rs = HttpResponse(striptags(song['content']).replace('&nbsp;',' ').encode('cp1251')
-                                  +'\n\n(source egaxegax.appspot.com)', 
+            rs = HttpResponse((song['artist'] + ' ' + song['title'] + '\n\n' +
+                                  striptags(song['content']
+                                            .replace('&nbsp;',' ').replace('<br/>', '\n'))).encode('cp1251')
+                                      +'\n\n(source egaxegax.appspot.com)', 
                               content_type='text/plain')
             return rs
         if song['title'] != 'about':
