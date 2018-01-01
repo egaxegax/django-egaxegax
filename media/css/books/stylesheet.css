@@ -71,16 +71,16 @@
 .calibre11 {
     /*font-size: 0.75em;*/
     /*line-height: normal;*/
-    vertical-align: sub
+    /*vertical-align: sub*/
     }
 .calibre12 {
     /*font-size: 0.75em;*/
     /*line-height: normal;*/
-    vertical-align: super
+    /*vertical-align: super*/
     }
 .calibre13 {
     display: block;
-    margin: 1em 0.2em 1em 4em
+/*    margin: 1em 0.2em 1em 4em*/
     }
 .calibre14 {
     font-style: italic
