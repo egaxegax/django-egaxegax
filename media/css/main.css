@@ -1,19 +1,19 @@
 /* 
 * main stylesheets here 
 */
-body { font-family: "Tahoma",Arial,sans-serif; font-weight:400; background-color: #efeeef; color: #222; }
+body { font-family: "Tahoma",Arial,sans-serif; font-weight:400; background-color: #f8f8f8; color: #222; }
 h2 { font-size: 24px; font-family: Arial,Helvetica,sans-serif; font-weight: normal; padding: 0 0 0 20px; }
 h3 { font-weight: normal; margin-top: 5px; }
-.main { width: 960px; margin: 0 auto 10px auto !important; padding: 0 !important; }
-.wrap { background-color: #fefefe; padding: 5px 10px 2px 10px; margin: 0 0 10px;
+.main { width: 960px; margin: 10px auto 10px auto !important; padding: 0 !important; }
+.wrap { background-color: #fff; padding: 5px 10px 2px 10px; margin: 0 0 10px;
   border-radius: 2px;
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.08); }
-.wrap2 { background-color: #fefefe; padding: 5px 10px 2px 10px; margin: 0 0 2px;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.2); }
+.wrap2 { background-color: #fff; padding: 5px 10px 2px 10px; margin: 0 0 2px;
   border-radius: 1px 1px 0 0;
-  box-shadow: 0 0px 1px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.05); } 
-.wrapbg { border-radius: 6px; 
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.2); }
+.wrapbg { border-radius: 2px; 
   background-color: rgb(230,240,242);
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.1); }
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.2); }
 .rounded { border-radius: 50%; }
 .gray { color: gray; }
 .lightgray { color: #aaa; }
