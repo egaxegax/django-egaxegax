@@ -153,8 +153,8 @@ def list_photos(request, **kw):
                 AddPhotosListCache(album, photos_list)
             photos_list = eval(cache.get('photos:' + album))
     else: # full list by album
-        rows = 50
-        cols = 2
+        rows = 100
+        cols = 1
         photos_list = {}
         allkey = '.full_list'
         if not cache.has_key('photos:' + allkey):
