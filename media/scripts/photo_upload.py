@@ -5,9 +5,12 @@
 #
 # photo_upload.py <path_to_files> <memberonly>
 
+import urllib2, re, sys, os, time
+
+sys.path.insert(0, os.path.abspath(sys.argv[0] + '/../../..'))
+
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
-import urllib2, re, sys, os, time, zlib
 
 def E_OS(text):
   if os.name == 'nt':
@@ -46,13 +49,13 @@ for root, dirs, files in os.walk(path, topdown=False):
       param += [("title", E_OS(fname))]
       param += [("memberonly", memberonly)]
 
-      print os.path.basename(cwd), fname
+      print os.path.basename(cwd), name
 
       register_openers()
       datagen, headers = multipart_encode(param)
 
-      url = "http://egaxegax.appspot.com/photos/add"
-#       url = "http://127.0.0.1:8800/photos/add"
+#       url = "http://egaxegax.appspot.com/photos/add"
+      url = "http://127.0.0.1:8800/photos/add"
 
       request = urllib2.Request(url)
       uri = re.findall(r'form action="([^\"]*)"', urllib2.urlopen(request).read())

@@ -113,7 +113,7 @@ def copy_subj(request):
     return HttpResponse('Done.')
 
 def list_posts(request, **kw):
-    per_page = 20
+    per_page = 10
     initial = {}
     posts_list = []
     if kw.get('id'):
@@ -140,10 +140,16 @@ def list_posts(request, **kw):
             posts_list = Greeting.objects.all().order_by('-date')
             AddPostListCache(subj_id, posts_list)
         posts_list = eval(cache.get('posts:' + subj_id) or [])
+    posts_title = []
+    for post in posts_list:
+        if post['title']: 
+            posts_title.append([ post['title'], post['id'] ] )
+    posts_title.sort()
     return render_to_response('posts.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
                                'posts': PageList(request, posts_list, per_page),
+                               'posts_title': posts_title,
                                'subject': initial,
                                'form': AddPostForm(),
                                'form_subject': AddSubjForm(initial=initial),

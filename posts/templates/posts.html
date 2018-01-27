@@ -6,6 +6,7 @@
 {% block keywords %}{% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}, {% endblock %}
 {% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %}, {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
+.subtitle { display: block; margin: 4px; }
 {% endblock %}
 {% block postsclass %}wrap{% endblock %}
 {% block pagescript %}
@@ -23,7 +24,19 @@
   <p><h2 class="nomarg"><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subject.id %}"><span class="hspace">{{ subject.subject }} </span></a></h2></p>
 {% else %}
   <p>Читайте, пишите заметки, оставляйте комментарии.</p>
-{% endif %}  
+{% endif %} 
+{% if posts_title|length > 1 %}
+  <div class="wrap">
+    <div class="msgtext">
+       <a class="nodecor smaller" href="#" onclick="if(document.getElementById('posttitle').style.display=='none') { document.getElementById('posttitle').style.display = ''; } else { document.getElementById('posttitle').style.display = 'none'; } return false;">Список глав</a>
+       <div id="posttitle" style="display:none;"><br>
+{% for title, post_id in posts_title %}
+  <a class="subtitle hspace nodecor" href="{% url 'posts.views.list_posts' id=post_id %}">{{ title }}</a>
+{% endfor %}
+       </div>
+    </div>
+  </div>
+{% endif %}
 {% for post in posts.object_list %}
   <div class="wrap">
     <a id="id{{ post.id }}" name="id{{ post.id }}"></a>
