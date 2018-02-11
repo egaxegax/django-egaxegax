@@ -4,6 +4,7 @@ from django.utils.translation import ugettext as _
 
 class Writer(models.Model):
     writer = models.CharField(max_length=150, db_index=True, verbose_name=_('writer'))
+    content = models.TextField(null=True, blank=True, verbose_name=_('content'))
     count = models.IntegerField()
 
 class Subject(models.Model):

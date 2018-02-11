@@ -1,7 +1,7 @@
 /* 
 * main stylesheets here 
 */
-body { font-family: "Tahoma",Arial,sans-serif; font-weight:400; background-color: #f8f8f8; color: #222; }
+body { font-family: Arial,sans-serif; font-weight:400; background-color: #f8f8f8; color: #222; }
 h2 { font-size: 24px; font-family: Arial,Helvetica,sans-serif; font-weight: normal; padding: 0 0 0 20px; }
 h3 { font-weight: normal; margin-top: 5px; }
 .main { width: 960px; margin: 10px auto 10px auto !important; padding: 0 !important; }

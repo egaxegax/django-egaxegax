@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load myfilter %}
-{% block description %}{{ book.writer.writer|strans }}, {{ book.title }}, {% trans 'books' %} {% endblock %}
+{% block description %}{{ book.content|striptags|strip_text|truncatewords:"80" }} {% endblock %}
 {% block keywords %}{{ book.writer.writer|strans }}, {{ book.title }}, {% trans 'books' %}, {% endblock %}
 {% block title %}{{ book.writer.writer|strans }} - {{ book.title }}, {% trans 'books' %} - {% endblock %}
 {% block pagestylelink %}

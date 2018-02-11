@@ -346,7 +346,7 @@ def get_song(request, **kw):
                                       +'\n\n(source egaxegax.appspot.com)', 
                               content_type='text/plain')
             return rs
-        if song['title'] != 'about':
+        if song['title'] != 'about': # add about to song text
             mkey = '.about' + song['artist']
             if not cache.has_key('songs:' + mkey):
                 song_list = Song.objects.filter(Q(title='about')&Q(artist=song['artist']))

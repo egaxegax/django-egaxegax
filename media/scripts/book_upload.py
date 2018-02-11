@@ -5,9 +5,12 @@
 #
 # book_upload.py <path_to_files>
 
+import urllib2, re, sys, os, time, zlib
+
+sys.path.insert(0, os.path.abspath(sys.argv[0] + '/../../..'))
+
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
-import urllib2, re, sys, os, time, zlib
 
 def E_OS(text):
   if os.name == 'nt':
@@ -67,8 +70,9 @@ for root, dirs, files in os.walk(path, topdown=False):
       register_openers()
       datagen, headers = multipart_encode(param)
 
-#       uri = "http://127.0.0.1:8800/books/add"
       uri = "http://egaxegax.appspot.com/books/add"
+      if os.getenv('EGAX_DEBUG') == '1':
+          uri = "http://127.0.0.1:8800/books/add"
  
       request = urllib2.Request(uri)
       uri = re.findall(r'form action="([^\"]*)"', urllib2.urlopen(request).read())

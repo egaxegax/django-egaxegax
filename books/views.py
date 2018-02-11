@@ -98,12 +98,6 @@ def AddBookListCache(mkey, book_list, **kw):
             continue
         dkey = book.writer.writer + ' ' + book.title
         if not dkey in dlist: 
-            # cover image
-#             thumb_url = ''
-#             if hasattr(book, 'img') and book.img:
-#                 name = book.img.name.rsplit('/')[-1]
-#                 for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name.replace("'","''"),)):
-#                     thumb_url = images.get_serving_url(blob.key())
             # description content
             content = GetBookContent(book, 'content.opf')
             dlist.append(dkey)
@@ -115,12 +109,23 @@ def AddBookListCache(mkey, book_list, **kw):
                'title': book.title,
                'content': truncatewords(content, 80),
                'index': book.index,
-#                'thumb_url': thumb_url,
                'date': book.date })
     cache.add('books:' + str(mkey), str(cache_list))
 
+def AddWrtCache(wrt_id, wrt):
+    cache_wrt = {
+        'id': wrt.id,
+        'writer': wrt.writer,
+        'content': wrt.content or E_OS('Об авторе...'),
+        'count': wrt.count }
+    cache.add('wrt:' + str(wrt_id), str(cache_wrt))
+    return cache_wrt
+
+def ClearWrtCache(wrt_key):
+    cache.delete_many(['wrt:' + str(wrt_key)])
+
 def ClearWrtListCache(wrt_key):
-    cache.delete_many(['wrts:.full_list', 'wrts:' + wrt_key])
+    cache.delete_many(['wrts:.full_list', 'wrts:' + str(wrt_key)])
     ClearSubjListCache()
 
 def ClearSubjListCache():
@@ -146,39 +151,39 @@ def ClearBookListSubjCache(subj_id):
 
 # extract content text, image, cover_image from .epub
 def GetBookContent(book, part='0'):
-        content = ''
-        if ((hasattr(book, 'file') and book.file)):
-            name = book.file.name.replace("'","''").rsplit('/')[-1]
-            for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name,)):
-                za = zipfile.ZipFile(blob.open())
-                # get content from zip archive by name or num part
-                for f in za.namelist():
-                    mpart = re.findall('(\d+)', f)
-                    try:
-                        ft = za.read(f)
-                        if ((part.isdigit() and len(mpart) and int(part) == int(mpart[0])) or (part == f) or (part == '0' and f == 'index.xhtml')) and f.startswith('index') and f.endswith('.xhtml'):
-                            try:
-                                content = re.findall('<body[^>]*>(.*)</body>', ft, re.M | re.S)[0]
-                            except:
-                                content = ''
-                        elif (part == f) and f.startswith('content.opf'):
-                            try:
-                                title = re.findall('>(.*)</dc:title>', ft)[0]
-                                writer = re.findall('>(.*)</dc:creator>', ft)[0]
-                                content = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)
-                                if len(content):
-                                    content = content[0]
-                                else:
-                                    content = writer + ' ' + title
-                            except:
-                                content = ''
-                        elif ((part == f) or part.startswith('cover')) and (f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png')):
-                            content = base64.b64encode(ft)
-                    except:
-                        continue
-                    if content:
-                        break
-        return content
+    content = ''
+    if ((hasattr(book, 'file') and book.file)):
+        name = book.file.name.replace("'","''").rsplit('/')[-1]
+        for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (name,)):
+            za = zipfile.ZipFile(blob.open())
+            # get content from zip archive by name or num part
+            for f in za.namelist():
+                mpart = re.findall('(\d+)', f)
+                try:
+                    ft = za.read(f)
+                    if ((part.isdigit() and len(mpart) and int(part) == int(mpart[0])) or (part == f) or (part == '0' and f == 'index.xhtml')) and f.startswith('index') and f.endswith('.xhtml'):
+                        try:
+                            content = re.findall('<body[^>]*>(.*)</body>', ft, re.M | re.S)[0]
+                        except:
+                            content = ''
+                    elif (part == f) and f.startswith('content.opf'):
+                        try:
+                            title = re.findall('>(.*)</dc:title>', ft)[0]
+                            writer = re.findall('>(.*)</dc:creator>', ft)[0]
+                            content = re.findall('<dc:description>(.*)</dc:description>', ft, re.M | re.S)
+                            if len(content):
+                                content = content[0]
+                            else:
+                                content = writer + ' ' + title
+                        except:
+                            content = ''
+                    elif ((part == f) or part.startswith('cover')) and (f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png')):
+                        content = base64.b64encode(ft)
+                except:
+                    continue
+                if content:
+                    break
+    return content
 
 # increment wrt book count
 def IncWrtCount(**kw):
@@ -277,7 +282,15 @@ def list_books(request, **kw):
         book_list = eval(cache.get('books:' + wrt_key))
         if len(book_list):
             book_count = book_list[0]['writer']['count']
-            writer = book_list[0]['writer']
+            if not cache.has_key('books:' + wrt_key):
+                book_list = Book.objects.filter(Q(writer=wrt_id)).order_by('title')[page_bottom:page_top]
+                AddBookListCache(wrt_key, book_list, page_num=page_num, per_page=per_page)
+            book_list = eval(cache.get('books:' + wrt_key))
+            if not cache.has_key('wrt:' + str(wrt_id)):
+                writer = Writer.objects.filter(Q(id=wrt_id))
+                if len(writer):
+                    AddWrtCache(wrt_id, writer[0])
+            writer = eval(cache.get('wrt:' + str(wrt_id)))
     elif kw.get('id_subj'): # filter by subj
         subj_id = ZI(kw.get('id_subj'))
         subj_key = '.subj' + str(subj_id) + '.' + str(page_num)
@@ -366,11 +379,11 @@ def get_book(request, **kw):
 
 def read_book(request, **kw):
     book = get_book(request, **kw)
-    f = book['part']
-    if f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png'):
+    part = book['part']
+    if part.endswith('.jpg') or part.endswith('.jpeg') or part.endswith('.png'):
         content_type = mimetypes.guess_type(book['part'])
         data = base64.b64decode(book['content'])
-        if f.startswith('cover'):  # resize cover image
+        if part.startswith('cover'):  # resize cover image
             img = images.Image(image_data=data)
             w = kw.get('width', 200)
             h = int( float(img.height) * (w/float(img.width)) )
@@ -471,7 +484,29 @@ def edit_book(request, **kw):
                                'form': form,
                                'upload_url': upload_url,
                                'upload_data': upload_data,
-                               'focus': form['title'].id_for_label}))
+                               'focus': form['content'].id_for_label}))
+
+def edit_wrt(request, **kw):
+    wrt_id = ZI(kw.get('id'))
+    wrt = get_object_or_404(Writer, id=wrt_id)
+    if request.method == 'POST':
+        form = AddWrtForm(request.POST, instance=wrt)
+        if form.is_valid():
+            mwrt = form.save(commit=False)
+            mwrt.save(force_update=True)
+            ClearWrtCache(wrt.id)
+            return HttpResponseRedirect(reverse('books.views.list_books', kwargs={'id_wrt': wrt_id}))
+    else:
+        form = AddWrtForm(initial={
+                           'id': wrt.id,
+                           'writer': wrt.writer,
+                           'content': wrt.content })
+    return render_to_response('edit_wrt.html', 
+                              context_instance=RequestContext(request,
+                              {'request': request,
+                               'form': form,
+                               'focus': form['content'].id_for_label}))
+    
 
 def delete_book(request, **kw):
     if request.user.is_authenticated():

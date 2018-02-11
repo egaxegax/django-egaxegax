@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load markup %}
 {% load myfilter %}
 {% block description %}{% if not last_count and book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %} {% endblock %}
 {% block keywords %}{% if not last_count and book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %}, {% endblock %}
@@ -91,6 +92,19 @@ dt .cont { display: table; width: 100%; }
     <a href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% elif writer %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">
     <div class="wrap cfloat">
       <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
+  {% endif %}
+
+  {% if writer %}
+    <div class="wrap">
+      <div class="msgtext smaller">
+        {{ writer.content|markdown:"codehilite,extra" }}
+      </div>
+      <div class="msgfooter gray">
+        {% if request.user.is_authenticated or request.user.is_superuser %}
+          <a class="nodecor" href="{% url 'books.views.edit_wrt' id=writer.id %}">{% trans 'Edit' %}</a>
+        {% endif %}
+      </div>
+    </div>
   {% endif %}
 
   {% for book in books.object_list %}

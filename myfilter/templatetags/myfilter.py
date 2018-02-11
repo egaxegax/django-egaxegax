@@ -22,6 +22,7 @@ def strans(strval):
 
 @register.filter
 def strip_text(s):
+    s = s.lstrip(' Annotation ')
     s = s.replace('"','')
     s = s.replace("'",'')
     s = s.replace(">",'')

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load filetransfers %}
+{% block description %}{% trans 'Edit writer' %} {% endblock %}
+{% block keywords %}{% trans 'Edit writer' %}, {% endblock %}
+{% block title %}{% trans 'Edit writer' %} - {% trans 'books' %} - {% endblock %}
+{% block pagestyle %}
+#id_writer { color: #c8c8c8; }
+#id_title { width:100%; }
+{% endblock %}
+{% block booksclass %}wrap{% endblock %}
+{% block pageheader %}{# trans 'Edit writer' #}{% endblock %}
+{% block content %}
+<p>Править автора. </p>
+  <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
+{% if request.user.is_authenticated %}
+    <table class="formpost">
+      {{ form }}
+      <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
+    </table>
+    <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
+{% else %}
+  <p>{% trans "You don't have permission to edit anything." %}</p>
+{% endif %}
+  </form>
+{% endblock %}
