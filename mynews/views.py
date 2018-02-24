@@ -108,11 +108,11 @@ def delete_msg(request, **kw):
             msg.delete()
     return HttpResponseRedirect(reverse('mynews.views.list_msg'))
 
-def get_user_profile(request, **kw):
+def user_profile(request, **kw):
     if request.method == 'GET':
         user = get_object_or_404(User, id=ZI(kw.get('id')))
         m = News.objects.filter(author__id=user.id)
-        return render_to_response('get_user_profile.html', 
+        return render_to_response('user_profile.html', 
                                   context_instance=RequestContext(request,
                                   {'request': request,
                                    'record': m[0],

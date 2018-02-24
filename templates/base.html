@@ -12,10 +12,11 @@
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css" type="text/css" />
 {% block pagestylelink %}{% endblock %}
 <style type="text/css">
+#main_header { width: 1060px; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
 #top_logo { width: 240px; margin-top: 10px; text-align: center; }
-#top_nav { margin: 0 10px; }
+#top_nav { margin: 0 40px; }
 #top_nav .vspace { margin-top: 20px; }
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
 #top_menu ul { padding: 10px 0; display: table; width: 100%; max-width: 100%; }
@@ -57,7 +58,7 @@
     </script>
     <!--/Banner-->
   </div>
-  <div id="top_nav" class="rfloat smaller">      
+  <div id="top_nav" class="rfloat smaller">
     {% if request.user.is_authenticated %}
     <ul class="nomarg nopad nolist">
       <li>{% trans 'Welcome,' %} <b>{{ request.user.username }}</b></li>
@@ -73,12 +74,12 @@
   <div id="top_menu" class="main">
     <ul class="inl nomarg">
       <li>&nbsp;</li>
-      <li class="{% block aboutsclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.index' %}"><span>{% trans 'About' %}</span></a></li>
-      <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><span>{% trans 'News' %}</span></a></li>
-      <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><span>{% trans 'Posts' %}</span></a></li>
-      <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><span>{% trans 'Photos' %}</span></a></li>
-      <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><span>{% trans 'Chords' %}</span></a></li>
-      <li class="{% block booksclass %}{% endblock %}"><a class="nodecor" href="{% url 'books.views.list_books' %}"><span>{% trans 'Books' %}</span></a></li>
+      <li class="{% block aboutsclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.index' %}"><span class="bigger">&#127752;</span><span>О&nbsp;САЙТЕ</span></a></li>
+      <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><span class="pink bigger">&#9749;</span><span>{% trans 'News' %}</span></a></li>
+      <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><span class="bigger">&#128240;</span><span>{% trans 'Posts' %}</span></a></li>
+      <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><span class="bigger">&#128247;</span><span>{% trans 'Photos' %}</span></a></li>
+      <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><span class="bigger">&#127928;</span><span>{% trans 'Chords' %}</span></a></li>
+      <li class="{% block booksclass %}{% endblock %}"><a class="nodecor" href="{% url 'books.views.list_books' %}"><span class="bigger">&#128218;</span><span>{% trans 'Books' %}</span></a></li>
       <li>&nbsp;</li>
     </ul>
   </div>

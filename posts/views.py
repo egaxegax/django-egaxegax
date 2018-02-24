@@ -242,11 +242,11 @@ def delete_post(request, **kw):
         return HttpResponseRedirect(reverse('posts.views.list_posts', kwargs={'id_subj': ZI(request.GET.get('id_subj'))}))
     return HttpResponseRedirect(reverse('posts.views.list_posts'))
 
-def get_user_profile(request, **kw):
+def user_profile(request, **kw):
     if request.method == 'GET':
         user = get_object_or_404(User, id=ZI(kw.get('id')))
         m = Greeting.objects.filter(author__id=user.id)
-        return render_to_response('get_user_profile.html', 
+        return render_to_response('user_profile.html', 
                                   context_instance=RequestContext(request,
                                   {'request': request,
                                    'record': m[0],

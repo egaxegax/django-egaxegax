@@ -11,5 +11,5 @@ urlpatterns = [
     url(r'^add/?$', views.add_post),
     url(r'^edit/(?P<id>[0-9]*)/?$', views.edit_post),
     url(r'^del/(?P<id>[0-9]*)/?$', views.delete_post),
-    url(r'^user/(?P<id>[0-9]*)/?$', views.get_user_profile),
+    url(r'^user/(?P<id>[0-9]*)/?$', views.user_profile),
 ]

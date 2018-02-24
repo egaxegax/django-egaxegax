@@ -8,5 +8,5 @@ urlpatterns = [
     url(r'^add/?$', views.add_msg),
     url(r'^edit/(?P<id>[0-9]*)/?$', views.edit_msg),
     url(r'^del/(?P<id>[0-9]*)/?$', views.delete_msg),
-    url(r'^user/(?P<id>[0-9]*)/?$', views.get_user_profile),
+    url(r'^user/(?P<id>[0-9]*)/?$', views.user_profile),
 ]

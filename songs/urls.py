@@ -13,5 +13,5 @@ urlpatterns = [
     url(r'^add/?$', views.add_song),
     url(r'^del/(?P<id>[0-9]*)/?$', views.delete_song),
     url(r'^edit/(?P<id>[0-9]*)/?$', views.edit_song),
-    url(r'^user/(?P<id>[0-9]*)/?$', views.get_user_profile),
+    url(r'^user/(?P<id>[0-9]*)/?$', views.user_profile),
 ]

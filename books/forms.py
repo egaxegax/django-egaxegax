@@ -15,6 +15,13 @@ class AddWrtForm(forms.ModelForm):
         model = Writer
         exclude = ['count']
         widgets = {
+            'writer': forms.TextInput(attrs={'class': 'formtext'}),
+        }
+
+class AddWrtFormAll(forms.ModelForm):
+    class Meta:
+        model = Writer
+        widgets = {
             'writer': forms.TextInput(attrs={'class': 'formtext', 'readonly':True}),
         }
 

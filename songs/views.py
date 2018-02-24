@@ -363,11 +363,11 @@ def get_song(request, **kw):
                                    'autoplay': request.GET.get('a', 0),
                                    'logback': reverse('songs.views.get_song', kwargs={'id': song_id}) }))
 
-def get_user_profile(request, **kw):
+def user_profile(request, **kw):
     if request.method == 'GET':
         user = get_object_or_404(User, id=ZI(kw.get('id')))
         m = Song.objects.filter(author__id=user.id)
-        return render_to_response('get_user_profile.html', 
+        return render_to_response('user_profile.html', 
                                   context_instance=RequestContext(request,
                                   {'request': request,
                                    'record': m[0],

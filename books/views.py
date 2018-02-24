@@ -125,7 +125,8 @@ def ClearWrtCache(wrt_key):
     cache.delete_many(['wrt:' + str(wrt_key)])
 
 def ClearWrtListCache(wrt_key):
-    cache.delete_many(['wrts:.full_list', 'wrts:' + str(wrt_key)])
+    try:    cache.delete_many(['wrts:.full_list', 'wrts:' + str(wrt_key)])
+    except: pass
     ClearSubjListCache()
 
 def ClearSubjListCache():
@@ -490,17 +491,18 @@ def edit_wrt(request, **kw):
     wrt_id = ZI(kw.get('id'))
     wrt = get_object_or_404(Writer, id=wrt_id)
     if request.method == 'POST':
-        form = AddWrtForm(request.POST, instance=wrt)
+        form = AddWrtFormAll(request.POST, instance=wrt)
         if form.is_valid():
             mwrt = form.save(commit=False)
             mwrt.save(force_update=True)
             ClearWrtCache(wrt.id)
             return HttpResponseRedirect(reverse('books.views.list_books', kwargs={'id_wrt': wrt_id}))
     else:
-        form = AddWrtForm(initial={
+        form = AddWrtFormAll(initial={
                            'id': wrt.id,
                            'writer': wrt.writer,
-                           'content': wrt.content })
+                           'content': wrt.content,
+                           'count': wrt.count })
     return render_to_response('edit_wrt.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
@@ -523,11 +525,11 @@ def delete_book(request, **kw):
             book.delete()
     return HttpResponseRedirect(reverse('books.views.list_books'))
 
-def get_user_profile(request, **kw):
+def user_profile(request, **kw):
     if request.method == 'GET':
         user = get_object_or_404(User, id=ZI(kw.get('id')))
         m = Book.objects.filter(author__id=user.id)
-        return render_to_response('get_user_profile.html', 
+        return render_to_response('user_profile.html', 
                                   context_instance=RequestContext(request,
                                   {'request': request,
                                    'record': m[0],

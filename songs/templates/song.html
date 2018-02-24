@@ -100,7 +100,7 @@ function addSongChords(opts) {
       </div>
       <div class="msgfooter gray">
         {% if song.author %}
-          <a class="nodecor" href="{% url 'songs.views.get_user_profile' id=song.author.id %}">{{ song.author.username }}</a> {% trans 'wrote' %}
+          <a class="nodecor" href="{% url 'songs.views.user_profile' id=song.author.id %}">{{ song.author.username }}</a> {% trans 'wrote' %}
         {% else %}
           {% trans 'An anonymous person' %} {% trans 'wrote' %}
         {% endif %}

@@ -32,10 +32,10 @@
 </div>
 
 {% if not song_count and not search_count %}
-<p>
+<p class="hspace">
 Подборы гитарных аккордов к песням. В базе свыше <b>25000</b> текстов. Читайте, добавляйте свои подборы и тексты.
 </p>
-<p class="hspace">
+<p class="hspace2">
 <a class="nodecor" href="/posts/5691594208444416#id5691594208444416">Аккорды</a>&nbsp;&nbsp;&nbsp;
 <a class="nodecor" href="/posts/5657300505198592#id5657300505198592">Таблица аккордов</a>&nbsp;&nbsp;&nbsp;
 <a class="nodecor" href="/posts/5707820058017792#id5707820058017792">Транспонирование аккордов</a>&nbsp;&nbsp;&nbsp;
@@ -56,7 +56,7 @@
 {% endif %}
 
 {% if last_count %}
-  <p>Последние обновления:</p>
+  <p class="hspace">Последние обновления:</p>
 {% endif %}
 
 {% if songs.object_list %}
@@ -115,7 +115,7 @@
   {% endif %}
   </p>
 {% else %}
-  <p>{% trans 'No songs' %}.</p>
+  <p class="hspace">{% trans 'No songs' %}.</p>
 {% endif %}
 
 {% if request.user.is_authenticated %}

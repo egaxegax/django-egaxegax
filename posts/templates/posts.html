@@ -23,7 +23,7 @@
 {% if subject.subject %}
   <p><h2 class="nomarg"><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subject.id %}"><span class="hspace">{{ subject.subject }} </span></a></h2></p>
 {% else %}
-  <p>Читайте, пишите заметки, оставляйте комментарии.</p>
+  <p class="hspace">Читайте, пишите заметки, оставляйте комментарии.</p>
 {% endif %} 
 {% if posts_title|length > 1 %}
   <div class="wrap">
@@ -50,7 +50,7 @@
       {% endif %}
       <div class="gray">
         {% if post.author %}
-          <a class="nodecor" href="{% url 'posts.views.get_user_profile' id=post.author.id %}">{{ post.author.username }}</a> {% trans 'wrote' %}
+          <a class="nodecor" href="{% url 'posts.views.user_profile' id=post.author.id %}">{{ post.author.username }}</a> {% trans 'wrote' %}
         {% else %}
           {% trans 'An anonymous person' %} {% trans 'wrote' %}
         {% endif %}

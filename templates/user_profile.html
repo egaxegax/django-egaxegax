@@ -7,7 +7,7 @@
 {% block aboutclass %}wrap{% endblock %}
 {% block pageheader %}{# trans 'Profile' #}{% endblock %}
 {% block content %}
-<p>Информация о пользователе:</p>
+<p class="hspace">Информация о пользователе:</p>
  <div class="wrap">
  <dl class="msgtext">
    <dt>{% trans 'avatar'|capfirst %}&nbsp; <img width="26px" height="26px" src="{% url 'my.views.get_avatar' id=record.author.id %}" title="{{ record.author.username }}"/></dt>

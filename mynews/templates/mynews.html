@@ -13,12 +13,12 @@
 {% endblock %}
 {% block pageheader %}{# trans 'My news' #}{% endblock %}
 {% block content %}
-<p>Кто на новенького? Новости, изменения, обновления на сайте, сообщения от пользователей.</p>
+  <p class="hspace">Кто на новенького? Новости, изменения, обновления на сайте, сообщения от пользователей.</p>
 {% for msg in news.object_list %}
   <div class="wrap">
     <div class="msgtext">{{ msg.content|markdown:"codehilite,extra" }}</div>
     <div class="msgfooter">
-      <a class="nodecor" href="{% url 'mynews.views.get_user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>
+      <a class="nodecor" href="{% url 'mynews.views.user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>
       {% trans 'added' %} <acronym title="{{ msg.date }}">{{ msg.date|time_since }}</acronym> {% trans 'ago' %}
       {% if request.user.is_authenticated and request.user.id == msg.author.id or request.user.is_superuser %}
         <a class="nodecor" href="{% url 'mynews.views.edit_msg' id=msg.id %}">{% trans 'Edit' %}</a>

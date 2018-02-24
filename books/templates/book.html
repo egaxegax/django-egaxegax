@@ -54,7 +54,7 @@
 
 <p class="smaller hspace">{% trans 'part' %} {{ book.npart }}</p>
 <p class="smaller hspace"><a href="{% url 'books.views.get_file' ind=book.index %}">Скачать книгу</a></p>
-<p class="smaller hspace">{% trans 'Added' %} <a href="{% url 'books.views.get_user_profile' id=book.author.id %}">{{ book.author.username }}</a> 
+<p class="smaller hspace">{% trans 'Added' %} <a href="{% url 'books.views.user_profile' id=book.author.id %}">{{ book.author.username }}</a> 
 <acronym title="{{ book.date }}">{{ book.date|time_since }}</acronym> {% trans 'ago' %}</p>
 
 {% if request.user.is_authenticated and request.user.id == book.author.id or request.user.is_superuser %}

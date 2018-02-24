@@ -15,5 +15,5 @@ urlpatterns = [
     url(r'^del/(?P<id>[0-9]*)/?$', views.delete_book),
     url(r'^edit/(?P<id>[0-9]*)/?$', views.edit_book),
     url(r'^edit_wrt/(?P<id>[0-9]*)/?$', views.edit_wrt),
-    url(r'^user/(?P<id>[0-9]*)/?$', views.get_user_profile),
+    url(r'^user/(?P<id>[0-9]*)/?$', views.user_profile),
 ]
