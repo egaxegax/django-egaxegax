@@ -12,15 +12,16 @@
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css" type="text/css" />
 {% block pagestylelink %}{% endblock %}
 <style type="text/css">
-#main_header { width: 1060px; }
+#main_header { display: table; height: 140px; }
+#main_header div { display: table-cell; vertical-align: middle; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
-#top_logo { width: 240px; margin-top: 10px; text-align: center; }
-#top_nav { margin: 0 40px; }
-#top_nav .vspace { margin-top: 20px; }
+#top_logo { min-width: 160px; max-width: 160px; text-align: center; }
+#top_nav { min-width: 140px; max-width: 140px; text-align: center; }
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
+#top_menu {  }
 #top_menu ul { padding: 10px 0; display: table; width: 100%; max-width: 100%; }
-#top_menu ul li { padding: 5px 10px 2px; display: table-cell; text-align: center; width: 10%; }
+#top_menu ul li { padding: 15px 10px 15px; display: table-cell; text-align: center; width: 10%; }
 #top_menu ul li a { height: 40px; display: table; width: 100%; }
 #top_menu ul li span { display: table-row; vertical-align: middle; }
 {% block pagestyle %}{% endblock %}
@@ -39,12 +40,12 @@
 </head>
 <body class="nomarg">
 <div id="main_header" class="main wrapbg">
-  <div id="top_logo" class="lfloat">
+  <div id="top_logo">
     <a class="nodecor" href="/">
       <img src="{{ MEDIA_URL }}img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
     </a>
   </div>
-  <div id="top_ban" class="lfloat">
+  <!-- div id="top_ban">
     <!--Banner-->
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <!-- eg1 -->
@@ -57,30 +58,28 @@
     (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
     <!--/Banner-->
-  </div>
-  <div id="top_nav" class="rfloat smaller">
-    {% if request.user.is_authenticated %}
-    <ul class="nomarg nopad nolist">
-      <li>{% trans 'Welcome,' %} <b>{{ request.user.username }}</b></li>
-      <li><a class="nodecor" href="{% url 'django.contrib.auth.views.logout' %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
-      </ul>
-    {% else %}
-    <ul class="vspace">
-      <li class="inl login hspace"><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
-      <li class="inl hspace"><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
-    </ul>
-    {% endif %}
-  </div>
+  </div-->
   <div id="top_menu" class="main">
     <ul class="inl nomarg">
-      <li>&nbsp;</li>
       <li class="{% block aboutsclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.index' %}"><span class="bigger2">&#128222;</span><span>О&nbsp;САЙТЕ</span></a></li>
       <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><span class="pink bigger2">&#9749;</span><span>{% trans 'News' %}</span></a></li>
       <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><span class="bigger2">&#128240;</span><span>{% trans 'Posts' %}</span></a></li>
       <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><span class="bigger2">&#128247;</span><span>{% trans 'Photos' %}</span></a></li>
       <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><span class="bigger2">&#127928;</span><span>{% trans 'Chords' %}</span></a></li>
       <li class="{% block booksclass %}{% endblock %}"><a class="nodecor" href="{% url 'books.views.list_books' %}"><span class="bigger2">&#128218;</span><span>{% trans 'Books' %}</span></a></li>
+    </ul>
+  </div>
+  <div id="top_nav" class="smaller">
+    <ul class="nomarg nopad nolist">
+    {% if request.user.is_authenticated %}
+      <li>{% trans 'Welcome,' %} <b>{{ request.user.username }}</b></li>
       <li>&nbsp;</li>
+      <li><a class="nodecor" href="{% url 'django.contrib.auth.views.logout' %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
+    {% else %}
+      <li><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
+      <li>&nbsp;</li>
+      <li><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
+    {% endif %}
     </ul>
   </div>
 </div>

@@ -39,7 +39,7 @@ a.nodecor img { border: 0px none; padding: 5px; }
 .inl { display: inline; }
 li.inl { display: inline; vertical-align: top; }
 ul.nolist { list-style-type: none; }
-ul.nolist li { padding: 10px 0 0 0; }
+ul.nolist li { padding: 2px 0 0 0; }
 .nomarg { margin: 0 0 0 0; }
 .nopad { padding: 0 0 0 0; }
 .hspaced { padding: 0 2px; }
