@@ -75,7 +75,7 @@ function addSongChords(opts) {
 </div>
 
 <p>
-  <h2 class="nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' id_art=song.art_id %}"><span class="hspace">{{ song.artist }} </span></a>{{ song.title }}</h2>
+  <h2 class="nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}"><span class="hspace">{{ song.artist }} </span></a>{{ song.title }}</h2>
 </p>
 
 {% for song in songs %}
@@ -114,7 +114,7 @@ function addSongChords(opts) {
       </div>
     </div>
     <div class="hspace smaller">
-      <a href="{% url 'songs.views.get_song' id=song.id title=song.title %}.txt">Сохранить текст</a>
+      <a href="{% url 'songs.views.get_song' id=song.id %}?astext=1">Сохранить текст</a>
     </div>
   {% endif %}
 

@@ -25,7 +25,7 @@ function toTranslit(text) {
     });
 }
 </script>
-<p>Добавляйте свои фото и картинки.</p>
+<p class="hspace">Добавляйте свои фото и картинки.</p>
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
     {% render_upload_data upload_data %}
 {% if request.user.is_authenticated %}

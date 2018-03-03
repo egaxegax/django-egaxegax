@@ -9,7 +9,7 @@
 {% block songsclass %}wrap{% endblock %}
 {% block pageheader %}{# trans 'Add song' #}{% endblock %}
 {% block content %}
-<p>Добавляйте свои подборы и песни.</p>
+<p class="hspace">Добавляйте свои подборы и песни.</p>
   <form action="{% url 'songs.views.add_song' %}" method="post">{% csrf_token %}
 {% if request.user.is_authenticated %}
     <table class="formpost">
