@@ -142,6 +142,7 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 		});
 	}
 	dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '');
+	document.getElementById("viewtab").focus();
 }
 function cl(){ 
     document.getElementById("viewtab").style.visibility="hidden";
@@ -217,7 +218,7 @@ function vc(counter) {
   <p class="smaller hspace">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
 <!-- viewphoto -->
-<table id="viewtab">
+<table id="viewtab" tabindex="0" onkeypress="if (event.keyCode==27) cl();">
 <tr>
 <td id="viewcont"></td>
 </tr>
