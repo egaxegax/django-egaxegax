@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.list_songs),
     url(r'^art/?$', views.list_art),
+    url(r'^artdel/(?P<id_art>[0-9]*)/?$', views.delete_art),
     url(r'^artcp/?$', views.copy_art),       # debug only
     url(r'^add/?$', views.add_song),
     url(r'^del/(?P<id>[0-9]*)/?$', views.delete_song),

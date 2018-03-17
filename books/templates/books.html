@@ -37,24 +37,28 @@ dt .cont { display: table; width: 100%; }
 
 {% if last_count %}
 <p class="hspace">
-Коллекция книг различных жанров отечественных и зарубежных авторов из свободных источников.
+  Коллекция книг различных жанров отечественных и зарубежных авторов из свободных источников.
 </p>
 {% endif %}
 
-<p>
 {% if book_count %}
-  {% if subject %}
-    <span class="hspace">Жанр <b>{% trans subject.subject %}</b></span>
-  {% endif %}
-  {% if writer %}
-    <h2 class="inl nomarg"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=writer.id %}">
-      <span class="hspace">{{ writer.writer|strans }}</span></a></h2>
-  {% endif %}
+<p>
+{% if subject %}
+  <h2 class="inl nomarg"></h2><span class="hspace">Жанр <b>{% trans subject.subject %}</b></span>
+    <span class="hspace">Найдено <b>{{ book_count }}</b> книг</span>
 {% endif %}
-{% if not last_count and book_count %}
-  <span class="hspace"></span> Найдено {% if search_count %} более {% endif %}{% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}
+{% if writer %}
+  <h2 class="inl nomarg"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=writer.id %}">
+    <span class="hspace">{{ writer.writer|strans }}</span></a></h2>
+    <span class="hspace">Найдено <b>{{ book_count }}</b> книг</span>
 {% endif %}
 </p>
+{% endif %}
+{% if search_count or wrt_count %}
+<p>
+  <h2 class="inl nomarg"></h2><span class="hspace"> Найдено {% if search_count %} более {% endif %}{% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}</span>
+</p>
+{% endif %}
 
 {% if books.object_list %}
 
@@ -150,7 +154,7 @@ dt .cont { display: table; width: 100%; }
 
 {% else %}
 
-  <p class="hspace">{% trans 'No books' %}.</p>
+  <h2 class="inl nomarg"></h2>{% trans 'No books' %}.
 
 {% endif %}
 

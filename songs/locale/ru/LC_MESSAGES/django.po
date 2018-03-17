@@ -74,11 +74,17 @@ msgstr "Войдите, чтобы добавлять песни"
 msgid "Add song"
 msgstr "Добавить песню"
 
+msgid "Save"
+msgstr "Сохранить"
+
 msgid "Edit"
 msgstr "Править"
 
 msgid "Edit song"
 msgstr "Править песню"
+
+msgid "Remove songs"
+msgstr "Удалить песни"
 
 msgid "Added"
 msgstr "Добавил"

@@ -58,7 +58,7 @@
           <acronym title="{{ post.date }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
         {% endif %}
         {% if request.user.is_authenticated and request.user.id == post.author.id or request.user.is_superuser %}
-          <a class="nodecor" href="{% url 'posts.views.edit_post' id=post.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor hspace" href="{% url 'posts.views.edit_post' id=post.id %}">{% trans 'Edit' %}</a>
           <a class="nodecor" href="{% url 'posts.views.delete_post' id=post.id %}{% if subject.subject %}?id_subj={{ post.subject.id }}{% endif %}">{% trans 'Delete' %}</a>
         {% endif %}
       </div>

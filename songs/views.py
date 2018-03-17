@@ -48,11 +48,11 @@ def AddArtListCache(artkey, art_list):
         tr_art = re.sub('[^\w]', '', translit(art.artist, 'ru', reversed=True).replace(" ", "_").lower())
         cache_list.append({
            'id': art.id,
+           'art_id': art.id,
            'index': i+1,
            'artist': art.artist,
            'tr_art': tr_art,
-           'count': art.count,
-           'ref_id': art.id })
+           'count': art.count })
     cache.add('arts:' + artkey, str(cache_list))
 
 def AddSongCache(song):
@@ -331,13 +331,34 @@ def edit_song(request, **kw):
 
 def delete_song(request, **kw):
     if request.user.is_authenticated():
-        song = get_object_or_404(Song, id=ZI(kw.get('id')))         
+        song = get_object_or_404(Song, id=ZI(kw.get('id')))
         if request.user.is_superuser or hasattr(song, 'author') and request.user.username == song.author.username:
             IncArtCount(artist=song.artist, count=-1)
             ClearArtListCache(song.artist[0].capitalize())
             ClearSongListCache(song.artist)
             ClearSongCache(song)
             song.delete()
+    return HttpResponseRedirect(reverse('songs.views.list_songs'))
+
+def delete_art(request, **kw):
+    art_id = ZI(kw.get('id_art'))
+    artist = GetArtArtist(art_id)
+    if not cache.has_key('songs:' + artist):
+        song_list = Song.objects.filter(artist=artist).order_by('title')
+        AddSongListCache(artist, song_list)
+    song_list = eval(cache.get('songs:' + artist)) or []
+    if song_list:
+        for s in song_list:
+            for song in Song.objects.filter(id=s['id']):
+                ClearArtListCache(song.artist[0].capitalize())
+                ClearSongListCache(song.artist)
+                ClearSongCache(song)
+                song.delete()
+        for art in Art.objects.filter(id=art_id):
+            ClearArtListCache(artist)
+            ClearArtListCache('.id' + str(art_id))
+            ClearArtListCache('.art' + artist)
+            art.delete()
     return HttpResponseRedirect(reverse('songs.views.list_songs'))
 
 def get_song(request, **kw):

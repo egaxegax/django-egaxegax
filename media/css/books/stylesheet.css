@@ -1,3 +1,7 @@
+a {    
+    text-decoration: none;
+    font-weight:normal;
+}
 .calibre {
     display: block;
     font-size: 1em;
@@ -32,7 +36,7 @@
 /*    background-color: #F4F4F4;*/
     display: block;
     font-size: 1.0em;
-    font-style: italic;
+/*     font-style: italic; */
     /*font-weight: bold;*/
     text-align: left;
 /*    border: Gray solid 1px;*/

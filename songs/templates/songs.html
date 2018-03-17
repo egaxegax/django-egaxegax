@@ -31,9 +31,9 @@
   </form>
 </div>
 
-{% if not song_count and not search_count %}
+{% if last_count %}
 <p class="hspace">
-Подборы гитарных аккордов к песням. В базе свыше <b>25000</b> текстов. Читайте, добавляйте свои подборы и тексты.
+  Подборы гитарных аккордов к песням. В базе свыше <b>25000</b> текстов. Читайте, добавляйте свои подборы и тексты.
 </p>
 <p class="hspace2">
 <a class="nodecor" href="/posts/5691594208444416#id5691594208444416">Аккорды</a>&nbsp;&nbsp;&nbsp;
@@ -47,11 +47,15 @@
 
 {% if song_count %}
 <p>
-{% if not search_count %}{% if art_key %}{% else %}{% with songs.object_list|first as f %}
+{% if search_count or art_key %}
+  <h2 class="inl nomarg"></h2><span class="hspace"> Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов</span>
+{% else %}
+{% with songs.object_list|first as f %}
   <h2 class="inl nomarg"><a class="nodecor" href="{% url 'songs.views.list_songs' tr_art=f.tr_art id_art=f.art_id %}">
     <span class="hspace">{{ f.artist }}</span></a></h2>
-{% endwith %}{% endif %}{% endif %}
-  <span class="hspace"></span> Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов
+    <span class="hspace">Найдено <b>{{ song_count }}</b> текстов</span>
+{% endwith %}
+{% endif %}
 </p>
 {% endif %}
 
@@ -77,7 +81,7 @@
     <div class="wrap">
       <dl class="msgtext"><dt>
       {% if art_count %}
-        <a class="nodecor" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.ref_id %}">{{ song.artist }}</a>
+        <a class="nodecor" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
       {% endif %}
       {% if last_count or search_count%}
         <a class="nodecor pink" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
@@ -115,11 +119,17 @@
   {% endif %}
   </p>
 {% else %}
-  <p class="hspace">{% trans 'No songs' %}.</p>
+  <h2 class="inl nomarg"></h2> {% trans 'No songs' %}.
 {% endif %}
 
 {% if request.user.is_authenticated %}
-  <p class="smaller hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
+  <p class="smaller hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a>
+    {% if request.user.is_superuser and not art_key and not last_count and not search_count %}
+      {% with songs.object_list|first as f %}
+        <a class="hspace" href="{% url 'songs.views.delete_art' id_art=f.art_id %}" title="Удалить все песни автора">{% trans 'Remove songs' %}</a>
+      {% endwith %} 
+    {% endif %}  
+  </p>
 {% else %}
   <p class="smaller hspace">{% trans 'Please authorize to add songs' %}.</p>
 {% endif %}
