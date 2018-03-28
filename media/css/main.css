@@ -6,11 +6,11 @@ h2 { font-size: 24px; font-family: Arial,Helvetica,sans-serif; font-weight: norm
 h3 { font-weight: normal; margin-top: 5px; }
 .main { width: 960px; margin: 10px auto 10px auto !important; padding: 0 !important; }
 .wrap { background-color: #fff; padding: 5px 10px 2px 10px; margin: 0 0 10px;
-  border-radius: 2px;
-  box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.2); }
+  border-radius: 2px 2px 2px 2px;
+  box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.1); }
 .wrap2 { background-color: #fff; padding: 5px 10px 2px 10px; margin: 0 0 2px;
   border-radius: 1px 1px 0 0;
-  box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.2); }
+  box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.1); }
 .wrapbg { 
   background-color: rgb(210,224,240); }
 .rounded { border-radius: 50%; }
