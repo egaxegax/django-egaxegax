@@ -5,9 +5,12 @@
 #
 # song_upload.py <path_to_files>
 
+import urllib2, re, sys, os, time, zlib, base64
+
+sys.path.insert(0, os.path.abspath(sys.argv[0] + '/../../..'))
+
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
-import urllib2, re, sys, os, time, zlib, base64
 
 def E_OS(text):
   if os.name == 'nt':
@@ -63,7 +66,7 @@ for root, dirs, files in os.walk(path, topdown=False):
       param = []
       param += [("artist", E_OS(artist))]
       param += [("title", E_OS(title))]
-      param += [("content", E_OS( file(name).read() ))]
+      param += [("content", ( file(name).read() ))]
 
       register_openers()
       datagen, headers = multipart_encode(param)
