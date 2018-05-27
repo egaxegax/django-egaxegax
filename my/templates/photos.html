@@ -14,7 +14,7 @@ table.cont td { text-align: center; }
 .photocont { max-width: 150px; }
 .nav { fill: rgba(255,255,255,0.6); }
 {% endblock %}
-{% block myclass %}wrap{% endblock %}
+{% block myclass %}wrap rounded2{% endblock %}
 {% block pageheader %}{# trans 'Photogallery' #}{% endblock %}
 {% block content %}
 <script src="/media/js/dbcartasvg.js"></script>
@@ -27,7 +27,7 @@ if(window.addEventListener) {
 }
 {% endif %}
 
-function viewphoto(counter, photo_id, photo_title, photo_user_id){
+function viewphoto(counter, photo_id, photo_title, photo_date, photo_user_id){
 	var vTab = document.getElementById('viewtab'),
 		vCont = document.getElementById('viewcont'),
 		thumbPhoto = document.getElementById('thumb' + counter); 
@@ -87,6 +87,13 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 			'text-anchor': 'end'
 		});
 		text.appendChild(document.createTextNode('\u2750'));
+		  // top caption
+		dw.captiontop = dw.append(dw.root, 'text', {
+			class: 'nav',
+			x:mapWidth/2, y:0, dy:'0.8em',
+			'font-size': '50%',
+			'text-anchor': 'middle'
+		});
 		  // caption
 		dw.caption = dw.append(dw.root, 'text', {
 			class: 'nav',
@@ -125,7 +132,9 @@ function viewphoto(counter, photo_id, photo_title, photo_user_id){
 	if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
 	if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
 	for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
+	for(var i=0; i<dw.captiontop.childNodes.length; i++){ dw.captiontop.removeChild(dw.captiontop.childNodes[i]); }
 	dw.caption.appendChild(document.createTextNode(vPhoto.title));
+	dw.captiontop.appendChild(document.createTextNode(photo_date));
 	vPhoto.onload = function() {
 		var ratio = dw.root.getAttribute('width')/dw.root.getAttribute('height'),
 		    vs = dw.viewsizeOf();  // map sizes
@@ -186,14 +195,14 @@ function vc(counter) {
     {% endif %}
       {% if album %}
         <td class="photocont">
-          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.title }}','{{ photo.author.id }}');">
+          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.title }}','{{ photo.date }}','{{ photo.author.id }}');">
             <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url }}=s128{% endif %}" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
             <span class="gray smaller">{{ photo.title }}</span></a>
         </td>
       {% else %}
         <td class="albcont">
           <a class="nodecor" href="{% url 'my.views.list_photos' id_album=photo.id %}">
-            <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url }}{% endif %}=s500" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
+            <img class="rounded1" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url }}{% endif %}=s400" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
           {{ photo.album }}</a><span class="smaller"> [{{ photo.album_count }}]</span><br/>
             <span class="gray smaller">{{ photo.date|time_since }}</span>
         </td>

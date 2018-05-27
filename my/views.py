@@ -57,7 +57,7 @@ def AddAlbumListCache(allkey, photos_list):
                'album': photo.album,
                'thumb_url': photo.thumb_url,
                'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-               'date': photo.date,
+               'date': photo.date.strftime("%Y-%m-%d"),
                'memberonly': photo.memberonly }
         else:
             album_list[photo.album]['album_count'] += 1
@@ -81,7 +81,7 @@ def UpdateAlbumListCache(photo):
            'album': photo.album,
            'thumb_url': photo.thumb_url,
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-           'date': photo.date,
+           'date': photo.date.strftime("%Y-%m-%d"),
            'memberonly': photo.memberonly }
         ClearPhotosFullListCache()
         cache.add(cache_id, str(album_list))
@@ -93,7 +93,7 @@ def AddPhotoCache(photo):
         'album': photo.album,
         'thumb_url': photo.thumb_url,
         'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-        'date': photo.date,
+        'date': photo.date.strftime("%Y-%m-%d"),
         'memberonly': photo.memberonly }
     cache.add('photo:' + str(photo.id), str(cache_photo))
 
@@ -106,7 +106,7 @@ def AddPhotosListCache(album, photos_list):
            'album': photo.album,
            'thumb_url': photo.thumb_url,
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
-           'date': photo.date,
+           'date': photo.date.strftime("%Y-%m-%d"),
            'memberonly': photo.memberonly })
     cache.add('photos:' + album, str(cache_list))
 
