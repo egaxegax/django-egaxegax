@@ -14,9 +14,12 @@ h3 { font-weight: normal; margin-top: 5px; }
 .wrapbg { 
   background-color: rgb(210,224,240); }
 .rounded { border-radius: 50%; }
-.rounded3 { border-radius: 10% 90% 40% 40%; }
-.rounded2 { border-radius: 40% 10%; }
 .rounded1 { border-radius: 3%; }
+.rounded2 { border-radius: 40% 10%; }
+.rounded3 { border-radius: 10% 90% 40% 40%; }
+.rounded4 { border-radius: 10% 90% 10% 10%; }
+.rounded5 { border-radius: 90% 50%; }
+.rounded6 { border-radius: 10%; }
 .gray { color: gray; }
 .green { color: green; }
 .lightgray { color: #aaa; }

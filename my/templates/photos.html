@@ -10,7 +10,12 @@ table.cont { width:100%; padding: 10px 2px; }
 table.cont td { text-align: center; }
 #viewtab { visibility: hidden; border-collapse: collapse; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8);
     padding:0 margin: 0; width: 100%; height: 100%; font-size: 40pt; }
-.albcont { padding: 10px; }
+.albcont .cont { position: relative; display: table-cell; }
+.dborder { border: 1px dashed rgba(0,0,0,0.1);  height:200px; width: 400px; }
+.caption { color: rgba(255,255,255,0.7); text-shadow: rgba(0,0,0,0.7) 0 0 4px; font-weight: 900; }
+.mid { position: absolute; top:45%; left: 50%; margin-left: -200px; width: 400px; }
+.ne { position: absolute; top:10px; right: 20px; }
+.se { position: absolute; bottom:10px; right: 20px; }
 .photocont { max-width: 150px; }
 .nav { fill: rgba(255,255,255,0.6); }
 {% endblock %}
@@ -195,16 +200,20 @@ function vc(counter) {
     {% endif %}
       {% if album %}
         <td class="photocont">
-          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.title }}','{{ photo.date }}','{{ photo.author.id }}');">
+          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.title }}','{{ photo.date|date:"Y-m-d" }}','{{ photo.author.id }}');">
             <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url }}=s128{% endif %}" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
             <span class="gray smaller">{{ photo.title }}</span></a>
         </td>
       {% else %}
         <td class="albcont">
           <a class="nodecor" href="{% url 'my.views.list_photos' id_album=photo.id %}">
-            <img class="rounded1" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url }}{% endif %}=s400" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
-          {{ photo.album }}</a><span class="smaller"> [{{ photo.album_count }}]</span><br/>
-            <span class="gray smaller">{{ photo.date|time_since }}</span>
+          <div class="cont {% if photo.memberonly %}dborder{% endif %}">
+            <img class="rounded1 bigger" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url }}{% endif %}=s400" title="{{ photo.title }}" alt="&#128273;"/><br/>
+            <span class="caption mid bigger white">{{ photo.album }}</span>
+			<span class="caption ne bigger"> {{ photo.album_count }}</span>
+			<span class="caption se">{{ photo.date|time_since }}</span>
+	      </div>
+          </a>          
         </td>
       {% endif %}        
     {% if photos.has_next %}

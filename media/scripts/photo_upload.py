@@ -3,7 +3,7 @@
 #
 # Upload images to GAE
 #
-# photo_upload.py <path_to_files> <memberonly>
+# photo_upload.py <path_to_files> [<memberonly>] [<user>]
 
 import urllib2, re, sys, os, time
 
@@ -24,6 +24,10 @@ if (len(sys.argv) > 1):
 memberonly = False
 if (len(sys.argv) > 2):
   memberonly = len(sys.argv[2]) > 0
+  
+user = 'guru'
+if (len(sys.argv) > 3):
+  user = sys.argv[3]
 
 uplog = file(os.path.join(path, 'up.log'), 'w')
 
@@ -48,6 +52,7 @@ for root, dirs, files in os.walk(path, topdown=False):
       param += [("album", E_OS(os.path.basename(cwd)))]
       param += [("title", E_OS(fname))]
       param += [("memberonly", memberonly)]
+      param += [("user", user)]
 
       print os.path.basename(cwd), name
 
