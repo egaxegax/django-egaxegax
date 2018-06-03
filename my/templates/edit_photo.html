@@ -6,7 +6,7 @@
 {% block myclass %}wrap rounded2{% endblock %}
 {% block pageheader %}{# trans 'Edit photo' #}{% endblock %}
 {% block content %}
-<p>Меняйте названия своих фото и альбомов.</p>
+<p class="hspace">Меняйте названия своих фото и альбомов.</p>
 <!--p>'{{ request.user.username }}' == '{{ form.initial.author.username }}' or  </p-->
 {% if request.user.username == form.initial.author.username or request.user.is_superuser %}
   <form action="{% url 'my.views.edit_photo' id=form.initial.id %}" method="post">{% csrf_token %}
@@ -18,6 +18,6 @@
     <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
   </form>
 {% else %}
-  <p>{% trans "You don't have permission to edit anything." %}</p>
+  <p class="hspace">{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
 {% endblock %}

@@ -34,7 +34,7 @@ function toTranslit(text) {
       <tr><th></th><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
     </table>
 {% else %}
-  <p>{% trans "You don't have permission to edit anything." %}</p>
+  <p class="hspace">{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
     {{ form.title_hid }}{{ form.album_hid }}
   </form>

@@ -48,9 +48,10 @@ function viewphoto(counter, photo_id, photo_title, photo_date, photo_user_id){
 			id:'viewcont',
 			height: vCont.offsetHeight,
 			bg: 'transparent',
+			draggable: false,
 			sbar: 0,
 			sbarpos: 'left',
-			sbarsize:2
+			sbarsize:4
 		});
 		  // map size
 		var mapWidth = dw.root.getAttribute('width'),
@@ -94,14 +95,14 @@ function viewphoto(counter, photo_id, photo_title, photo_date, photo_user_id){
 		text.appendChild(document.createTextNode('\u2750'));
 		  // top caption
 		dw.captiontop = dw.append(dw.root, 'text', {
-			class: 'nav',
+			class: 'nav caption',
 			x:mapWidth/2, y:0, dy:'0.8em',
 			'font-size': '50%',
 			'text-anchor': 'middle'
 		});
 		  // caption
 		dw.caption = dw.append(dw.root, 'text', {
-			class: 'nav',
+			class: 'nav caption',
 			x:mapWidth/2, y:mapHeight, dy:'-0.25em',
 			'font-size': '50%',
 			'text-anchor': 'middle'
