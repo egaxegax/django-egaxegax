@@ -46,9 +46,7 @@
     </a>
   </div>
   <!-- div id="top_ban">
-    <!--Banner-->
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <!-- eg1 -->
     <ins class="adsbygoogle"
        style="display:block"
        data-ad-client="ca-pub-2243951601941043"
@@ -57,7 +55,6 @@
     <script>
     (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
-    <!--/Banner-->
   </div-->
   <div id="top_menu" class="main">
     <ul class="inl nomarg">
@@ -124,9 +121,14 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 </div>
 {% if focus or form.username %}
 <script type="text/javascript">
-  window.onload = function() {
+  var SetFocus = function() {
     var el = document.getElementById('{{ focus }}{{ form.username.id_for_label }}');
     if (el) el.focus();
+  }
+  if(window.addEventListener) {
+    window.addEventListener('load', SetFocus, false);
+  } else {
+    window.attachEvent('onload', SetFocus);
   }
 </script>
 {% endif %}

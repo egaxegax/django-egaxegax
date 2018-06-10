@@ -3,13 +3,15 @@
 {% block title %}{% trans 'Log in' %} - {% endblock %}
 {% block pageheader %}{# trans 'Log in' #}{% endblock %}
 {% block content %}
-<p>Введите свои учетные данные.</p>
-<form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
-<table>
-  {{ form }}
-  <tr><th/><td><input type="submit" value="{% trans 'Log in' %}" /></td></tr>
-</table>
-<input type="hidden" name="next" value="{{ request.GET.b }}">
-</form>
-<p class="smaller"><a href="{% url 'my.views.create_new_user' %}">{% trans 'Add user' %}</a></p>
+<p class="hspace">Введите свои учетные данные.</p>
+<div class="hspace">
+  <form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
+  <table>
+    {{ form }}
+    <tr><th/><td><input type="submit" value="{% trans 'Log in' %}" /></td></tr>
+  </table>
+  <input type="hidden" name="next" value="{{ request.GET.b }}">
+  </form>
+</div>
+<p class="smaller hspace"><a href="{% url 'my.views.create_new_user' %}">{% trans 'Add user' %}</a></p>
 {% endblock %}
