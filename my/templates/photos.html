@@ -10,10 +10,11 @@ table.cont { width:100%; padding: 10px 2px; }
 table.cont td { text-align: center; }
 #viewtab { visibility: hidden; border-collapse: collapse; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8);
     padding:0 margin: 0; width: 100%; height: 100%; font-size: 40pt; }
-.albcont .cont { position: relative; display: table-cell; }
-.dborder { border: 1px dashed rgba(0,0,0,0.1);  height:200px; width: 400px; }
+.imcont { position: relative; display: table-cell; vertical-align: middle; }
+.albcont .mb { border: 1px dashed rgba(0,0,0,0.1);  height:200px; width: 400px; }
+.photocont .mb { border: 1px dashed rgba(0,0,0,0.1);  height:128px; width: 90px; }
 .caption { color: rgba(255,255,255,0.7); text-shadow: rgba(0,0,0,0.7) 0 0 4px; font-weight: 900; }
-.mid { position: absolute; top:45%; left: 50%; margin-left: -200px; width: 400px; }
+.mid { position: absolute; top:50%; left: 50%; margin-left: -200px; width: 400px; }
 .ne { position: absolute; top:10px; right: 20px; }
 .se { position: absolute; bottom:10px; right: 20px; }
 .photocont { max-width: 150px; }
@@ -32,13 +33,13 @@ if(window.addEventListener) {
 }
 {% endif %}
 
-function viewphoto(counter, photo_id, photo_title, photo_date, photo_user_id){
+function viewphoto(photo_counter, photo_id, photo_title, photo_date, photo_user_id){
 	var vTab = document.getElementById('viewtab'),
 		vCont = document.getElementById('viewcont'),
-		thumbPhoto = document.getElementById('thumb' + counter); 
+		thumbPhoto = document.getElementById('thumb' + photo_counter); 
 	  // add img
 	var vPhoto = new Image();
-	vPhoto.src = thumbPhoto.src.substr(0, thumbPhoto.src.length-5);
+	vPhoto.src = thumbPhoto.src;
 	vPhoto.id = '__' + thumbPhoto.id;
 	vPhoto.title = thumbPhoto.title;
 	vTab.style.visibility = 'visible';
@@ -132,9 +133,9 @@ function viewphoto(counter, photo_id, photo_title, photo_date, photo_user_id){
 	}
 	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:cl()');
 	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
-	dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (-(Number(vPhoto.id.substr(7))-1)) + ')');
-	dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (Number(vPhoto.id.substr(7))+1) + ')');
-	dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/orig/' + photo_id);
+	dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1-photo_counter) + ')');
+	dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1+photo_counter) + ')');
+	dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vorig(' + photo_counter + ')');
 	if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
 	if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
 	for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
@@ -146,18 +147,38 @@ function viewphoto(counter, photo_id, photo_title, photo_date, photo_user_id){
 		    vs = dw.viewsizeOf();  // map sizes
 		var crds = [[-vs[1]*ratio,vs[1]],[-vs[3]*ratio,vs[3]]],
 			pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
-		dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src+'=s800');
+		var wh = pts[0][0]-pts[1][0],
+		    ht = pts[0][1]-pts[1][1],
+		    left = pts[1][0],
+		    top = pts[1][1];
+		var src = im(this.src, 1000); // get image by size
+          //
+		dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', src);
 		dw.attr(dw.img, {
-			width:  pts[0][0]-pts[1][0],
-			height: pts[0][1]-pts[1][1],
-			x: pts[1][0],
-			y: pts[1][1],
+			width: wh, height: ht, x: left, y: top,
 			title: photo_title,
 			cursor: 'pointer'
 		});
+        dw.extend(dw.vp, {
+          onmousedown: function(ev){
+            dw.mousedown(ev);
+            var spts = dw.canvasXY(ev);
+            if(spts[0] < wh/2) eval(dw.prevlink.getAttribute('href'));
+            if(spts[0] >= wh/2) eval(dw.nextlink.getAttribute('href'));
+          }
+        });
 	}
 	dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '');
 	document.getElementById("viewtab").focus();
+}
+function im(src, size){
+  return (src.match(/size=\d+x/)) ?
+    size ? src.replace(/size=\d+x/,'size='+size+'x') : src.replace(/size=\d+x/,'size=10000x') : // ya disk
+    size ? src.replace(/=s\d+/,'=s'+size) : src.replace(/=s\d+/,'=s10000');  // google store	
+}
+function vorig(photo_counter){
+  var thumb = document.getElementById('thumb' + photo_counter);
+  window.open(im(thumb.src), '_self');
 }
 function cl(){ 
     document.getElementById("viewtab").style.visibility="hidden";
@@ -202,14 +223,17 @@ function vc(counter) {
       {% if album %}
         <td class="photocont">
           <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.title }}','{{ photo.date|date:"Y-m-d" }}','{{ photo.author.id }}');">
-            <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url }}=s128{% endif %}" title="{{ photo.title }}" alt="{{ photo.title }}"/><br/>
-            <span class="gray smaller">{{ photo.title }}</span></a>
+          <div class="imcont {% if photo.memberonly %}mb{% endif %}">
+            <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_thumb:'128' }}{% endif %}" title="{{ photo.title }}" alt="{% if photo.memberonly %}&#128274;{% else %}{{ photo.title }}{% endif %}"/><br/>
+             <span class="gray smaller">{{ photo.title }}</span>
+          </div>
+          </a>
         </td>
       {% else %}
         <td class="albcont">
           <a class="nodecor" href="{% url 'my.views.list_photos' id_album=photo.id %}">
-          <div class="cont {% if photo.memberonly %}dborder{% endif %}">
-            <img class="rounded1 bigger" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url }}{% endif %}=s400" title="{{ photo.title }}" alt="&#128273;"/><br/>
+          <div class="imcont {% if photo.memberonly %}mb{% endif %}">
+            <img class="rounded1 bigger" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_thumb:'400' }}{% endif %}" title="{{ photo.title }}" alt="&#128274;"/><br/>
             <span class="caption mid bigger white">{{ photo.album }}</span>
 			<span class="caption ne bigger"> {{ photo.album_count }}</span>
 			<span class="caption se">{{ photo.date|time_since }}</span>

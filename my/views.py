@@ -204,13 +204,16 @@ def add_photo(request):
         if form.is_valid():
             photo = form.save(commit=False)
             try:
-                blob_key = request.FILES['img'].blobstore_info._BlobInfo__key
-                photo.thumb_url = images.get_serving_url(blob_key)
-#                 data = blobstore.BlobReader(blob_key).read()
-#                 img = images.Image(image_data=data)
-                o = request.FILES['img']
-                for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (o.name.replace("'","''"),)):
-                    if blob.key() != o.blobstore_info.key() and blob.md5_hash == o.blobstore_info.md5_hash : blob.delete()
+                if 'thumb_url' in form.data:
+                    photo.thumb_url = form.data['thumb_url']
+                if request.FILES.get('img'):
+                    blob_key = request.FILES['img'].blobstore_info._BlobInfo__key
+                    photo.thumb_url = images.get_serving_url(blob_key)
+#                     data = blobstore.BlobReader(blob_key).read()
+#                     img = images.Image(image_data=data)
+                    o = request.FILES['img']
+                    for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'"  % (o.name.replace("'","''"),)):
+                        if blob.key() != o.blobstore_info.key() and blob.md5_hash == o.blobstore_info.md5_hash : blob.delete()
                 if 'title1' in form.data:
                     photo.title = FromTranslit(form.data['title1'])
                 if 'album1' in form.data:
@@ -279,16 +282,3 @@ def get_photo(request, **kw):
     if request.method == 'GET':
         photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
         return serve_file(request, photo.img)
-
-def view_photo(request, **kw):
-    if request.method == 'GET':
-        cache_photo_id = 'photo:' + kw.get('id', '')
-        if not cache.has_key(cache_photo_id):
-            photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
-            AddPhotoCache(photo)
-        photo = eval(cache.get(cache_photo_id))
-        return render_to_response('view_photo.html', 
-                                  context_instance=RequestContext(request,
-                                  {'request': request,
-                                   'photo': photo}))
-

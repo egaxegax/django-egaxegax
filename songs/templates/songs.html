@@ -64,7 +64,9 @@
 {% endif %}
 
 {% if songs.object_list %}
+
 {% for song in songs.object_list %}
+
   {% if not song.date and song.content %}
     <div class="wrap">
       <div class="msgtext smaller">
@@ -104,7 +106,9 @@
       </dl>
     </div>
   {% endif %}
+
 {% endfor %}
+
   <p class="smaller">
   {% if songs.has_previous %}
     <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
@@ -118,17 +122,20 @@
     <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
   {% endif %}
   </p>
+  
 {% else %}
+
   <h2 class="inl nomarg"></h2> {% trans 'No songs' %}.
+
 {% endif %}
 
 {% if request.user.is_authenticated %}
   <p class="smaller hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a>
-    {% if request.user.is_superuser and not art_key and not last_count and not search_count %}
-      {% with songs.object_list|first as f %}
-        <a class="hspace" href="{% url 'songs.views.delete_art' id_art=f.art_id %}" title="Удалить все песни автора">{% trans 'Remove songs' %}</a>
-      {% endwith %} 
-    {% endif %}  
+  {% if request.user.is_superuser and not art_key and not last_count and not search_count %}
+    {% with songs.object_list|first as f %}
+      <a class="hspace" href="{% url 'songs.views.delete_art' id_art=f.art_id %}" title="Удалить все песни автора">{% trans 'Remove songs' %}</a>
+    {% endwith %} 
+  {% endif %}  
   </p>
 {% else %}
   <p class="smaller hspace">{% trans 'Please authorize to add songs' %}.</p>

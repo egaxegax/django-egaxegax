@@ -1,8 +1,13 @@
-from datetime import datetime
-from django import template
-from django.utils.timesince import timesince
 
+
+from datetime import datetime
+from django.utils.timesince import timesince
+from django import template
 register = template.Library()
+
+import urllib, urllib2, urlparse, re
+from HTMLParser import HTMLParser
+ph = HTMLParser()
 
 @register.filter
 def time_since(strval):
@@ -29,3 +34,21 @@ def strip_text(s):
     s = s.replace("<",'')
     s = s.replace("!",'')
     return s
+
+@register.filter
+def get_thumb(url, sz):
+    if url is None:
+        url = ''
+    u = urlparse.urlparse(url)
+    if u.netloc == 'yadi.sk':
+        request = urllib2.Request(url)
+        uri = re.findall(r'<img class="[^\"]*" src="([^\"]*)"', urllib2.urlopen(request).read())
+    
+        if uri:
+            scheme, netloc, path, params, query, fragment = urlparse.urlparse(uri[0]) 
+            q = urlparse.parse_qs((query))
+            q['size'] = [sz + 'x']
+            query = urllib.urlencode(q, True)
+            muri = urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
+            return muri
+    return url + '=s' + sz

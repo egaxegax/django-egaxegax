@@ -7,10 +7,10 @@ h3 { font-weight: normal; margin-top: 5px; }
 .main { width: 960px; margin: 0px auto 0px auto !important; padding: 0 !important; }
 .wrap { background-color: #fff; padding: 5px 10px 2px 10px; margin: 0 0 10px;
   border-radius: 2px 2px 2px 2px;
-  box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.1); }
+  box-shadow: 1px 1px 3px 0px #dfdfdf; }
 .wrap2 { background-color: #fff; padding: 5px 10px 2px 10px; margin: 0 0 2px;
   border-radius: 1px 1px 0 0;
-  box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.1); }
+  box-shadow: 1px 1px 3px 0px #dfdfdf; }
 .wrapbg { 
   background-color: rgb(210,224,240); }
 .rounded { border-radius: 50%; }
@@ -28,7 +28,7 @@ h3 { font-weight: normal; margin-top: 5px; }
 .red { color: #f22; }
 .white { color: #eee; }
 .yellow { color: #caae81; }
-input[type=text], input[type=password], input[type=number], textarea, select  { border-radius: 4px; border:1px solid gray; padding:6px; }
+input[type=text], input[type=password], input[type=number], textarea, select  { border-radius: 4px; border:1px solid #afafaf; padding:6px; }
 input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .formpost { width: 100%; }
 .formpost th { width: 8%; }
