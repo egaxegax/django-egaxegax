@@ -44,12 +44,11 @@ for root, dirs, files in os.walk(path, topdown=False):
 
     if ext.lower() in ('.gif','.jpg','.png',):
 
-      remote_folder = E_OS('Foto')
+      remote_folder = E_OS('FotoSite')
       remote_file = E_OS(name)
       remote_path = '/{folder}/{file}'.format(folder=remote_folder, file=remote_file)
 
       yadisk.upload(remote_file, remote_path)
-      
       url = yadisk.publish_doc(remote_path)
 
       param = []

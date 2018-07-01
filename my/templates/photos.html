@@ -24,30 +24,25 @@ table.cont td { text-align: center; }
 {% block pageheader %}{# trans 'Photogallery' #}{% endblock %}
 {% block content %}
 <script src="/media/js/dbcartasvg.js"></script>
-<script type="text/javascript">
+<script>
+  var dw;
 {% if album %}
 if(window.addEventListener) {
-    window.addEventListener('load', function(){ vc(1); }, false);
+  window.addEventListener('load', function(){ vc(1); }, false);
 } else {
-   window.attachEvent('onload', function(){ vc(1); });
+  window.attachEvent('onload', function(){ vc(1); });
 }
 {% endif %}
 
 function viewphoto(photo_counter, photo_id, photo_title, photo_date, photo_user_id){
-	var vTab = document.getElementById('viewtab'),
-		vCont = document.getElementById('viewcont'),
-		thumbPhoto = document.getElementById('thumb' + photo_counter); 
-	  // add img
-	var vPhoto = new Image();
-	vPhoto.src = thumbPhoto.src;
-	vPhoto.id = '__' + thumbPhoto.id;
-	vPhoto.title = thumbPhoto.title;
-	vTab.style.visibility = 'visible';
-	document.body.style.overflow='hidden';
+	var vtab = document.getElementById('viewtab'),
+		vcont = document.getElementById('viewcont'),
+		thumb = document.getElementById('thumb' + photo_counter);
+	  //
 	if (!window.dw){
 		dw = new dbCartaSvg({
 			id:'viewcont',
-			height: vCont.offsetHeight,
+			height: vcont.offsetHeight,
 			bg: 'transparent',
 			draggable: false,
 			sbar: 0,
@@ -131,18 +126,11 @@ function viewphoto(photo_counter, photo_id, photo_title, photo_date, photo_user_
 			text.appendChild(document.createTextNode('\u2672'));
 		}
 	}
-	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:cl()');
-	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
-	dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1-photo_counter) + ')');
-	dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1+photo_counter) + ')');
-	dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vorig(' + photo_counter + ')');
-	if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
-	if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
-	for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
-	for(var i=0; i<dw.captiontop.childNodes.length; i++){ dw.captiontop.removeChild(dw.captiontop.childNodes[i]); }
-	dw.caption.appendChild(document.createTextNode(vPhoto.title));
-	dw.captiontop.appendChild(document.createTextNode(photo_date));
-	vPhoto.onload = function() {
+	  // add img
+	var vphoto = new Image();
+	vphoto.src = thumb.src;
+	vphoto.title = thumb.title;
+	vphoto.onload = function() {
 		var ratio = dw.root.getAttribute('width')/dw.root.getAttribute('height'),
 		    vs = dw.viewsizeOf();  // map sizes
 		var crds = [[-vs[1]*ratio,vs[1]],[-vs[3]*ratio,vs[3]]],
@@ -167,9 +155,22 @@ function viewphoto(photo_counter, photo_id, photo_title, photo_date, photo_user_
             if(spts[0] >= wh/2) eval(dw.nextlink.getAttribute('href'));
           }
         });
+		document.body.style.overflow='hidden';
+		vtab.style.visibility='visible';
+		vtab.focus();
 	}
+	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:cl()');
+	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
+	dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1-photo_counter) + ')');
+	dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1+photo_counter) + ')');
+	dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vorig(' + photo_counter + ')');
+	if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
+	if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
+	for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
+	for(var i=0; i<dw.captiontop.childNodes.length; i++){ dw.captiontop.removeChild(dw.captiontop.childNodes[i]); }
+	dw.caption.appendChild(document.createTextNode(vphoto.title));
+	dw.captiontop.appendChild(document.createTextNode(photo_date));
 	dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '');
-	document.getElementById("viewtab").focus();
 }
 function im(src, size){
   return (src.match(/size=\d+x/)) ?
@@ -238,9 +239,9 @@ function vc(counter) {
 			<span class="caption ne bigger"> {{ photo.album_count }}</span>
 			<span class="caption se">{{ photo.date|time_since }}</span>
 	      </div>
-          </a>          
+          </a>
         </td>
-      {% endif %}        
+      {% endif %}
     {% if photos.has_next %}
       <td>{% if forloop.revcounter == 1 %}
         <a id="pagenext" class="nodecor" href="{% if album %}{% url 'my.views.list_photos' id_album=photo.id %}{% else %}{% url 'my.views.list_photos' %}{% endif %}?page={{ photos.next_page_number }}">
@@ -261,7 +262,7 @@ function vc(counter) {
   <p class="smaller hspace">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
 <!-- viewphoto -->
-<table id="viewtab" tabindex="0" onkeypress="if (event.keyCode==27) cl();">
+<table id="viewtab" tabindex="0" onkeypress="(event.keyCode==27) ? cl() : (event.keyCode==37) ? eval(dw.prevlink.getAttribute('href')) : (event.keyCode==39) ? eval(dw.nextlink.getAttribute('href')) : false;">
 <tr>
 <td id="viewcont"></td>
 </tr>
