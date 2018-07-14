@@ -37,18 +37,17 @@ def strip_text(s):
 
 @register.filter
 def get_thumb(url, sz):
-    if url is None:
-        url = ''
-    u = urlparse.urlparse(url)
-    if u.netloc == 'yadi.sk':
-        request = urllib2.Request(url)
-        uri = re.findall(r'<img class="[^\"]*" src="([^\"]*)"', urllib2.urlopen(request).read())
-    
-        if uri:
-            scheme, netloc, path, params, query, fragment = urlparse.urlparse(uri[0]) 
-            q = urlparse.parse_qs((query))
-            q['size'] = [sz + 'x']
-            query = urllib.urlencode(q, True)
-            muri = urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
-            return muri
-    return url + '=s' + sz
+    if url:
+        u = urlparse.urlparse(url)
+        if u.netloc == 'yadi.sk':
+            request = urllib2.Request(url)
+            uri = re.findall(r'<img class="[^\"]*" src="([^\"]*)"', urllib2.urlopen(request).read())
+            if uri:
+                scheme, netloc, path, params, query, fragment = urlparse.urlparse(uri[0]) 
+                q = urlparse.parse_qs((query))
+                q['size'] = [sz + 'x' + sz]     # Yandex size
+                query = urllib.urlencode(q, True)
+                url = urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
+        else:
+            url += '=s' + sz   # Google size
+    return url

@@ -11,6 +11,7 @@ table.cont td { text-align: center; }
 #viewtab { visibility: hidden; border-collapse: collapse; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8);
     padding:0 margin: 0; width: 100%; height: 100%; font-size: 40pt; }
 .imcont { position: relative; display: table-cell; vertical-align: middle; }
+.photocont .imcont { background: #f8f9fa; border:1px solid rgba(0,0,0,0.1); border-radius:2px; padding:4px; }
 .albcont .mb { border: 1px dashed rgba(0,0,0,0.1);  height:200px; width: 400px; }
 .photocont .mb { border: 1px dashed rgba(0,0,0,0.1);  height:128px; width: 90px; }
 .caption { color: rgba(255,255,255,0.7); text-shadow: rgba(0,0,0,0.7) 0 0 4px; font-weight: 900; }
@@ -173,9 +174,9 @@ function viewphoto(photo_counter, photo_id, photo_title, photo_date, photo_user_
 	dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '');
 }
 function im(src, size){
-  return (src.match(/size=\d+x/)) ?
-    size ? src.replace(/size=\d+x/,'size='+size+'x') : src.replace(/size=\d+x/,'size=10000x') : // ya disk
-    size ? src.replace(/=s\d+/,'=s'+size) : src.replace(/=s\d+/,'=s10000');  // google store	
+  return (src.match(/size=\d+x\d+/)) ?
+    src.replace(/size=\d+x\d+/, size ? 'size='+size+'x'+size : 'size=10000x10000') : // ya disk
+    src.replace(/=s\d+/, size ? '=s'+size : '=s10000');  // google store	
 }
 function vorig(photo_counter){
   var thumb = document.getElementById('thumb' + photo_counter);
