@@ -288,9 +288,7 @@ def get_photo(request, **kw):
         photo = eval(cache.get('photo:' + str(id_photo)))        
         thumb_url = myfilter.get_thumb(photo['thumb_url'], 10000)
         try:
-            img = urllib2.urlopen(thumb_url).read()
-            content_type = mimetypes.guess_type(img)
-            response = HttpResponse(img, content_type)
+            response = HttpResponseRedirect(thumb_url)
         except:
             raise Http404
         return response
