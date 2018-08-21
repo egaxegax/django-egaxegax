@@ -164,7 +164,7 @@ function viewphoto(photo_counter, photo_id, photo_title, photo_date, photo_user_
 	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
 	dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1-photo_counter) + ')');
 	dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1+photo_counter) + ')');
-	dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vorig(' + photo_counter + ')');
+	dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/orig/' + photo_id);
 	if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
 	if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
 	for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }

@@ -38,6 +38,7 @@ def strip_text(s):
 @register.filter
 def get_thumb(url, sz):
     if url:
+        sz = str(sz)
         u = urlparse.urlparse(url)
         if u.netloc == 'yadi.sk':
             request = urllib2.Request(url)
@@ -48,6 +49,8 @@ def get_thumb(url, sz):
                 q['size'] = [sz + 'x' + sz]     # Yandex size
                 query = urllib.urlencode(q, True)
                 url = urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
+        elif '127.0.0.1' in u.netloc: # debug 
+            pass
         else:
             url += '=s' + sz   # Google size
     return url

@@ -7,7 +7,7 @@
 {% block newsclass %}wrap rounded5{% endblock %}
 {% block pageheader %}{# trans 'News' #}{% endblock %}
 {% block content %}
-<p>Что нового? Новости, изменения, обновления на сайте и не только.<p>
+  <p class="hspace">Что нового? Новости, изменения, обновления на сайте и не только.<p>
 {% if request.user.is_authenticated %}
   <p>
     <form action="{% url 'mynews.views.edit_msg' id=form.initial.id %}" method="post">{% csrf_token %}

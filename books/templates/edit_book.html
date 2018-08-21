@@ -11,7 +11,7 @@
 {% block booksclass %}wrap rounded6{% endblock %}
 {% block pageheader %}{# trans 'Edit book' #}{% endblock %}
 {% block content %}
-<p>Добавляйте тексты.</p>
+  <p class="hspace">Добавляйте тексты.</p>
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
   {% render_upload_data upload_data %}
 {% if request.user.is_authenticated %}

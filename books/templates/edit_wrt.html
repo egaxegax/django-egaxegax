@@ -11,7 +11,7 @@
 {% block booksclass %}wrap rounded6{% endblock %}
 {% block pageheader %}{# trans 'Edit writer' #}{% endblock %}
 {% block content %}
-<p>Править автора. </p>
+  <p class="hspace">Править автора. </p>
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
 {% if request.user.is_authenticated %}
     <table class="formpost">

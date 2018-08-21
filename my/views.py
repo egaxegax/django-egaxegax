@@ -14,9 +14,10 @@ from google.appengine.api import images
 from google.appengine.ext import blobstore
 from my.forms import *
 from my.models import *
+from myfilter.templatetags import myfilter
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
-import datetime, re, sys
+import datetime, re, sys, urllib2, mimetypes
 
 def ZI(s):
     try:
@@ -280,5 +281,16 @@ def delete_photo(request, **kw):
 
 def get_photo(request, **kw):
     if request.method == 'GET':
-        photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
-        return serve_file(request, photo.img)
+        id_photo = ZI(kw.get('id'))
+        if not cache.has_key(id_photo):
+            photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
+            AddPhotoCache(photo)
+        photo = eval(cache.get('photo:' + str(id_photo)))        
+        thumb_url = myfilter.get_thumb(photo['thumb_url'], 10000)
+        try:
+            img = urllib2.urlopen(thumb_url).read()
+            content_type = mimetypes.guess_type(img)
+            response = HttpResponse(img, content_type)
+        except:
+            raise Http404
+        return response
