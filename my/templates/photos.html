@@ -7,10 +7,10 @@
 {% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
 {% block pagestyle %}
 table.cont { width:100%; padding: 10px 2px; }
-table.cont td { text-align: center; }
+table.cont td { text-align: center; vertical-align: top; }
 #viewtab { visibility: hidden; border-collapse: collapse; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8);
     padding:0 margin: 0; width: 100%; height: 100%; font-size: 40pt; }
-.imcont { position: relative; display: table-cell; vertical-align: middle; }
+.imcont { position: relative; display: table-cell; vertical-align: middle; height:150px; width:200px; }
 .photocont .imcont { background: #f8f9fa; border:1px solid rgba(0,0,0,0.1); border-radius:2px; padding:4px; }
 .albcont .mb { border: 1px dashed rgba(0,0,0,0.1);  height:200px; width: 400px; }
 .photocont .mb { border: 1px dashed rgba(0,0,0,0.1);  height:128px; width: 90px; }
@@ -226,8 +226,8 @@ function vc(counter) {
         <td class="photocont">
           <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.title }}','{{ photo.date|date:"Y-m-d" }}','{{ photo.author.id }}');">
           <div class="imcont {% if photo.memberonly %}mb{% endif %}">
-            <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_thumb:'128' }}{% endif %}" title="{{ photo.title }}" alt="{% if photo.memberonly %}&#128274;{% else %}{{ photo.title }}{% endif %}"/><br/>
-             <span class="gray smaller">{{ photo.title }}</span>
+            <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_thumb:'128' }}{% endif %}" title="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.title }}{% endif %}" alt="{% if photo.memberonly %}&#128274;{% else %}{{ photo.title }}{% endif %}"/><br/>
+            <span class="gray smaller">{% if not photo.memberonly or request.user.is_superuser %}{{ photo.title }}{% endif %}</span>
           </div>
           </a>
         </td>
@@ -235,8 +235,8 @@ function vc(counter) {
         <td class="albcont">
           <a class="nodecor" href="{% url 'my.views.list_photos' id_album=photo.id %}">
           <div class="imcont {% if photo.memberonly %}mb{% endif %}">
-            <img class="rounded1 bigger" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_thumb:'400' }}{% endif %}" title="{{ photo.title }}" alt="&#128274;"/><br/>
-            <span class="caption mid bigger white">{{ photo.album }}</span>
+            <img class="rounded1 bigger" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_thumb:'400' }}{% endif %}" title="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.title }}{% endif %}" alt="&#128274;"/><br/>
+            <span class="caption mid bigger white">{% if not photo.memberonly or request.user.is_superuser %}{{ photo.album }}{% endif %}</span>
 			<span class="caption ne bigger"> {{ photo.album_count }}</span>
 			<span class="caption se">{{ photo.date|time_since }}</span>
 	      </div>
