@@ -175,8 +175,8 @@ function viewphoto(photo_counter, photo_id, photo_title, photo_date, photo_user_
 }
 function im(src, size){
   return (src.match(/size=\d+x\d+/)) ?
-    src.replace(/size=\d+x\d+/, size ? 'size='+size+'x'+size : 'size=10000x10000') : // ya disk
-    src.replace(/=s\d+/, size ? '=s'+size : '=s10000');  // google store	
+    src.replace(/size=\d+x\d+/, size ? 'size='+size+'x'+size : 'size=2048x2048') : // ya disk
+    src.replace(/=s\d+/, size ? '=s'+size : '=s2048');  // google store	
 }
 function vorig(photo_counter){
   var thumb = document.getElementById('thumb' + photo_counter);

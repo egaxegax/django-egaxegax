@@ -18,6 +18,7 @@ from myfilter.templatetags import myfilter
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 import datetime, re, sys, urllib2, mimetypes
+import transliterate
 
 def ZI(s):
     try:
@@ -286,9 +287,11 @@ def get_photo(request, **kw):
             photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
             AddPhotoCache(photo)
         photo = eval(cache.get('photo:' + str(id_photo)))        
-        thumb_url = myfilter.get_thumb(photo['thumb_url'], 10000)
-        try:
-            response = HttpResponseRedirect(thumb_url)
-        except:
-            raise Http404
+        thumb_url = myfilter.get_thumb(photo['thumb_url'], '10000')
+#         try:
+        response = HttpResponseRedirect(thumb_url)
+#         name = transliterate.translit(photo['title'], 'ru', reversed=True)
+#         response['Content-Disposition'] = 'inline; filename="' + name + '"'
+#         except:
+#             raise Http404
         return response

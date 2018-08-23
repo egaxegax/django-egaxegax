@@ -55,7 +55,8 @@ a {
     }
 .calibre6 {
     display: block;
-    /*line-height: 1*/
+    font-size: 1.0em;
+    line-height: 1
     }
 .calibre7 {
     /*display: block;*/
@@ -66,7 +67,7 @@ a {
     width: auto
     }
 .calibre9 {
-    /*line-height: 1*/
+    line-height: 1
     }
 .calibre10 {
     font-style: italic;
