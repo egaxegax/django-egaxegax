@@ -4,7 +4,7 @@
 {% block description %}{% trans 'Posts and notes' %} {% endblock %}
 {% block keywords %}{% trans 'Posts and notes' %}, {% endblock %}
 {% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
-{% block postsclass %}wrap rounded4{% endblock %}
+{% block postsclass %}wrap3{% endblock %}
 {% block content %}
 {% if subject.subject %}
   <p><h2 class="nomarg"><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subject.id %}"><span class="hspace">{{ subject.subject }} </span></a></h2></p>
