@@ -16,8 +16,8 @@
 #main_header div { display: table-cell; vertical-align: middle; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
-#top_logo { min-width: 160px; max-width: 160px; text-align: center; }
-#top_nav { min-width: 140px; max-width: 140px; text-align: center; }
+#top_logo { min-width: 120px; max-width: 120px; text-align: center; }
+#top_nav { min-width: 120px; max-width: 120px; text-align: center; }
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
 #top_menu {  }
 #top_menu ul { padding: 10px 0; display: table; width: 100%; max-width: 100%; }
@@ -69,8 +69,8 @@
   <div id="top_nav" class="smaller">
     <ul class="nomarg nopad nolist">
     {% if request.user.is_authenticated %}
-      <li>{% trans 'Welcome,' %} <b>{{ request.user.username }}</b></li>
-      <li>&nbsp;</li>
+      <li>{% trans 'Welcome,' %}</li>
+      <li><b>{{ request.user.username }}</b></li>
       <li><a class="nodecor" href="{% url 'django.contrib.auth.views.logout' %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
     {% else %}
       <li><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
