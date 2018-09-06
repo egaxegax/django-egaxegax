@@ -4,7 +4,8 @@
 {% block keywords %}{% trans 'info, contacts' %}, {% endblock %}
 {% block title %}{% trans 'Main' %} - {% endblock %}
 {% block pagestyle %}
-#myview { background: url({{ MEDIA_URL }}img/egaxegax.png) no-repeat; height: 170px; padding: 20px 0 0 250px; }
+div.myview { height: 300px; }
+dl.myview { background: url({{ MEDIA_URL }}img/egaxegax.png) no-repeat; height: 170px; padding: 20px 0 0 250px; }
 {% endblock %}
 {% block aboutsclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'Main' #}{% endblock %}
@@ -13,11 +14,11 @@
   Портал Григория Еремина. Фото, тексты, сообщения от автора. Смотрите, пишите заметки, оставляйте комментарии.
 </p>
 <p class="smaller hspace2">
-  P.S. Делай что можешь, с тем что имеешь, там где ты есть. <i>Теодор Рузвельт</i>. 
+  P.S. Делай что можешь, с тем что имеешь, там где ты есть. <i><a href="http://egaxegax.appspot.com/posts/5702939616215040">Теодор Рузвельт</a></i>. 
 </p>
-<div class="wrap">
+<div class="myview wrap">
   <div class="msgtext">
-    <dl id="myview" class="nomarg">
+    <dl class="myview nomarg">
       <dt>Контакты:</dt>
       <dd></dd>
       <dd>Личная: <a class="smaller" href="http://vk.com/egaxegax">http://vk.com/egaxegax</a></dd>

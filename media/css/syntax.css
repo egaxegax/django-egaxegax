@@ -1,6 +1,6 @@
 /* pygments style */
 .codehilite .hll { background-color: #ffffcc; }
-div.codehilite { background-color: rgb(230,240,255); border: 1px solid #dedede; }
+div.codehilite { background-color: rgb(240,240,255); border: 1px solid #dedede; }
 .codehilite pre { background-color: transparent; padding: 10px; margin: 0; overflow: auto; }
 .codehilite .c { color: #8f5902; font-style: italic } /* Comment */
 .codehilite .err { color: #a40000; border: 1px solid #ef2929 } /* Error */

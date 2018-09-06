@@ -1,18 +1,20 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load myfilter %}
 {% block description %}{% trans 'Profile' %} пользователя {{ record.author.username }}{% endblock %}
 {% block title %}{% trans 'Profile' %} пользователя {{ record.author.username }} - {% endblock %}
 {% block pagestyle %}
+div.myview { height: 300px; }
 {% endblock %}
-{% block aboutclass %}wrap{% endblock %}
+{% block aboutsclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'Profile' #}{% endblock %}
 {% block content %}
-<p class="hspace">Информация о пользователе:</p>
- <div class="wrap">
- <dl class="msgtext">
+<p class="hspace">{% trans 'Profile' %} пользователя <b>{{ record.author.username }}</b></p>
+ <div class="myview wrap">
+ <dl class="myview msgtext">
    <dt>{% trans 'avatar'|capfirst %}&nbsp; <img width="26px" height="26px" src="{% url 'my.views.get_avatar' id=record.author.id %}" title="{{ record.author.username }}"/></dt>
    <dt>{% trans 'name'|capfirst %}&nbsp; <span class="smaller">{{ record.author.username }}</span></dt>
-   <dt>{% trans 'last login'|capfirst %}&nbsp; <span class="smaller">{{ record.author.last_login }}</span></dt>
+   <dt>{% trans 'last login'|capfirst %}&nbsp; <span class="smaller"><acronym title="{{ record.author.last_login }}">{{ record.author.last_login|time_since }}</acronym> {% trans 'ago' %}</span></dt>
    <dt>{% trans 'date joined'|capfirst %}&nbsp; <span class="smaller">{{ record.author.date_joined }}</span></dt>
    <dt>{% trans 'posts'|capfirst %}&nbsp; <span class="smaller">{{ record_count }}</span></dt>
  </dl>
