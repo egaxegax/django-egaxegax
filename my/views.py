@@ -262,7 +262,9 @@ def edit_photo(request, **kw):
                              'id': photo.id,
                              'title': photo.title,
                              'author': photo.author,
-                             'album': photo.album})
+                             'album': photo.album,
+                             'thumb_url': photo.thumb_url,
+                             'memberonly': photo.memberonly})
     return render_to_response('edit_photo.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
