@@ -35,7 +35,7 @@ if(window.addEventListener) {
 }
 {% endif %}
 
-function viewphoto(photo_counter, photo_id, photo_title, photo_date, photo_user_id){
+function viewphoto(photo_counter, photo_id, photo_date, photo_user_id){
 	var vtab = document.getElementById('viewtab'),
 		vcont = document.getElementById('viewcont'),
 		thumb = document.getElementById('thumb' + photo_counter);
@@ -133,29 +133,28 @@ function viewphoto(photo_counter, photo_id, photo_title, photo_date, photo_user_
 	vphoto.title = thumb.title;
 	vphoto.onload = function() {
 		var ratio = dw.root.getAttribute('width')/dw.root.getAttribute('height'),
-		    vs = dw.viewsizeOf();  // map sizes
+	    vs = dw.viewsizeOf();  // map sizes
 		var crds = [[-vs[1]*ratio,vs[1]],[-vs[3]*ratio,vs[3]]],
-			pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
+		  pts = [dw.toPoints(crds[1]), dw.toPoints(crds[0])];
 		var wh = pts[0][0]-pts[1][0],
-		    ht = pts[0][1]-pts[1][1],
-		    left = pts[1][0],
-		    top = pts[1][1];
+		  ht = pts[0][1]-pts[1][1],
+		  left = pts[1][0],
+		  top = pts[1][1];
 		var src = im(this.src, 1000); // get image by size
-          //
+      //
 		dw.img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', src);
 		dw.attr(dw.img, {
 			width: wh, height: ht, x: left, y: top,
-			title: photo_title,
 			cursor: 'pointer'
 		});
-        dw.extend(dw.vp, {
-          onmousedown: function(ev){
-            dw.mousedown(ev);
-            var spts = dw.canvasXY(ev);
-            if(spts[0] < wh/2) eval(dw.prevlink.getAttribute('href'));
-            if(spts[0] >= wh/2) eval(dw.nextlink.getAttribute('href'));
-          }
-        });
+    dw.extend(dw.vp, {
+      onmousedown: function(ev){
+        dw.mousedown(ev);
+        var spts = dw.canvasXY(ev);
+        if(spts[0] < wh/2) eval(dw.prevlink.getAttribute('href'));
+        if(spts[0] >= wh/2) eval(dw.nextlink.getAttribute('href'));
+      }
+    });
 		document.body.style.overflow='hidden';
 		vtab.style.visibility='visible';
 		vtab.focus();
@@ -224,7 +223,7 @@ function vc(counter) {
     {% endif %}
       {% if album %}
         <td class="photocont">
-          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.title }}','{{ photo.date|date:"Y-m-d" }}','{{ photo.author.id }}');">
+          <a id="thumbref{{ forloop.counter }}" class="nodecor" href="javascript:viewphoto({{ forloop.counter }},{{ photo.id }},'{{ photo.date|date:"Y-m-d" }}','{{ photo.author.id }}');">
           <div class="imcont {% if photo.memberonly %}mb{% endif %}">
             <img id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_thumb:'128' }}{% endif %}" title="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.title }}{% endif %}" alt="{% if photo.memberonly %}&#128274;{% else %}{{ photo.title }}{% endif %}"/><br/>
             <span class="gray smaller">{% if not photo.memberonly or request.user.is_superuser %}{{ photo.title }}{% endif %}</span>
@@ -237,9 +236,9 @@ function vc(counter) {
           <div class="imcont {% if photo.memberonly %}mb{% endif %}">
             <img class="rounded1 bigger" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_thumb:'400' }}{% endif %}" title="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.title }}{% endif %}" alt="&#128274;"/><br/>
             <span class="caption mid bigger white">{% if not photo.memberonly or request.user.is_superuser %}{{ photo.album }}{% endif %}</span>
-			<span class="caption ne bigger"> {{ photo.album_count }}</span>
-			<span class="caption se">{{ photo.date|time_since }}</span>
-	      </div>
+            <span class="caption ne bigger"> {{ photo.album_count }}</span>
+            <span class="caption se">{{ photo.date|time_since }}</span>
+          </div>
           </a>
         </td>
       {% endif %}
