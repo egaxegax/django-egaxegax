@@ -44,9 +44,9 @@ for root, dirs, files in os.walk(path, topdown=False):
 
     if ext.lower() in ('.gif','.jpg','.png',):
 
-      remote_folder = E_OS('FotoSite')
-      remote_file = E_OS(name)
-      remote_path = (u'/{folder}/{file}'.format(folder=remote_folder, file=remote_file))
+      remote_folder = 'FotoSite'
+      remote_file = name
+      remote_path = E_OS('/{folder}/{file}'.format(folder=remote_folder, file=remote_file))
 
       yadisk.upload(remote_file, remote_path)
       url = yadisk.publish_doc(remote_path)
