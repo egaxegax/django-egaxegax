@@ -6,8 +6,6 @@ from django import template
 register = template.Library()
 
 import urllib, urllib2, urlparse, re
-from HTMLParser import HTMLParser
-ph = HTMLParser()
 
 @register.filter
 def time_since(strval):
@@ -36,18 +34,32 @@ def strip_text(s):
     return s
 
 @register.filter
-def get_thumb(url, sz):
+def get_im_url(url):
     if url:
         u = urlparse.urlparse(url)
-        if u.netloc == 'yadi.sk':
-            request = urllib2.Request(url)
-            uri = re.findall(r'<img class="[^\"]*" src="([^\"]*)"', urllib2.urlopen(request).read())
-            if uri:
-                scheme, netloc, path, params, query, fragment = urlparse.urlparse(uri[0]) 
-                q = urlparse.parse_qs((query))
-                q['size'] = [sz + 'x' + sz]     # Yandex size
-                query = urllib.urlencode(q, True)
-                url = urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
+        if u.netloc == 'yadi.sk': # Yandex disk
+            try:
+                uri = re.findall(r'<img class="[^\"]*" src="([^\"]*)"', urllib2.urlopen(url).read())
+                if uri:
+                    scheme, netloc, path, params, query, fragment = urlparse.urlparse(uri[0]) 
+                    q = urlparse.parse_qs((query))
+                    query = urllib.urlencode(q, True)
+                    url = urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
+            except:
+                pass
         else:
-            url += '=s' + sz   # Google size
+            pass   # Google store
+    return url
+
+@register.filter
+def get_im_thumb(url, sz=''):
+    if not sz: 
+        sz = '2048'
+    if url:
+        if re.search('size=\d+x\d+', url): # Ya disk
+            url = re.sub('size=\d+x\d+', 'size='+sz+'x'+sz, url)
+        elif re.search('=s\d+$', url): # Google store
+            url = re.sub('=s\d+$', '=s'+sz, url)
+        else: # google store
+            url += '=s' + sz
     return url

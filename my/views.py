@@ -2,9 +2,8 @@
 
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.core.exceptions import *
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response
@@ -14,10 +13,10 @@ from google.appengine.api import images
 from google.appengine.ext import blobstore
 from my.forms import *
 from my.models import *
-from myfilter.templatetags import myfilter
+from myfilter.templatetags.myfilter import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
-import datetime, re, sys, urllib2, mimetypes
+import datetime, re
 import transliterate
 
 def ZI(s):
@@ -57,7 +56,7 @@ def AddAlbumListCache(allkey, photos_list):
                'id': photo.id,
                'title': photo.title,
                'album': photo.album,
-               'thumb_url': photo.thumb_url,
+               'thumb_url': get_im_url(photo.thumb_url),
                'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
                'date': photo.date,
                'memberonly': photo.memberonly }
@@ -65,7 +64,7 @@ def AddAlbumListCache(allkey, photos_list):
             album_list[photo.album]['album_count'] += 1
             if photo.date > album_list[photo.album]['date']:
                 album_list[photo.album]['title'] = photo.title
-                album_list[photo.album]['thumb_url'] = photo.thumb_url
+                album_list[photo.album]['thumb_url'] = get_im_url(photo.thumb_url)
                 album_list[photo.album]['date'] = photo.date
                 album_list[photo.album]['memberonly'] = photo.memberonly
     cache.add('photos:' + allkey, str(album_list))
@@ -81,7 +80,7 @@ def UpdateAlbumListCache(photo):
            'id': photo.id,
            'title': photo.title,
            'album': photo.album,
-           'thumb_url': photo.thumb_url,
+           'thumb_url': get_im_url(photo.thumb_url),
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
            'date': photo.date,
            'memberonly': photo.memberonly }
@@ -93,7 +92,7 @@ def AddPhotoCache(photo):
         'id': photo.id,
         'title': photo.title,
         'album': photo.album,
-        'thumb_url': photo.thumb_url,
+        'thumb_url': get_im_url(photo.thumb_url),
         'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
         'date': photo.date,
         'memberonly': photo.memberonly }
@@ -106,7 +105,7 @@ def AddPhotosListCache(album, photos_list):
            'id': photo.id,
            'title': photo.title,
            'album': photo.album,
-           'thumb_url': photo.thumb_url,
+           'thumb_url': get_im_url(photo.thumb_url),
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
            'date': photo.date,
            'memberonly': photo.memberonly })
@@ -285,15 +284,10 @@ def delete_photo(request, **kw):
 def get_photo(request, **kw):
     if request.method == 'GET':
         id_photo = ZI(kw.get('id'))
-        if not cache.has_key(id_photo):
+        if not cache.has_key('photo:' + str(id_photo)):
             photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
             AddPhotoCache(photo)
         photo = eval(cache.get('photo:' + str(id_photo)))        
-        thumb_url = myfilter.get_thumb(photo['thumb_url'], '10000')
-#         try:
+        thumb_url = get_im_thumb(photo['thumb_url'], '10000')
         response = HttpResponseRedirect(thumb_url)
-#         name = transliterate.translit(photo['title'], 'ru', reversed=True)
-#         response['Content-Disposition'] = 'inline; filename="' + name + '"'
-#         except:
-#             raise Http404
         return response
