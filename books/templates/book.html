@@ -35,10 +35,12 @@
   <h2 class="nomarg"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}"><span class="hspace">{{ book.writer.writer|strans }} </span></a>{{ book.title }}</h2>
 </p>
 
-{% if book.prev_npart >= 0 %}
-  <a href="{% url 'books.views.read_book' ind=book.index part=book.prev_npart %}">
-    <div class="wrap cfloat">
-      <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
+{% if request.user.is_authenticated %}
+  {% if book.prev_npart >= 0 %}
+    <a href="{% url 'books.views.read_book' ind=book.index part=book.prev_npart %}">
+      <div class="wrap cfloat">
+        <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
+  {% endif %}
 {% endif %}
 
 <div class="wrap">
@@ -47,9 +49,13 @@
   </div>
 </div>
 
-{% if book.next_npart >= 0 %}
-  <a href="{% url 'books.views.read_book' ind=book.index part=book.next_npart %}"><div class="wrap cfloat">
-    <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>
+{% if request.user.is_authenticated %}
+  {% if book.next_npart >= 0 %}
+    <a href="{% url 'books.views.read_book' ind=book.index part=book.next_npart %}"><div class="wrap cfloat">
+      <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>
+  {% endif %}
+{% else %}
+  <p class="smaller"><span class="hspace">Войдите, чтобы читать дальше.</span></p>
 {% endif %}
 
 <p class="smaller hspace">{% trans 'part' %} {{ book.npart }}</p>

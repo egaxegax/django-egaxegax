@@ -19,6 +19,8 @@ from filetransfers.api import serve_file
 import datetime, re
 import transliterate
 
+CACHE_TIMEOUT = 60*60*3  # lifetime sec
+
 def ZI(s):
     try:
         s=int(s)
@@ -67,7 +69,7 @@ def AddAlbumListCache(allkey, photos_list):
                 album_list[photo.album]['thumb_url'] = get_im_url(photo.thumb_url)
                 album_list[photo.album]['date'] = photo.date
                 album_list[photo.album]['memberonly'] = photo.memberonly
-    cache.add('photos:' + allkey, str(album_list))
+    cache.add('photos:' + allkey, str(album_list), CACHE_TIMEOUT)
 
 def UpdateAlbumListCache(photo):
     cache_id = 'photos:' + '.full_list' 
@@ -85,7 +87,7 @@ def UpdateAlbumListCache(photo):
            'date': photo.date,
            'memberonly': photo.memberonly }
         ClearPhotosFullListCache()
-        cache.add(cache_id, str(album_list))
+        cache.add(cache_id, str(album_list), CACHE_TIMEOUT)
 
 def AddPhotoCache(photo):
     cache_photo = {
@@ -96,7 +98,7 @@ def AddPhotoCache(photo):
         'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
         'date': photo.date,
         'memberonly': photo.memberonly }
-    cache.add('photo:' + str(photo.id), str(cache_photo))
+    cache.add('photo:' + str(photo.id), str(cache_photo), CACHE_TIMEOUT)
 
 def AddPhotosListCache(album, photos_list):
     cache_list = []
@@ -109,7 +111,7 @@ def AddPhotosListCache(album, photos_list):
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
            'date': photo.date,
            'memberonly': photo.memberonly })
-    cache.add('photos:' + album, str(cache_list))
+    cache.add('photos:' + album, str(cache_list), CACHE_TIMEOUT)
 
 def ClearPhotoCache(photo):
     cache.delete_many(['photo:' + str(photo.id)])
