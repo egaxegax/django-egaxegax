@@ -1,5 +1,3 @@
-
-
 from datetime import datetime
 from django.utils.timesince import timesince
 from django import template
@@ -56,10 +54,11 @@ def get_im_thumb(url, sz=''):
     if not sz: 
         sz = '2048'
     if url:
+        url = get_im_url(url)  # check if Yandex img url
         if re.search('size=\d+x\d+', url): # Ya disk
             url = re.sub('size=\d+x\d+', 'size='+sz+'x'+sz, url)
-        elif re.search('=s\d+$', url): # Google store
+        elif re.search('=s\d+$', url):  # Google store
             url = re.sub('=s\d+$', '=s'+sz, url)
-        else: # google store
+        else:    # Google store
             url += '=s' + sz
     return url
