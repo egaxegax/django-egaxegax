@@ -10,7 +10,7 @@ class Photo(models.Model):
     img = models.FileField(upload_to='img', null=True, blank=True, verbose_name=_('img'))
     thumb_url = models.CharField(max_length=1024, null=True, verbose_name=_('thumb_url'))
     author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
-    date = models.DateTimeField(auto_now_add=True, verbose_name=_('date'))
+    date = models.DateTimeField(verbose_name=_('date'))
     memberonly = models.NullBooleanField(null=True, blank=True)
 
 class Profile(models.Model):

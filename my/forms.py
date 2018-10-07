@@ -26,7 +26,7 @@ class AddPhotoForm(forms.ModelForm):
 class EditPhotoForm(forms.ModelForm):
     class Meta:
         model = Photo
-        exclude = ['date', 'thumb_url', 'img']
+        exclude = ['thumb_url', 'img']
 
 
 class AddUserForm(forms.ModelForm):

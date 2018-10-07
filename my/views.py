@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.context import RequestContext
 from django.db.models import Q
+from django.utils import timezone
 from google.appengine.api import images
 from google.appengine.ext import blobstore
 from my.forms import *
@@ -227,6 +228,7 @@ def add_photo(request):
                         photo.author = usr[0]
                 if isinstance(request.user, User):
                     photo.author = request.user
+                photo.date = timezone.now()
                 photo = form.save()
                 ClearPhotosListCache(photo.album)
                 UpdateAlbumListCache(photo)
@@ -262,9 +264,10 @@ def edit_photo(request, **kw):
         form = EditPhotoForm(initial={
                              'id': photo.id,
                              'title': photo.title,
-                             'author': photo.author,
                              'album': photo.album,
                              'thumb_url': photo.thumb_url,
+                             'author': photo.author,
+                             'date': photo.date,
                              'memberonly': photo.memberonly})
     return render_to_response('edit_photo.html', 
                               context_instance=RequestContext(request,
