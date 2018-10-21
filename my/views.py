@@ -289,10 +289,11 @@ def delete_photo(request, **kw):
 def get_photo(request, **kw):
     if request.method == 'GET':
         id_photo = ZI(kw.get('id'))
+        size_photo = kw.get('size', '1000')
         if not cache.has_key('photo:' + str(id_photo)):
-            photo = get_object_or_404(Photo, id=ZI(kw.get('id')))
+            photo = get_object_or_404(Photo, id=id_photo)
             AddPhotoCache(photo)
-        photo = eval(cache.get('photo:' + str(id_photo)))        
-        thumb_url = get_im_thumb(photo['thumb_url'], '10000')
+        photo = eval(cache.get('photo:' + str(id_photo)))
+        thumb_url = get_im_thumb(photo['thumb_url'], size_photo)
         response = HttpResponseRedirect(thumb_url)
         return response
