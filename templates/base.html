@@ -75,7 +75,7 @@
     {% else %}
       <li><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>
       <li>&nbsp;</li>
-      <li><a class="nodecor" href="{% url 'my.views.create_new_user' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
+      <li><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Register' %}</a></li>
     {% endif %}
     </ul>
   </div>

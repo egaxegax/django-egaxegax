@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^upload/', include('upload.urls')),
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^accounts/create_user/?$', 'my.views.create_new_user'),
+    url(r'^accounts/new/?$', 'my.views.create_new_user'),
     url(r'^accounts/login/?$', 'django.contrib.auth.views.login',
         {'authentication_form': AuthenticationForm,
         'template_name': 'login.html',}),
