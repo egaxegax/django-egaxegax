@@ -7,6 +7,7 @@ import urllib, urllib2, urlparse, re
 
 @register.filter
 def time_since(strval):
+    """Time interval."""
     try:
         return timesince(strval)
     except:
@@ -14,6 +15,7 @@ def time_since(strval):
 
 @register.filter
 def strans(strval):
+    """Reverse text."""
     ss = strval.split(';')
     for i, strval in enumerate(ss):
         s = strval.split(',')
@@ -23,6 +25,7 @@ def strans(strval):
 
 @register.filter
 def strip_text(s):
+    """Remove special chars."""
     s = s.lstrip(' Annotation ')
     s = s.replace('"','')
     s = s.replace("'",'')
@@ -33,6 +36,7 @@ def strip_text(s):
 
 @register.filter
 def get_im_url(url):
+    """Get photo url."""
     if url:
         u = urlparse.urlparse(url)
         if u.netloc == 'yadi.sk': # Yandex disk
@@ -48,9 +52,10 @@ def get_im_url(url):
         else:
             pass   # Google store
     return url
-
+ 
 @register.filter
 def get_im_thumb(url, sz=''):
+    """Get photo thumb with size."""
     if not sz: 
         sz = '2048'
     if url:

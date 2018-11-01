@@ -532,6 +532,6 @@ def user_profile(request, **kw):
         return render_to_response('user_profile.html', 
                                   context_instance=RequestContext(request,
                                   {'request': request,
-                                   'record': m[0],
+                                   'record': user,
                                    'record_count': m.count(),
                                    'logback': reverse('books.views.list_books')}))

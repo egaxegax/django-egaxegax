@@ -295,5 +295,20 @@ def get_photo(request, **kw):
             AddPhotoCache(photo)
         photo = eval(cache.get('photo:' + str(id_photo)))
         thumb_url = get_im_thumb(photo['thumb_url'], size_photo)
+        return render_to_response('photo.html', 
+                                  context_instance=RequestContext(request,
+                                  {'request': request,
+                                   'thumb_url': thumb_url,
+                                   'size': size_photo}))
+
+def get_photo_orig(request, **kw):
+    if request.method == 'GET':
+        id_photo = ZI(kw.get('id'))
+        size_photo = kw.get('size', '1000')
+        if not cache.has_key('photo:' + str(id_photo)):
+            photo = get_object_or_404(Photo, id=id_photo)
+            AddPhotoCache(photo)
+        photo = eval(cache.get('photo:' + str(id_photo)))
+        thumb_url = get_im_thumb(photo['thumb_url'], size_photo)
         response = HttpResponseRedirect(thumb_url)
         return response
