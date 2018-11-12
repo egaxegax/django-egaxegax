@@ -41,7 +41,7 @@ input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .msgfooter { padding: 0 10px; font-size: 70%; text-align: right; }
 .msgtext dt { padding: 5px 0; }
 .msgtext dd { padding-bottom: 5px; color: gray; }
-a, a:active, a:focus { color: #5645ad; outline:none; }
+a, a:active, a:focus { color: #4d3ca0; outline:none; }
 a.nodecor { text-decoration:none; outline:none; }
 a.nodecor img { border: 0px none; padding: 5px; }
 .inl { display: inline; }
