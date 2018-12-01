@@ -8,7 +8,7 @@
 <meta name="author" content="Grigoriy Eremin, Григорий Еремин, egax@bk.ru">
 <meta name="google-site-verification" content="tDIIwt3nNSOeRwaSbOPKjWIuVvKvi6E7YCLV_WOnCqE" />
 <meta name='yandex-verification' content='5b93c57666b143ad' />
-<link rel='shortcut icon' href='{{ MEDIA_URL }}img/favicon.ico?1322400151' />
+<link rel="shortcut icon" href="{{ MEDIA_URL }}img/favicon.ico?1322400151" />
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css" type="text/css" />
 {% block pagestylelink %}{% endblock %}
 <style type="text/css">
@@ -58,12 +58,12 @@
   </div-->
   <div id="top_menu">
     <ul class="inl nomarg">
-      <li class="{% block aboutsclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.index' %}"><span class="bigger2">&#128222;</span><span>&nbsp;&nbsp;О&nbsp;САЙТЕ&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
-      <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><span class="pink bigger2">&#9749;</span><span>&nbsp;&nbsp;{% trans 'News' %}&nbsp;&nbsp;&nbsp;</span></a></li>
-      <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><span class="bigger2">&#128240;</span><span>&nbsp;&nbsp;&nbsp;{% trans 'Posts' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
-      <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><span class="bigger2">&#128247;</span><span>&nbsp;&nbsp;&nbsp;&nbsp;{% trans 'Photos' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
-      <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><span class="bigger2">&#127928;</span><span>&nbsp;&nbsp;{% trans 'Chords' %}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
-      <li class="{% block booksclass %}{% endblock %}"><a class="nodecor" href="{% url 'books.views.list_books' %}"><span class="bigger2">&#128218;</span><span>&nbsp;&nbsp;&nbsp;&nbsp;{% trans 'Books' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+      <li class="{% block aboutsclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.index' %}"><img src="/media/img/about.png" alt="&#128222;"/><span>&nbsp;&nbsp;О&nbsp;САЙТЕ&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+      <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><img src="/media/img/news.png" alt="&#9749;"/><span>&nbsp;&nbsp;{% trans 'News' %}&nbsp;&nbsp;&nbsp;</span></a></li>
+      <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_subjects' %}"><img src="/media/img/posts.png" alt="&#128240;"/><span>&nbsp;&nbsp;&nbsp;{% trans 'Posts' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+      <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><img src="/media/img/foto.png" alt="&#128247;"/><span>&nbsp;&nbsp;&nbsp;&nbsp;{% trans 'Photos' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+      <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><img src="/media/img/chords.png" alt="&#127928;"/><span>&nbsp;&nbsp;{% trans 'Chords' %}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+      <li class="{% block booksclass %}{% endblock %}"><a class="nodecor" href="{% url 'books.views.list_books' %}"><img src="/media/img/books.png" alt="&#128218;"/><span>&nbsp;&nbsp;&nbsp;&nbsp;{% trans 'Books' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
     </ul>
   </div>
   <div id="top_nav" class="smaller">
