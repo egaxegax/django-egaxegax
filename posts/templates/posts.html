@@ -25,18 +25,30 @@
 {% else %}
   <p class="hspace">Читайте, пишите заметки, оставляйте комментарии.</p>
 {% endif %} 
-{% if posts_title|length > 1 %}
+{% if subject.subject %}
+  {% if posts_title|length > 1 %}
+    <div class="wrap">
+      <div class="msgtext">
+        <a class="nodecor smaller" href="#" onclick="if(document.getElementById('posttitle').style.display=='none') { document.getElementById('posttitle').style.display = ''; } else { document.getElementById('posttitle').style.display = 'none'; } return false;">Список глав</a>
+          <span class="smaller"> [{{ posts_title|length }}]</span>
+        <div id="posttitle" style="display:none">
+        {% for title, post_id in posts_title %}
+          {% if forloop.counter == 1 %}<br>{% endif %}
+            <div class="subtitle"> 
+              <a class="nodecor" href="{% url 'posts.views.list_posts' id=post_id %}">{{ title }}</a>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% else %}
   <div class="wrap">
-    <div class="msgtext">
-       <a class="nodecor smaller" href="#" onclick="if(document.getElementById('posttitle').style.display=='none') { document.getElementById('posttitle').style.display = ''; } else { document.getElementById('posttitle').style.display = 'none'; } return false;">Список глав</a>
-       <div id="posttitle" style="display:none;"><br>
-{% for title, post_id in posts_title %}
-  <a class="subtitle hspace nodecor" href="{% url 'posts.views.list_posts' id=post_id %}">{{ title }}</a>
-{% endfor %}
-       </div>
+    <div class="msgtext">    
+      <a class="nodecor smaller" href="{% url 'posts.views.list_subjects' %}">Список тем</a>
     </div>
   </div>
-{% endif %}
+{% endif %}  
 {% for post in posts.object_list %}
   <div class="wrap">
     <a id="id{{ post.id }}" name="id{{ post.id }}"></a>

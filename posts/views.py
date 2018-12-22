@@ -66,8 +66,9 @@ def AddPostListCache(subj_id, posts_list):
            'title': post.title,
            'content': post.content,
            'date': post.date }
-        if cache_post['date'] is None:
-            cache_list = [cache_post] + cache_list # nulls first
+        if cache_post['date'] is None:  # post with none date is first
+            if subj_id != '.full_list':
+                cache_list = [cache_post] + cache_list
         else:
             cache_list.append(cache_post)
     cache.add('posts:' + str(subj_id), str(cache_list))
@@ -115,6 +116,7 @@ def copy_subj(request):
 def list_posts(request, **kw):
     per_page = 10
     initial = {}
+    subj_id = ''
     posts_list = []
     if kw.get('id'):
         post_id = kw.get('id', '')
@@ -141,10 +143,11 @@ def list_posts(request, **kw):
             AddPostListCache(subj_id, posts_list)
         posts_list = eval(cache.get('posts:' + subj_id) or [])
     posts_title = []
-    for post in posts_list:
-        if post['title']: 
-            posts_title.append([ post['title'], post['id'] ] )
-    posts_title.sort()
+    if subj_id != '.full_list':
+        for post in posts_list:
+            if post['title']: 
+                posts_title.append([ post['title'], post['id'] ] )
+        posts_title.sort()
     return render_to_response('posts.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
