@@ -397,33 +397,24 @@ transformers:
       export_transform: transform.key_id_or_name_as_string
       import_transform: transform.none_if_empty(int)
 
-    - property: audio
-      external_name: audio
-      # Type: String Stats: 4 properties of this type in this kind.
-
-    - property: author_id
-      external_name: author_id
-      # Type: Integer Stats: 6 properties of this type in this kind.
-      import_transform: transform.none_if_empty(int)
-
-    - property: content
-      external_name: content
-      # Type: Text Stats: 6 properties of this type in this kind.
-      import_transform: db.Text
-
-    - property: date
-      external_name: date
-      # Type: Date/Time Stats: 6 properties of this type in this kind.
-      import_transform: transform.import_date_time('%d.%m.%Y %H:%M')
-      export_transform: transform.export_date_time('%d.%m.%Y %H:%M')
-
-    - property: title
-      external_name: title
-      # Type: String Stats: 6 properties of this type in this kind.
-
     - property: artist
       external_name: artist
 
+    - property: title
+      external_name: title
+
+    - property: content
+      external_name: content
+      import_transform: db.Text
+
+    - property: author_id
+      external_name: author_id
+      import_transform: transform.none_if_empty(int)
+
+    - property: date
+      external_name: date
+      import_transform: transform.import_date_time('%d.%m.%Y %H:%M')
+      export_transform: transform.export_date_time('%d.%m.%Y %H:%M')
 
 - kind: my_art
   connector: csv
