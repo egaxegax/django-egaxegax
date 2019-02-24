@@ -7,7 +7,7 @@
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
 {% if book_count and not search_count and not last_count %}{% if subject %}Жанр {% trans subject.subject %}, {{ subject.subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}{% endif %}{% endif %}
-{% if last_count %}{% trans 'Books' %}{% endif %}
+{% if last_count or not book_count and not search_count %}{% trans 'Books' %}{% endif %}
  - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
 .lside2 { min-width:20%; max-width:200px; }

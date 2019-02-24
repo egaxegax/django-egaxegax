@@ -35,8 +35,6 @@ if len(sys.argv) > 2:
 if len(sys.argv) > 3:
   ncount = int(sys.argv[3])
 
-uplog = file(os.path.join(path, 'up.log'), 'w')
-
 for root, dirs, files in os.walk(path, topdown=False):
   for name in files:
 
@@ -72,9 +70,10 @@ for root, dirs, files in os.walk(path, topdown=False):
       datagen, headers = multipart_encode(param)
 
       uri = "http://egaxegax.appspot.com/songs/add"
-#       uri = "http://127.0.0.1:8800/songs/add"
-#       request = urllib2.Request(uri)
+      if os.getenv('EGAX_DEBUG') == '1':
+          uri = "http://127.0.0.1:8800/songs/add"
+
       print mcount, uri
       request = urllib2.Request(uri, datagen, headers)
-      print >> uplog, urllib2.urlopen(request).read()
+      resp = urllib2.urlopen(request).read()
       time.sleep(1)

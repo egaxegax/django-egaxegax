@@ -45,6 +45,8 @@ for root, dirs, files in os.walk(path, topdown=False):
     if ext.lower() in ('.gif','.jpg','.png',):
 
       remote_folder = 'FotoSite'
+      if os.getenv('EGAX_DEBUG') == '1':
+          remote_folder = 'Foto'
       remote_file = name
       remote_path = E_OS('/{folder}/{file}'.format(folder=remote_folder, file=remote_file))
 

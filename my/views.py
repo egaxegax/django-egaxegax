@@ -18,9 +18,9 @@ from myfilter.templatetags.myfilter import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 import datetime, re
-import transliterate
+from transliterate import translit
 
-CACHE_TIMEOUT = 60*60*3  # lifetime sec
+CACHE_TIMEOUT = 60*60*3  # lifetime in sec 3h
 
 def ZI(s):
     try:
@@ -49,6 +49,9 @@ def FromTranslit(s):
          'r':u'р', 's':u'с', 't':u'т', 'u':u'у', 'f':u'ф', 'h':u'х', 'c':u'ц', 'ch':u'ч', 'sh':u'ш', 'shch':u'щ', '\'\'':u'ъ', 'y\'':u'ы', '\'':u'ь', 'e\'':u'э', 'yu':u'ю', 'ya':u'я'};
     pattern = '|'.join(map(re.escape, sorted(r, key=len, reverse=True)))
     return re.sub(pattern, lambda m: r[m.group()], s)
+
+def ToTranslit(s):
+    return re.sub('[^\w]', '', translit(s, 'ru', reversed=True).replace(" ", "_").lower())
 
 def AddAlbumListCache(allkey, photos_list):
     album_list = {}
@@ -104,21 +107,25 @@ def AddPhotoCache(photo):
 def AddPhotosListCache(album, photos_list):
     cache_list = []
     for photo in photos_list:
-        cache_list.append({
+        cache_photo = {
            'id': photo.id,
            'title': photo.title,
            'album': photo.album,
+           'tr_titl': ToTranslit(photo.title),
            'thumb_url': get_im_url(photo.thumb_url),
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
            'date': photo.date,
-           'memberonly': photo.memberonly })
+           'memberonly': photo.memberonly }
+        cache_list.append( cache_photo )
+    # sort by date desc
+    cache_list = sorted(cache_list, key=lambda p: p['date'], reverse=True)
     cache.add('photos:' + album, str(cache_list), CACHE_TIMEOUT)
 
 def ClearPhotoCache(photo):
     cache.delete_many(['photo:' + str(photo.id)])
 
 def ClearPhotosListCache(album):
-    cache.delete_many(['photos:' + album])
+    cache.delete_many(['photos:' + ToTranslit(album)])
 
 def ClearPhotosFullListCache():
     cache.delete_many(['photos:.full_list'])
@@ -152,17 +159,18 @@ def list_photos(request, **kw):
         if cache.has_key(cache_photo_id):
             photo = eval(cache.get(cache_photo_id))
             album = photo['album']
-            if not cache.has_key('photos:' + album):
-                photos_list = Photo.objects.filter(album=album).order_by('-date')
-                AddPhotosListCache(album, photos_list)
-            photos_list = eval(cache.get('photos:' + album))
+            tr_alb = ToTranslit(album)
+            if not cache.has_key('photos:' + tr_alb):
+                photos_list = Photo.objects.filter(album=album)
+                AddPhotosListCache(tr_alb, photos_list)
+            photos_list = eval(cache.get('photos:' + tr_alb))
     else: # full list by album
         rows = 100
         cols = 2
         photos_list = {}
         allkey = '.full_list'
         if not cache.has_key('photos:' + allkey):
-            photos_list = Photo.objects.all().order_by('album')
+            photos_list = Photo.objects.all()
             AddAlbumListCache(allkey, photos_list)
         photos_list = eval(cache.get('photos:' + allkey)).values()
     return render_to_response('photos.html', 
@@ -286,6 +294,7 @@ def delete_photo(request, **kw):
             photo.delete()
     return HttpResponseRedirect(reverse('my.views.list_photos'))
 
+# get html page with photo
 def get_photo(request, **kw):
     if request.method == 'GET':
         id_photo = ZI(kw.get('id'))
@@ -301,10 +310,25 @@ def get_photo(request, **kw):
                                    'thumb_url': thumb_url,
                                    'size': size_photo}))
 
+# get photo small size from cache by title
+def get_photo_cache(request, **kw):
+    if request.method == 'GET':
+        tr_alb = kw.get('tr_alb', '')
+        tr_titl = kw.get('tr_titl', '')
+        size_photo = kw.get('size', '60')
+        if cache.has_key('photos:' + tr_alb):
+            photos_list = eval(cache.get('photos:' + tr_alb))
+            for photo in photos_list:
+                if photo['tr_titl'] == tr_titl:
+                    thumb_url = get_im_thumb(photo['thumb_url'], size_photo)
+                    return HttpResponseRedirect(thumb_url)
+        return HttpResponse("")
+
+# get photo big size
 def get_photo_orig(request, **kw):
     if request.method == 'GET':
         id_photo = ZI(kw.get('id'))
-        size_photo = kw.get('size', '1000')
+        size_photo = kw.get('size', '1600')
         if not cache.has_key('photo:' + str(id_photo)):
             photo = get_object_or_404(Photo, id=id_photo)
             AddPhotoCache(photo)

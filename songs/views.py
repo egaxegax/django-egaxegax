@@ -87,13 +87,14 @@ def AddSongListCache(mkey, song_list):
     for song in song_list:
         tr_art = re.sub('[^\w]', '', translit(song.artist, 'ru', reversed=True).replace(" ", "_").lower())
         tr_title = re.sub('[^\w]', '', translit(song.title, 'ru', reversed=True).replace(" ", "_").lower())
-        if song.date is None: # nulls date first
-            cache_list = [{
-               'id': song.id,
-               'artist': song.artist,
-               'content': UnpackContent(song),
-               'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
-               'title': song.title }] + cache_list
+        if song.date is None: # nulls date first - about
+            if mkey != '.last_update':
+                cache_list = [{
+                   'id': song.id,
+                   'artist': song.artist,
+                   'content': UnpackContent(song),
+                   'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
+                   'title': song.title }] + cache_list
         else:
             i += 1
             cache_list.append({
