@@ -44,7 +44,8 @@ dt .cont { display: table; width: 100%; }
 {% if book_count %}
 <p>
 {% if subject %}
-  <h2 class="inl nomarg"></h2><span class="hspace">Жанр <b>{% trans subject.subject %}</b></span>
+  <h2 class="inl nomarg"></h2>
+    <span class="hspace">Жанр <a class="nodecor" href="">{% trans subject.subject %}</a></span>
     <span class="hspace">Найдено <b>{{ book_count }}</b> книг</span>
 {% endif %}
 {% if writer %}
@@ -98,7 +99,7 @@ dt .cont { display: table; width: 100%; }
       <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
   {% endif %}
 
-  {% if writer %}
+  {% if writer.content %}
     <div class="wrap">
       <div class="msgtext smaller">
         {{ writer.content|markdown:"codehilite,extra" }}
@@ -154,7 +155,7 @@ dt .cont { display: table; width: 100%; }
 
 {% else %}
 
-  <h2 class="inl nomarg"></h2>{% trans 'No books' %}.
+  <p class="hspace">{% trans 'No books' %}.</p>
 
 {% endif %}
 

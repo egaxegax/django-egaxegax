@@ -23,7 +23,11 @@
 {% if subject.subject %}
   <p><h2 class="nomarg"><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subject.id %}"><span class="hspace">{{ subject.subject }} </span></a></h2></p>
 {% else %}
-  <p class="hspace">Читайте, пишите заметки, оставляйте комментарии.</p>
+  <div class="wrap">
+    <div class="msgtext">
+      <a class="nodecor smaller" href="{% url 'posts.views.list_subjects' %}">Список тем</a>
+    </div>
+  </div>
 {% endif %} 
 {% if subject.subject %}
   {% if posts_title|length > 1 %}
@@ -43,11 +47,7 @@
     </div>
   {% endif %}
 {% else %}
-  <div class="wrap">
-    <div class="msgtext">    
-      <a class="nodecor smaller" href="{% url 'posts.views.list_subjects' %}">Список тем</a>
-    </div>
-  </div>
+  <p class="hspace">Читайте, пишите заметки, оставляйте комментарии.</p>
 {% endif %}  
 {% for post in posts.object_list %}
   <div class="wrap">
@@ -92,7 +92,7 @@
   {% endif %}
   </p>
 {% else %}
-  <p>{% trans 'No posts' %}.</p>
+  <p class="hspace">{% trans 'No posts' %}.</p>
 {% endif %}
 {% if request.user.is_authenticated %}
   <p>

@@ -116,7 +116,7 @@ def AddWrtCache(wrt_id, wrt):
     cache_wrt = {
         'id': wrt.id,
         'writer': wrt.writer,
-        'content': wrt.content or E_OS('Об авторе...'),
+        'content': wrt.content,
         'count': wrt.count }
     cache.add('wrt:' + str(wrt_id), str(cache_wrt))
     return cache_wrt

@@ -21,7 +21,7 @@
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
 #top_menu {  }
 #top_menu ul { padding: 4px 0; display: table; width: 100%; max-width: 100%; }
-#top_menu ul li { padding: 15px 10px 15px; display: table-cell; text-align: center; width: 10%; }
+#top_menu ul li { padding: 15px 10px 15px; display: table-cell; text-align: center; width: 12%; }
 #top_menu ul li a { height: 40px; display: table; width: 100%; }
 #top_menu ul li span { display: table-row; vertical-align: middle; }
 {% block pagestyle %}{% endblock %}
@@ -40,8 +40,8 @@
 </head>
 <body class="nomarg">
 <div id="main_header" class="main wrapbg">
-  <div id="top_logo">
-    <a class="nodecor" href="/">
+  <div id="top_logo" class="{% block aboutclass %}{% endblock %}">
+    <a class="nodecor" href="{% url 'my.views.index' %}">
       <img id="egax-logo" src="{{ MEDIA_URL }}img/egax-logo.png" title="{% trans 'Egax Portal' %}" alt="{% trans 'Egax Portal' %}"/>
     </a>
   </div>
@@ -58,7 +58,6 @@
   </div-->
   <div id="top_menu">
     <ul class="inl nomarg">
-      <li class="{% block aboutsclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.index' %}"><img src="/media/img/about.png" alt="&#128222;"/><span>&nbsp;&nbsp;О&nbsp;САЙТЕ&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
       <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><img src="/media/img/news.png" alt="&#9749;"/><span>&nbsp;&nbsp;{% trans 'News' %}&nbsp;&nbsp;&nbsp;</span></a></li>
       <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_posts' %}"><img src="/media/img/posts.png" alt="&#128240;"/><span>&nbsp;&nbsp;&nbsp;{% trans 'Posts' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
       <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><img src="/media/img/foto.png" alt="&#128247;"/><span>&nbsp;&nbsp;&nbsp;&nbsp;{% trans 'Photos' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
@@ -69,8 +68,8 @@
   <div id="top_nav" class="smaller">
     <ul class="nomarg nopad nolist">
     {% if request.user.is_authenticated %}
-      <li>{% trans 'Welcome,' %}</li>
-      <li><b>{{ request.user.username }}</b></li>
+      <li>Здравствуй,</li>
+      <li class="user"><b>{{ request.user.username }}</b></li>
       <li><a class="nodecor" href="{% url 'django.contrib.auth.views.logout' %}?b={{ logback }}">{% trans 'Log out' %}</a></li>
     {% else %}
       <li><a class="nodecor" href="{% url 'django.contrib.auth.views.login' %}?b={{ logback }}">{% trans 'Log in' %}</a></li>

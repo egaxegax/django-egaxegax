@@ -34,6 +34,8 @@ function addSongChords(opts) {
     // parse chords
     var songChords = songText.innerHTML.match(/(\s|\()*([A-GH])([0-9a-z#:]{0,})(\s|\))*/gm);
 
+    if(!songChords) return;
+
     songChords = songChords.reduce(function(items, chord) {
         chord = chord.replace(/(\s|\(|\))/,'');
         var parts = chord.split(":"),
