@@ -92,6 +92,8 @@ def AddSongListCache(mkey, song_list):
                 cache_list = [{
                    'id': song.id,
                    'artist': song.artist,
+                   'tr_art': tr_art,
+                   'tr_title': tr_title,
                    'content': UnpackContent(song),
                    'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
                    'title': song.title }] + cache_list

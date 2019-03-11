@@ -324,6 +324,13 @@ def get_photo_cache(request, **kw):
                     return HttpResponseRedirect(thumb_url)
         return HttpResponse("")
 
+def get_thumb(request, **kw):
+    if request.method == 'GET':
+        part = kw.get('part', '')
+        titl = kw.get('titl', '')
+        return HttpResponseRedirect("https://raw.githubusercontent.com/egaxegax/FotoSite/master/" + part + "/" + titl)
+    return HttpResponse("")
+
 # get photo big size
 def get_photo_orig(request, **kw):
     if request.method == 'GET':
