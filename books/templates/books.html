@@ -13,6 +13,7 @@
 .lside2 { min-width:20%; max-width:200px; }
 .rside2 { min-width:70%; max-width: 200px; overflow: hidden; }
 .msgtext dt { border:0; }
+.about p { display: inline; }
 dt .cont { display: table; width: 100%; }
 .bbar .button { padding: 20px 40px; margin: 10px 20px; border: 1px solid #dedede; border-radius: 4px; background: rgb(240,240,255); }
 .bbar .button:hover { border: 1px dashed lightgray; }
@@ -49,7 +50,7 @@ dt .cont { display: table; width: 100%; }
     <span class="hspace">Найдено <b>{{ book_count }}</b> книг</span>
 {% endif %}
 {% if writer %}
-  <h2 class="inl nomarg"><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=writer.id %}">
+  <h2 class="inl nomarg"><a class="nodecor" href="{% url 'books.views.list_books' tr_wrt=writer.tr_wrt id_wrt=writer.id %}">
     <span class="hspace">{{ writer.writer|strans }}</span></a></h2>
     <span class="hspace">Найдено <b>{{ book_count }}</b> книг</span>
 {% endif %}
@@ -75,7 +76,8 @@ dt .cont { display: table; width: 100%; }
     <div class="wrap">
       <dl class="msgtext"><dt>
       {% if wrt_count %}
-        <a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.id %}">{{ book.writer.writer }}</a>
+        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/books/{{ book.tr_wrt }}.jpg" alt=" " title="" />
+        <a class="nodecor" href="{% url 'books.views.list_books' tr_wrt=book.tr_wrt id_wrt=book.id %}">{{ book.writer.writer }}</a>
       {% endif %}
       {% if book.count %}
         <span class="smaller">[{{ book.count }}]</span>
@@ -101,7 +103,8 @@ dt .cont { display: table; width: 100%; }
 
   {% if writer.content %}
     <div class="wrap">
-      <div class="msgtext smaller">
+      <div class="about msgtext smaller">
+        <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/books/{{ writer.tr_wrt }}.jpg" alt=" " title="" />
         {{ writer.content|markdown:"codehilite,extra" }}
       </div>
       <div class="msgfooter gray">
@@ -125,14 +128,14 @@ dt .cont { display: table; width: 100%; }
   	      <div class="gray smaller">{{ book.title }}</div></a>
 	    </div>
 	    <div class="lfloat rside2">
-        <p><a class="nodecor" href="{% url 'books.views.list_books' id_wrt=book.writer.id %}">{{ book.writer.writer|strans }}</a>
-          <a href="{% url 'books.views.read_book' ind=book.index part=book.part %}">{{ book.title|escape }}</a></p>
-        <div class="smaller gray">Жанр: <a class="nodecor" href="{% url 'books.views.list_books' id_subj=book.subject.id %}">{{ book.subject.subject }}</a></div>
+        <p><a class="nodecor" href="{% url 'books.views.list_books' tr_wrt=book.tr_wrt id_wrt=book.writer.id %}">{{ book.writer.writer|strans }}</a>
+          <a href="{% url 'books.views.read_book' tr_wrt=book.tr_wrt tr_titl=book.tr_titl ind=book.index part=book.part %}">{{ book.title|escape }}</a></p>
+        <div class="smaller gray">Жанр: <a class="nodecor" href="{% url 'books.views.list_books' tr_subj=book.tr_subj id_subj=book.subject.id %}">{{ book.subject.subject }}</a></div>
       </div>
       <div class="bbar smaller">
         <span class="rfloat lightgray hspace">{{ book.counter }}</span>
         <a class="nodecor" href="{% url 'books.views.get_file' ind=book.index %}"><div class="pink button lfloat bigger">Скачать</div></a>&nbsp;
-        <a class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}"><div class="pink button lfloat bigger">Читать</div></a>
+        <a class="nodecor" href="{% url 'books.views.read_book' tr_wrt=book.tr_wrt tr_titl=book.tr_titl ind=book.index part=book.part %}"><div class="pink button lfloat bigger">Читать</div></a>
       </div>
 	    </div>
     </dt></dl>
@@ -160,7 +163,12 @@ dt .cont { display: table; width: 100%; }
 {% endif %}
 
 {% if request.user.is_authenticated %}
-  <p class="smaller"><a href="{% url 'books.views.add_book' %}"><span class="hspace">{% trans 'Add book' %}</span></a></p>
+  <p class="smaller">
+    <a href="{% url 'books.views.add_book' %}"><span class="hspace">{% trans 'Add book' %}</span></a>
+  {% if writer %}
+    <a href="{% url 'books.views.edit_wrt' id=writer.id %}"><span class="hspace">Править автора</span></a>
+  {% endif %}
+  </p>
 {% else %}
   <p class="smaller"><span class="hspace">{% trans 'Please authorize to add books' %}.</span></p>
 {% endif %}

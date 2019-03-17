@@ -13,12 +13,12 @@ from google.appengine.api import images
 from google.appengine.ext import blobstore
 from books.forms import *
 from books.models import *
+from myfilter.templatetags.myfilter import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 from math import ceil
 import datetime, time, sys, os.path, re
 import zlib, zipfile, base64, mimetypes
-import transliterate
 
 wrt_index = {
     20:'a',21:'b',22:'c',23:'d',24:'e',25:'f',26:'g',27:'h',28:'i',29:'j',30:'k',31:'l',32:'m',33:'n',34:'o',35:'p',36:'q',37:'r',38:'s',39:'t',40:'u',41:'v',42:'w',43:'x',44:'y',45:'z',
@@ -55,6 +55,7 @@ def AddWrtListCache(wrt_key, wrt_list):
         cache_list.append({
            'id': wrt.id,
            'writer': {'id': wrt.id, 'writer': wrt.writer, 'count': wrt.count},
+           'tr_wrt': to_translit(wrt.writer),
            'count': wrt.count })
     cache.add('wrts:' + wrt_key, str(cache_list))
 
@@ -64,6 +65,7 @@ def AddSubjListCache(subj_key, subj_list):
         cache_list.append({
            'id': subj.id,
            'subject': subj.subject,
+           'tr_subj': to_translit(subj.subject),
            'count': subj.count })
     cache.add('subj:' + subj_key, str(cache_list))
 
@@ -76,6 +78,9 @@ def AddBookCache(book, part, content):
         'writer': {'id': book.writer.id, 'writer': book.writer.writer, 'count': book.writer.count},
         'subject': ((hasattr(book, 'subject') and book.subject) and {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count}) or {},
         'title': book.title,
+        'tr_wrt': to_translit(book.writer.writer),
+        'tr_subj': to_translit(book.subject.subject),
+        'tr_titl': to_translit(book.title),
         'index': book.index,
         'part': part,
         'npart': npart,
@@ -107,6 +112,9 @@ def AddBookListCache(mkey, book_list, **kw):
                'writer': {'id': book.writer.id, 'writer': book.writer.writer, 'count': book.writer.count},
                'subject': {'id': book.subject.id, 'subject': book.subject.subject, 'count': book.subject.count},
                'title': book.title,
+               'tr_wrt': to_translit(book.writer.writer),
+               'tr_subj': to_translit(book.subject.subject),
+               'tr_titl': to_translit(book.title),
                'content': truncatewords(content, 80),
                'index': book.index,
                'date': book.date })
@@ -116,6 +124,7 @@ def AddWrtCache(wrt_id, wrt):
     cache_wrt = {
         'id': wrt.id,
         'writer': wrt.writer,
+        'tr_wrt': to_translit(wrt.writer),
         'content': wrt.content,
         'count': wrt.count }
     cache.add('wrt:' + str(wrt_id), str(cache_wrt))
@@ -304,7 +313,7 @@ def list_books(request, **kw):
             subject = book_list[0]['subject']
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
-        search_key = '.search' + transliterate.translit(st, 'ru', reversed=True) + '.' + str(page_num)
+        search_key = '.search' + to_translit(st) + '.' + str(page_num)
         if not cache.has_key('books:' + search_key):
             book_list = Book.objects.filter(Q(title__startswith=st))[page_bottom:page_top]
             AddBookListCache(search_key, book_list, page_num=page_num, per_page=per_page)

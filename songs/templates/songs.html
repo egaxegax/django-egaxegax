@@ -12,7 +12,7 @@
  - {% trans 'songs' %} - {% endblock %}
 {% block pagestyle %}
 .msgtext dt { border:0; }
-.msgtext p { display: inline; }
+.about p { display: inline; }
 #id_search { height: 16px; margin-left: 12px; }
 {% endblock %}
 {% block songsclass %}wrap3{% endblock %}
@@ -70,8 +70,8 @@
 
   {% if not song.date and song.content %}
     <div class="wrap">
-      <div class="msgtext smaller">
-        <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt="" title="{{ song.artist }}" />
+      <div class="about msgtext smaller">
+        <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
         {{ song.content|markdown:"codehilite,extra" }}
       </div>
       <div class="msgfooter gray">
@@ -85,11 +85,11 @@
     <div class="wrap">
       <dl class="msgtext"><dt>
       {% if art_count %}
-        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt="" title="{{ song.artist }}" />
+        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
         <a class="nodecor" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
       {% endif %}
       {% if last_count or search_count%}
-        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt="" title="{{ song.artist }}" />
+        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
         <a class="nodecor pink" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
       {% endif %}
       {% if song.count %}
@@ -134,13 +134,7 @@
 {% endif %}
 
 {% if request.user.is_authenticated %}
-  <p class="smaller hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a>
-  {% if request.user.is_superuser and not art_key and not last_count and not search_count %}
-    {% with songs.object_list|first as f %}
-      <a class="hspace" href="{% url 'songs.views.delete_art' id_art=f.art_id %}" title="Удалить все песни автора">{% trans 'Remove songs' %}</a>
-    {% endwith %} 
-  {% endif %}  
-  </p>
+  <p class="smaller hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
 {% else %}
   <p class="smaller hspace">{% trans 'Please authorize to add songs' %}.</p>
 {% endif %}

@@ -19,7 +19,7 @@
   {% for subj in subjects.object_list %}
     <div class="wrap">
     <dl class="msgtext"><dt>
-      <a class="nodecor" href="{% url 'books.views.list_books' id_subj=subj.id %}">
+      <a class="nodecor" href="{% url 'books.views.list_books' tr_subj=subj.tr_subj id_subj=subj.id %}">
         {% trans subj.subject%} </a><span class="smaller"> [{{ subj.count }}]</span>
         <div class="gray smaller">{{ subj.subject }}</div></dt>
       </dl>

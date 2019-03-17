@@ -12,10 +12,10 @@ from django.db.models import Q
 from django.utils import timezone
 from songs.forms import *
 from songs.models import *
+from myfilter.templatetags.myfilter import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 import os.path, datetime, time, sys, re, base64, zlib
-from transliterate import translit
 
 art_index = {
     20:'a',21:'b',22:'c',23:'d',24:'e',25:'f',26:'g',27:'h',28:'i',29:'j',30:'k',31:'l',32:'m',33:'n',34:'o',35:'p',36:'q',37:'r',38:'s',39:'t',40:'u',41:'v',42:'w',43:'x',44:'y',45:'z',
@@ -45,13 +45,12 @@ def PageList(request, qst, per_page=5):
 def AddArtListCache(artkey, art_list):
     cache_list = []
     for i, art in enumerate(art_list):
-        tr_art = re.sub('[^\w]', '', translit(art.artist, 'ru', reversed=True).replace(" ", "_").lower())
         cache_list.append({
            'id': art.id,
            'art_id': art.id,
            'index': i+1,
            'artist': art.artist,
-           'tr_art': tr_art,
+           'tr_art': to_translit(art.artist),
            'count': art.count })
     cache.add('arts:' + artkey, str(cache_list))
 
@@ -66,15 +65,13 @@ def AddSongCache(song):
         t = t.replace('\t', ' ')
         t = t.replace(' ', '&nbsp;')
         t = t.replace('\n','<br/>')
-    tr_art = re.sub('[^\w]', '', translit(song.artist, 'ru', reversed=True).replace(" ", "_").lower())
-    tr_title = re.sub('[^\w]', '', translit(song.title, 'ru', reversed=True).replace(" ", "_").lower())
     cache_song = {
         'id': song.id,
-        'artist': song.artist,
         'art_id': GetArtId(song.artist),
-        'tr_art': tr_art,
-        'tr_title': tr_title,
+        'artist': song.artist,
         'title': song.title,
+        'tr_art': to_translit(song.artist),
+        'tr_title': to_translit(song.title),
         'desc': truncatewords(s, 200),
         'content': t,
         'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
@@ -85,28 +82,27 @@ def AddSongListCache(mkey, song_list):
     cache_list = []
     i = 0
     for song in song_list:
-        tr_art = re.sub('[^\w]', '', translit(song.artist, 'ru', reversed=True).replace(" ", "_").lower())
-        tr_title = re.sub('[^\w]', '', translit(song.title, 'ru', reversed=True).replace(" ", "_").lower())
         if song.date is None: # nulls date first - about
             if mkey != '.last_update':
                 cache_list = [{
                    'id': song.id,
                    'artist': song.artist,
-                   'tr_art': tr_art,
-                   'tr_title': tr_title,
+                   'title': song.title,
+                   'tr_art': to_translit(song.artist),
+                   'tr_title': to_translit(song.title),
                    'content': UnpackContent(song),
                    'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
-                   'title': song.title }] + cache_list
+                }] + cache_list
         else:
             i += 1
             cache_list.append({
                'id': song.id,
                'index': i,
-               'artist': song.artist,
                'art_id': GetArtId(song.artist),
-               'tr_art': tr_art,
-               'tr_title': tr_title,
+               'artist': song.artist,
                'title': song.title,
+               'tr_art': to_translit(song.artist),
+               'tr_title': to_translit(song.title),
                'date': song.date })
     cache.add('songs:' + mkey, str(cache_list))
 
@@ -246,7 +242,7 @@ def list_songs(request, **kw):
         song_count = len(song_list)
     elif request.GET.get('search'): # search
         st = request.GET.get('search')
-        search_key = '.search' + translit(st, 'ru', reversed=True)
+        search_key = '.search' + to_translit(st)
         if not cache.has_key('songs:' + search_key):
             song_list = Song.objects.filter(Q(title__startswith=st))
             AddSongListCache(search_key, song_list)

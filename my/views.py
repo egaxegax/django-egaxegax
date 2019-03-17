@@ -18,7 +18,6 @@ from myfilter.templatetags.myfilter import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 import datetime, re
-from transliterate import translit
 
 CACHE_TIMEOUT = 60*60*3  # lifetime in sec 3h
 
@@ -49,9 +48,6 @@ def FromTranslit(s):
          'r':u'р', 's':u'с', 't':u'т', 'u':u'у', 'f':u'ф', 'h':u'х', 'c':u'ц', 'ch':u'ч', 'sh':u'ш', 'shch':u'щ', '\'\'':u'ъ', 'y\'':u'ы', '\'':u'ь', 'e\'':u'э', 'yu':u'ю', 'ya':u'я'};
     pattern = '|'.join(map(re.escape, sorted(r, key=len, reverse=True)))
     return re.sub(pattern, lambda m: r[m.group()], s)
-
-def ToTranslit(s):
-    return re.sub('[^\w]', '', translit(s, 'ru', reversed=True).replace(" ", "_").lower())
 
 def AddAlbumListCache(allkey, photos_list):
     album_list = {}
@@ -111,7 +107,7 @@ def AddPhotosListCache(album, photos_list):
            'id': photo.id,
            'title': photo.title,
            'album': photo.album,
-           'tr_titl': ToTranslit(photo.title),
+           'tr_titl': to_translit(photo.title),
            'thumb_url': get_im_url(photo.thumb_url),
            'author': (hasattr(photo, 'author') and hasattr(photo.author, 'id') and {'id': photo.author.id, 'username': photo.author.username}) or {},
            'date': photo.date,
@@ -125,7 +121,7 @@ def ClearPhotoCache(photo):
     cache.delete_many(['photo:' + str(photo.id)])
 
 def ClearPhotosListCache(album):
-    cache.delete_many(['photos:' + ToTranslit(album)])
+    cache.delete_many(['photos:' + to_translit(album)])
 
 def ClearPhotosFullListCache():
     cache.delete_many(['photos:.full_list'])
@@ -159,7 +155,7 @@ def list_photos(request, **kw):
         if cache.has_key(cache_photo_id):
             photo = eval(cache.get(cache_photo_id))
             album = photo['album']
-            tr_alb = ToTranslit(album)
+            tr_alb = to_translit(album)
             if not cache.has_key('photos:' + tr_alb):
                 photos_list = Photo.objects.filter(album=album)
                 AddPhotosListCache(tr_alb, photos_list)

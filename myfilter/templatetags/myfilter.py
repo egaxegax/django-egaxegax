@@ -1,6 +1,8 @@
 from datetime import datetime
 from django.utils.timesince import timesince
 from django import template
+from transliterate import translit
+
 register = template.Library()
 
 import urllib, urllib2, urlparse, re
@@ -33,6 +35,10 @@ def strip_text(s):
     s = s.replace("<",'')
     s = s.replace("!",'')
     return s
+
+@register.filter
+def to_translit(s):
+    return re.sub('[^\w]', '', translit(s, 'ru', reversed=True).replace(" ", "_").lower())
 
 @register.filter
 def get_im_url(url):
