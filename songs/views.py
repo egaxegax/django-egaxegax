@@ -244,7 +244,7 @@ def list_songs(request, **kw):
         st = request.GET.get('search')
         search_key = '.search' + to_translit(st)
         if not cache.has_key('songs:' + search_key):
-            song_list = Song.objects.filter(Q(title__startswith=st))
+            song_list = Song.objects.filter(Q(title__startswith=st.capitalize()))
             AddSongListCache(search_key, song_list)
         song_list = eval(cache.get('songs:' + search_key))    
         song_count = len(song_list)

@@ -315,7 +315,7 @@ def list_books(request, **kw):
         st = request.GET.get('search')
         search_key = '.search' + to_translit(st) + '.' + str(page_num)
         if not cache.has_key('books:' + search_key):
-            book_list = Book.objects.filter(Q(title__startswith=st))[page_bottom:page_top]
+            book_list = Book.objects.filter(Q(title__startswith=st.capitalize()))[page_bottom:page_top]
             AddBookListCache(search_key, book_list, page_num=page_num, per_page=per_page)
         book_list = eval(cache.get('books:' + search_key))
         book_count = len(book_list)
