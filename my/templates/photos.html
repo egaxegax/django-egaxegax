@@ -204,7 +204,7 @@ function vc(counter) {
 <p class="hspace">Подборка фотографий, снятых на телефон, о природе, местах, людях. Смотрите, добавляйте свои работы.</p>
 {% if photos_count %}
   {% if album %}
-    <p class="hspace">Найдено <b>{{ photos_count }}</b> изображений в альбоме <b>{{ album }}</b>.</p>
+    <p class="hspace">Найдено <b>{{ photos_count }}</b> изображений в альбоме <a class="nodecor" href="">{{ album }}</a>.</p>
   {% else %}
     <p class="hspace">Найдено <b>{{ photos_count }}</b> альбомов.</p>
   {% endif %}
@@ -262,7 +262,7 @@ function vc(counter) {
   <p class="smaller hspace">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
 <!-- viewphoto -->
-<table id="viewtab" tabindex="0" onkeypress="(event.keyCode==27) ? cl() : (event.keyCode==37) ? eval(dw.prevlink.getAttribute('href')) : (event.keyCode==39) ? eval(dw.nextlink.getAttribute('href')) : false;">
+<table id="viewtab" tabindex="0" onkeydown="(event.keyCode==27) ? cl() : (event.keyCode==37) ? eval(dw.prevlink.getAttribute('href')) : (event.keyCode==39) ? eval(dw.nextlink.getAttribute('href')) : false;">
 <tr>
 <td id="viewcont"></td>
 </tr>

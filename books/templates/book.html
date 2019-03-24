@@ -21,7 +21,7 @@
 
 <div class="indexlist wrap">
   <a class="hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
-  <a class="hspaced" href="{% url 'books.views.list_wrt' %}">{% trans 'Full list' %}</a>
+  <a class="hspaced" href="{% url 'books.views.list_wrt' %}">Авторы</a>
   {% for i, v in wrt_index.items %}
     <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
   {% endfor %}

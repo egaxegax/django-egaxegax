@@ -67,7 +67,7 @@ function addSongChords(opts) {
 {% block content %}
 
 <div class="indexlist wrap">
-  <a class="hspaced" href="{% url 'songs.views.list_art' %}">{% trans 'Full list' %}</a>
+  <a class="hspaced" href="{% url 'songs.views.list_art' %}">Все</a>
   {% for i, v in art_index.items %}
     <a class="nodecor hspaced" href="{% url 'songs.views.list_art' ind_art=i %}">{{ v|capfirst }}</a>
   {% endfor %}

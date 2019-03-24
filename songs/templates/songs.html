@@ -13,6 +13,8 @@
 {% block pagestyle %}
 .msgtext dt { border:0; }
 .about p { display: inline; }
+ul.hr { display: table; }
+ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 #id_search { height: 16px; margin-left: 12px; }
 {% endblock %}
 {% block songsclass %}wrap3{% endblock %}
@@ -22,7 +24,7 @@
 {% block content %}
 
 <div class="indexlist wrap">
-  <a class="hspaced" href="{% url 'songs.views.list_art' %}">{% trans 'Full list' %}</a>
+  <a class="hspaced" href="{% url 'songs.views.list_art' %}">Все</a>
   {% for i, v in art_index.items %}
     <a class="nodecor hspaced" href="{% url 'songs.views.list_art' ind_art=i %}">{{ v|capfirst }}</a>
   {% endfor %}
@@ -34,16 +36,16 @@
 
 {% if last_count %}
 <p class="hspace">
-  Подборы гитарных аккордов к песням. В базе свыше <b>25000</b> текстов. Читайте, добавляйте свои подборы и тексты.
+  Подборы гитарных аккордов к песням. В базе свыше <b>25000</b> текстов. Читайте, добавляйте свои тексты.
 </p>
-<p class="hspace2">
-<a class="nodecor" href="/posts/5691594208444416#id5691594208444416">Аккорды</a>&nbsp;&nbsp;&nbsp;
-<a class="nodecor" href="/posts/5657300505198592#id5657300505198592">Таблица аккордов</a>&nbsp;&nbsp;&nbsp;
-<a class="nodecor" href="/posts/5707820058017792#id5707820058017792">Транспонирование аккордов</a>&nbsp;&nbsp;&nbsp;
-<a class="nodecor" href="/posts/5752329273868288#id5752329273868288">Переборы</a>&nbsp;&nbsp;&nbsp;
-<a class="nodecor" href="/posts/5642340328800256#id5642340328800256">Гитарные бои</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a class="nodecor" href="/songs/art/5170602126082048">Мои тексты</a>
-</p>
+<ul class="hr hspace2">
+<li class="inl"><a class="nodecor" href="/posts/5691594208444416#id5691594208444416">Аккорды</a>
+<li class="inl"><a class="nodecor" href="/posts/5657300505198592#id5657300505198592">Таблица аккордов</a>
+<li class="inl"><a class="nodecor" href="/posts/5707820058017792#id5707820058017792">Транспонирование аккордов</a>
+<li class="inl"><a class="nodecor" href="/posts/5752329273868288#id5752329273868288">Переборы</a>
+<li class="inl"><a class="nodecor" href="/posts/5642340328800256#id5642340328800256">Гитарные бои</a>
+<li class="inl"><a class="nodecor" href="/songs/art/5170602126082048">Мои тексты</a>
+</ul>
 {% endif %}
 
 {% if song_count %}

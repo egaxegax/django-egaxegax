@@ -12,16 +12,18 @@
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css" type="text/css" />
 {% block pagestylelink %}{% endblock %}
 <style type="text/css">
-#main_header { display: table; border-radius: 2px; padding: 0; }
+.main { margin: 0px auto 0px auto; }
+#main_header, #main_content, #main_footer { width: 960px; }
+#main_header { display: table; padding: 0; }
 #main_header div { display: table-cell; vertical-align: middle; }
 #main_content .view { min-height: 450px; }
 #main_footer { height: 40px; text-align: center; }
 #top_logo { min-width: 100px; max-width: 100px; text-align: center; }
 #top_nav { min-width: 100px; max-width: 100px; text-align: center; }
 #top_ban { text-align: center; margin-top: 5px; width: 480px; height: 50px; }
-#top_menu {  }
-#top_menu ul { padding: 4px 0; display: table; width: 100%; max-width: 100%; }
-#top_menu ul li { padding: 15px 10px 15px; display: table-cell; text-align: center; width: 12%; }
+#top_menu { display: table; text-align: center; }
+#top_menu ul { padding: 4px 10px; }
+#top_menu ul li { padding: 18px 0px 14px; width: 10%; display: table-cell; }
 #top_menu ul li a { height: 40px; display: table; width: 100%; }
 #top_menu ul li span { display: table-row; vertical-align: middle; }
 {% block pagestyle %}{% endblock %}
@@ -56,12 +58,12 @@
     (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
   </div-->
-  <div id="top_menu">
-    <ul class="inl nomarg">
+  <div id="top_menu" class="">
+    <ul class="nomarg">
       <li class="{% block newsclass %}{% endblock %}"><a class="nodecor" href="{% url 'mynews.views.list_msg' %}"><img src="/media/img/news.png" alt="&#9749;"/><span>&nbsp;&nbsp;{% trans 'News' %}&nbsp;&nbsp;&nbsp;</span></a></li>
-      <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_posts' %}"><img src="/media/img/posts.png" alt="&#128240;"/><span>&nbsp;&nbsp;&nbsp;{% trans 'Posts' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
-      <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><img src="/media/img/foto.png" alt="&#128247;"/><span>&nbsp;&nbsp;&nbsp;&nbsp;{% trans 'Photos' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
-      <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><img src="/media/img/chords.png" alt="&#127928;"/><span>&nbsp;&nbsp;{% trans 'Chords' %}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+      <li class="{% block postsclass %}{% endblock %}"><a class="nodecor" href="{% url 'posts.views.list_posts' %}"><img src="/media/img/posts.png" alt="&#128240;"/><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% trans 'Posts' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+      <li class="{% block myclass %}{% endblock %}"><a class="nodecor" href="{% url 'my.views.list_photos' %}"><img src="/media/img/foto.png" alt="&#128247;"/><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% trans 'Photos' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+      <li class="{% block songsclass %}{% endblock %}"><a class="nodecor" href="{% url 'songs.views.list_songs' %}"><img src="/media/img/chords.png" alt="&#127928;"/><span>&nbsp;&nbsp;&nbsp;{% trans 'Chords' %}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
       <li class="{% block booksclass %}{% endblock %}"><a class="nodecor" href="{% url 'books.views.list_books' %}"><img src="/media/img/books.png" alt="&#128218;"/><span>&nbsp;&nbsp;&nbsp;&nbsp;{% trans 'Books' %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
     </ul>
   </div>
@@ -88,7 +90,7 @@
 <div id="main_footer" class="main smaller">
   <table width="100%" cellpadding="0" cellspacing="5"><tr>
   <td align="right" width="35%" class="smaller">
-    © 2011-2018 <a href="/about/">egaxegax</a>
+    © 2011-2019 <a href="/about/">egaxegax</a>
   </td>
   <td align="center" width="30%">
 <!--LiveInternet counter--><script type="text/javascript"><!--
