@@ -15,9 +15,6 @@
 {% endblock %}
 {% block songsclass %}wrap3{% endblock %}
 {% block pagescript %}
-<!--google+ comments-->
-<script src="https://apis.google.com/js/platform.js">{lang:'ru'}</script>
-<!--/google+ comments-->
 <script src="/media/js/jquery.min.js"></script>
 <script src="/media/js/rafael.min.js?v1.1.10"></script>
 <script src="/media/js/jtab.js?v1.1.10"></script>
@@ -134,18 +131,5 @@ function addSongChords(opts) {
 {% endif %}
 
 </p>
-
-<!--google+ comments-->
-<div class="g-follow" data-annotation="bubble" data-height="20" data-rel="publisher"></div>
-<div id="comments"></div>
-<script>
-gapi.comments.render('comments', {
-    href: window.location,
-    width: '640',
-    first_party_property: 'BLOGGER',
-    view_type: 'FILTERED_POSTMOD'
-});
-</script>
-<!--/google+ comments-->
 
 {% endblock %}

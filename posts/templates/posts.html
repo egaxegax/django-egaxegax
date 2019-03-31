@@ -10,11 +10,7 @@
 {% endblock %}
 {% block postsclass %}wrap3{% endblock %}
 {% block pagescript %}
-{% if subject.title %}
-<!--google+ comments-->
-<script src="https://apis.google.com/js/platform.js">{lang:'ru'}</script>
-<!--/google+ comments-->
-{% endif %}
+{% if subject.title %}{% endif %}
 {% endblock %}	
 {% block pagestylelink %}
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/syntax.css" />
@@ -111,17 +107,5 @@
 {% else %}
   <p class="smaller hspace">{% trans 'Please authorize to post messages' %}.</p>
 {% endif %}
-{% if subject.title %}
-<!--google+ comments-->
-<div id="comments"></div>
-<script>
-gapi.comments.render('comments', {
-    href: window.location,
-    width: '640',
-    first_party_property: 'BLOGGER',
-    view_type: 'FILTERED_POSTMOD'
-});
-</script>
-<!--/google+ comments-->
-{% endif %}
+{% if subject.title %}{% endif %}
 {% endblock %}
