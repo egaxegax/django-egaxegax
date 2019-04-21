@@ -72,7 +72,7 @@ def AddSongCache(song):
         'title': song.title,
         'tr_art': to_translit(song.artist),
         'tr_title': to_translit(song.title),
-        'desc': truncatewords(s, 200),
+        'desc': truncatewords(s, 80),
         'content': t,
         'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
         'date': song.date }

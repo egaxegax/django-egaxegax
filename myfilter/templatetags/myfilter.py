@@ -28,13 +28,17 @@ def strans(strval):
 @register.filter
 def strip_text(s):
     """Remove special chars."""
-    s = s.lstrip(' Annotation ')
     s = s.replace('"','')
     s = s.replace("'",'')
     s = s.replace(">",'')
     s = s.replace("<",'')
     s = s.replace("!",'')
     return s
+
+@register.filter
+def strip_anno(s):
+    "Strip Annotation word from Book content."
+    return s.replace('>Annotation<', '><', 1)
 
 @register.filter
 def to_translit(s):
