@@ -48,6 +48,15 @@
     <img id="cover-{{ book.title|to_translit }}" title="{{ book.writer.writer }} {{ book.title }}" alt="{{ book.writer.writer }} {{ book.title }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" width="160px"/><br/>
     <div class="calibre">{{ book.content|strip_anno|safe }}</div>
   </div>
+  <div class="msgfooter gray">
+    {% trans 'Added' %}
+    {% if book.author %} 
+      <a href="{% url 'books.views.user_profile' id=book.author.id %}">{{ book.author.username }}</a> 
+    {% else %}
+      {% trans 'An anonymous person' %}
+    {% endif %}
+    <acronym title="{{ book.date }}">{{ book.date|time_since }}</acronym> {% trans 'ago' %}    
+  </div>
 </div>
 
 {% if request.user.is_authenticated %}
@@ -58,17 +67,6 @@
 {% else %}
   <p class="smaller"><span class="hspace">Войдите, чтобы читать дальше</span></p>
 {% endif %}
-
-<p class="smaller hspace">{% trans 'part' %} {{ book.npart }}</p>
-<p class="smaller hspace">
-    {% trans 'Added' %}
-    {% if book.author %} 
-      <a href="{% url 'books.views.user_profile' id=book.author.id %}">{{ book.author.username }}</a> 
-    {% else %}
-      {% trans 'An anonymous person' %}
-    {% endif %}
-    <acronym title="{{ book.date }}">{{ book.date|time_since }}</acronym> {% trans 'ago' %}
-</p>
 
 {% if request.user.is_authenticated and request.user.id == book.author.id or request.user.is_superuser %}
   <p class="smaller hspace">

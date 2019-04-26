@@ -102,6 +102,9 @@ msgstr "Детективная фантастика"
 msgid "sf_epic"
 msgstr "Эпическая фантастика"
 
+msgid "sf_etc"
+msgstr "Разная фантастика"
+
 msgid "sf_history"
 msgstr "Альтернативная история"
 
@@ -120,7 +123,7 @@ msgstr "Юмористическая фантастика"
 msgid "sf_fantasy"
 msgstr "Фэнтези"
 
-msgid "sf_fantasy_сity"
+msgid "sf_fantasy_city"
 msgstr "Городское фэнтези"
 
 msgid "sf_mystic"
@@ -177,6 +180,9 @@ msgid "thriller"
 msgstr "Триллер"
 
 # Проза
+
+msgid "popadanec"
+msgstr "Попаданец"
 
 msgid "prose_classic"
 msgstr "Классическая проза"
@@ -531,3 +537,8 @@ msgstr "Литература 19 века"
 
 msgid "literature_20"
 msgstr "Литература 20 века"
+
+# Искусство
+
+msgid "visual_arts"
+msgstr "Изобразительные искусства"
