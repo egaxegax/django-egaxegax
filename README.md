@@ -13,9 +13,9 @@ RU: Содержит блог с поддержкой синтаксиса Markd
 
 ## Install
 
-To run local version install python27 and module Pillow (former PIL).
-Download and unpack google-appengine package 1.9.x. 
-Set environment and run as standart Django's project. E.g. in Windows shell:
+To run local version install python27 and module Pillow (former PIL).<br>
+Download and install the original App Engine SDK for Python (google_appengine_1.9.x.zip).<br>
+Set environment and run as standart Django project. E.g. in Windows shell:
 
     set PATH=c:\Python27;%PATH%
     set PATH=..\google_appengine;%PATH%
