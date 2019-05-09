@@ -378,6 +378,8 @@ def get_book(request, **kw):
     if request.method == 'GET':
         book_ind = kw.get('ind', '')
         part = kw.get('part', '') or '0'
+        if not request.user.is_authenticated() and part != '0' and part != 'cover.jpeg':
+            part = '0'
         if not cache.has_key('book:' + book_ind + '.' + str(part)):
             book = get_object_or_404(Book, Q(index=ZI(book_ind)))            
             content = GetBookContent(book, part)
