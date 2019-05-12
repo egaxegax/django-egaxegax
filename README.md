@@ -3,6 +3,8 @@ django-egaxegax
 
 [egaxegax.appspot.com](http://egaxegax.appspot.com) full source code. Google Appengine Python Django-nonrel website project.
 
+![](https://content-11.foto.my.mail.ru/bk/egax/_cover/b-74.jpg)
+
 Contains apps:
 
 * Blog with Markdown syntax support
