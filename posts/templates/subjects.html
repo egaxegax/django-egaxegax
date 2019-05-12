@@ -20,7 +20,7 @@
         <a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subj.id %}">
           {{ subj.subject|escape }} </a><span class="smaller"> [{{ subj.count }}]</span></dt>
         <dd class="smaller">
-          <acronym title="{{ subj.date }}">{{ subj.date|time_since }}</acronym> {% trans 'ago' %} {% trans 'ago' %}
+          <acronym title="{{ subj.date }}">{{ subj.date|time_since }}</acronym> {% trans 'ago' %}
         </dd>
       </dl>
       </div>
