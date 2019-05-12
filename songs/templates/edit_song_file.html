@@ -10,7 +10,7 @@
 {% block songsclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'Edit' #} {# trans 'audio' #}{% endblock %}
 {% block content %}
-<p>Загрузить файл <i>mp3</i>.</p>
+<p class="mtext hspace">Загрузить файл <i>mp3</i>.</p>
 {% if request.user.is_authenticated %}
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
     {% render_upload_data upload_data %}
@@ -22,6 +22,6 @@
     <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
   </form>
 {% else %}
-  <p>{% trans "You don't have permission to edit anything." %}</p>
+  <p class="mtext hspace">{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
 {% endblock %}

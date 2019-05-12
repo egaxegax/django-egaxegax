@@ -9,15 +9,18 @@
 {% block songsclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'Add song' #}{% endblock %}
 {% block content %}
-<p class="hspace">Добавляйте свои подборы и песни.</p>
-  <form action="{% url 'songs.views.add_song' %}" method="post">{% csrf_token %}
+
+<p class="mtext hspace">Добавляйте свои подборы и песни.</p>
+
+<form action="{% url 'songs.views.add_song' %}" method="post">{% csrf_token %}
 {% if request.user.is_authenticated %}
     <table class="formpost">
       {{ form_art }}{{ form }}
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
 {% else %}
-  <p>{% trans "You don't have permission to edit anything." %}</p>
+  <p class="mtext hspace">{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
-  </form>
+</form>
+
 {% endblock %}

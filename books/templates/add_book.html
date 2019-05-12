@@ -10,11 +10,14 @@
 {% block booksclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'Add book' #}{% endblock %}
 {% block content %}
-<p class="hspace">Добавляйте свои тексты книг. </p>
+
+<p class="mtext hspace">Добавляйте свои тексты книг. </p>
+
+<p>
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
   {% render_upload_data upload_data %}
 {% if request.user.is_authenticated %}
-    <table class="formpost">
+    <table class="mtext formpost">
       {{ form_wrt }}{{ form }}{{ form_subj }}
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
@@ -22,4 +25,6 @@
   <p class="hspace">{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
   </form>
+</p>
+
 {% endblock %}

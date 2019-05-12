@@ -10,10 +10,7 @@
 {% endblock %}
 {% block content %}
 
-<p class="hspace">
-Коллекция книг различных жанров отечественных и зарубежных авторов из свободных источников.
-</p>
-<p class="hspace"> Список жанров: </p>
+<p class="mtext hspace"> Список жанров книг: </p>
 
 {% if subjects.object_list %}
   {% for subj in subjects.object_list %}
@@ -26,13 +23,15 @@
     </div>
   {% endfor %}
 {% else %}
-  <p>{% trans 'No books' %}.</p>
+  <p class="mtext hspace">{% trans 'No books' %}.</p>
 {% endif %}
 
+<p class="hspace">
 {% if request.user.is_authenticated %}
-  <p class="smaller"><a href="{% url 'books.views.add_book' %}"><span class="hspace">{% trans 'Add book' %}</span></a></p>
+  <a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a>
 {% else %}
-  <p class="smaller"><span class="hspace">{% trans 'Please authorize to add books' %}.</span></p>
+  {% trans 'Please authorize to add books' %}.
 {% endif %}
+</p>
 
 {% endblock %}

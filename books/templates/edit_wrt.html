@@ -11,16 +11,21 @@
 {% block booksclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'Edit writer' #}{% endblock %}
 {% block content %}
-  <p class="hspace">Править автора. </p>
+
+<p class="mtext hspace">Править автора. </p>
+
+<p>
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
 {% if request.user.is_authenticated %}
-    <table class="formpost">
+    <table class="mtext formpost">
       {{ form }}
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
     <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
 {% else %}
-  <p>{% trans "You don't have permission to edit anything." %}</p>
+  <p class="hspace">{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
   </form>
+</p>
+
 {% endblock %}

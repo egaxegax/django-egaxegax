@@ -9,7 +9,7 @@ div.myview { height: 300px; }
 {% block aboutsclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'Profile' #}{% endblock %}
 {% block content %}
-<p class="hspace">{% trans 'Profile' %} пользователя <b>{{ record.username }}</b></p>
+<p class="mtext hspace">{% trans 'Profile' %} пользователя <b>{{ record.username }}</b></p>
  <div class="myview wrap">
  <dl class="myview msgtext">
    <dt>{% trans 'avatar'|capfirst %}&nbsp; <img width="26px" height="26px" src="{% url 'my.views.get_avatar' id=record.id %}" title="{{ record.username }}"/></dt>

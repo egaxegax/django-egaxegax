@@ -3,15 +3,19 @@
 {% block title %}{% trans 'Log in' %} - {% endblock %}
 {% block pageheader %}{# trans 'Log in' #}{% endblock %}
 {% block content %}
-<p class="hspace">Введите свои учетные данные.</p>
-<div class="hspace">
+
+<p class="mtext hspace">Введите свои учетные данные.</p>
+
+<p>
   <form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
-  <table>
+  <table class="mtext">
     {{ form }}
     <tr><th/><td><input type="submit" value="{% trans 'Log in' %}" /></td></tr>
   </table>
   <input type="hidden" name="next" value="{{ request.GET.b }}">
   </form>
-</div>
-<p class="smaller hspace">Для регистрации напишите письмо на <a class="smaller" href="mailto:egax@bk.ru?subject=О%20сайте%20egaxegax.appspot.com&body=Хочу%20написать" target="_blank">egax@bk.ru</a> для получения инструкции.</p>
+</p>
+
+<p class="hspace">Для регистрации напишите письмо на <a class="smaller" href="mailto:egax@bk.ru?subject=О%20сайте%20egaxegax.appspot.com&body=Хочу%20написать" target="_blank">egax@bk.ru</a> для получения инструкции.</p>
+
 {% endblock %}

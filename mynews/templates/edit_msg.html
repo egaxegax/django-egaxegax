@@ -7,18 +7,21 @@
 {% block newsclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'News' #}{% endblock %}
 {% block content %}
-  <p class="hspace">Что нового? Новости, изменения, обновления на сайте и не только.<p>
+
+<p class="mtext hspace">Что нового? Новости, изменения, обновления на сайте и не только.<p>
+
+<p>
+  <form action="{% url 'mynews.views.edit_msg' id=form.initial.id %}" method="post">{% csrf_token %}
 {% if request.user.is_authenticated %}
-  <p>
-    <form action="{% url 'mynews.views.edit_msg' id=form.initial.id %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form }}
        <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
-    </form>
-  </p>
 {% else %}
-  <p class="smaller hspace">{% trans 'Please authorize to post messages' %}.</p>
+  <p class="hspace">{% trans 'Please authorize to post messages' %}.</p>
 {% endif %}
+  </form>
+</p>
+
 {% endblock %}

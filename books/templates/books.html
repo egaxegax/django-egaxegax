@@ -25,8 +25,10 @@ dt .cont { display: table; width: 100%; }
 {% block content %}
 
 <div class="indexlist wrap">
-  <a class="hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
-  <a class="hspaced" href="{% url 'books.views.list_wrt' %}">Авторы</a>
+  <div class="lfloat">
+    <a class="nodecor" href="{% url 'books.views.list_subj' %}">Жанры</a><br>
+    <a class="nodecor" href="{% url 'books.views.list_wrt' %}">Авторы</a>
+  </div>
   {% for i, v in wrt_index.items %}
     <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
   {% endfor %}
@@ -37,7 +39,7 @@ dt .cont { display: table; width: 100%; }
 </div>
 
 {% if last_count %}
-<p class="hspace">
+<p class="mtext hspace">
   Коллекция книг различных жанров отечественных и зарубежных авторов из свободных источников.
 </p>
 {% endif %}
@@ -46,19 +48,20 @@ dt .cont { display: table; width: 100%; }
 <p>
 {% if subject %}
   <h2 class="inl nomarg"></h2>
-    <span class="hspace">Жанр <a class="nodecor" href="">{% trans subject.subject %}</a></span>
-    <span class="hspace">Найдено <b>{{ book_count }}</b> книг</span>
+    <span class="mtext hspace">Жанр <a class="nodecor" href="">{% trans subject.subject %}</a></span>
+    <span class="mtext hspace">Найдено <b>{{ book_count }}</b> книг</span>
 {% endif %}
 {% if writer %}
   <h2 class="inl nomarg"><a class="nodecor" href="{% url 'books.views.list_books' tr_wrt=writer.tr_wrt id_wrt=writer.id %}">
     <span class="hspace">{{ writer.writer|strans }}</span></a></h2>
-    <span class="hspace">Найдено <b>{{ book_count }}</b> книг</span>
+    <span class="mtext hspace">Найдено <b>{{ book_count }}</b> книг</span>
 {% endif %}
 </p>
 {% endif %}
+
 {% if search_count or wrt_count %}
 <p>
-  <h2 class="inl nomarg"></h2><span class="hspace"> Найдено {% if search_count %} более {% endif %}{% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}</span>
+  <h2 class="inl nomarg"></h2><span class="mtext hspace"> Найдено {% if search_count %} более {% endif %}{% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}</span>
 </p>
 {% endif %}
 
@@ -69,7 +72,9 @@ dt .cont { display: table; width: 100%; }
   {% if books.has_previous %}
     <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">
       <div class="wrap cfloat">
-        <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
+        <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" />
+      </div>
+    </a>
   {% endif %}
 
   {% for book in books.object_list %}
@@ -103,9 +108,9 @@ dt .cont { display: table; width: 100%; }
 
   {% if writer.content %}
     <div class="wrap">
-      <div class="about msgtext smaller">
+      <div class="about msgtext">
         <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/books/{{ writer.tr_wrt }}.jpg" alt=" " title="" />
-        {{ writer.content|markdown:"codehilite,extra" }}
+        <span class="smaller">{{ writer.content|markdown:"codehilite,extra" }}</span>
       </div>
       <div class="msgfooter gray">
         {% if request.user.is_authenticated or request.user.is_superuser %}
@@ -139,7 +144,7 @@ dt .cont { display: table; width: 100%; }
           <a class="hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
         </div>
       </div>
-      <span class="smaller rfloat lightgray hspace">{{ book.counter }}</span>
+      <p class="smaller rfloat lightgray hspace">{{ book.counter }}</p>
 	  </div>
     </dt></dl>
     </div>
@@ -147,33 +152,29 @@ dt .cont { display: table; width: 100%; }
 
   {% if books.has_next or last_count or search_count %}
     <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% elif writer %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">      
-    <div class="wrap cfloat">
-      <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>
-  {% endif %}
-
-  {% if books.paginator.num_pages > 1 %}
-    <p class="cfloat smaller">
-      {% trans 'Page' %} {{ books.number }} {% trans 'of' %} {{ books.paginator.num_pages }}
-    </p>
+      <div class="wrap cfloat">
+        <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" />
+      </div>
+    </a>
   {% endif %}
 
 {% endif %}
 
 {% else %}
 
-  <p class="hspace">{% trans 'No books' %}.</p>
+  <p class="mtext hspace">{% trans 'No books' %}.</p>
 
 {% endif %}
 
+<p class="hspace">
 {% if request.user.is_authenticated %}
-  <p class="smaller">
-    <a href="{% url 'books.views.add_book' %}"><span class="hspace">{% trans 'Add book' %}</span></a>
+  <a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a>
   {% if writer %}
-    <a href="{% url 'books.views.edit_wrt' id=writer.id %}"><span class="hspace">Править автора</span></a>
+    <a href="{% url 'books.views.edit_wrt' id=writer.id %}">Править автора</a>
   {% endif %}
-  </p>
 {% else %}
-  <p class="smaller"><span class="hspace">{% trans 'Please authorize to add books' %}.</span></p>
+  {% trans 'Please authorize to add books' %}.
 {% endif %}
+</p>
 
 {% endblock %}

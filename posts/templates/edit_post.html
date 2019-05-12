@@ -6,22 +6,25 @@
 {% block title %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %} - {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block postsclass %}wrap3{% endblock %}
 {% block content %}
+
 {% if subject.subject %}
   <p><h2 class="nomarg"><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subject.id %}"><span class="hspace">{{ subject.subject }} </span></a></h2></p>
 {% else %}
-  <p class="hspace">Читайте, пишите заметки, оставляйте комментарии.</p>
+  <p class="mtext hspace">Заметки, статьи, цитаты на самые разные темы.</p>
 {% endif %}
+
+<p>
+  <form action="{% url 'posts.views.edit_post' id=form.initial.id %}" method="post">{% csrf_token %}
 {% if request.user.is_authenticated %}
-  <p>
-    <form action="{% url 'posts.views.edit_post' id=form.initial.id %}" method="post">{% csrf_token %}
     <table class="formpost">
       {{ form }}
        <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
-    </form>
-  </p>
 {% else %}
-  <p class="smaller hspace">{% trans 'Please authorize to post messages' %}.</p>
+  <p class="hspace">{% trans 'Please authorize to post messages' %}.</p>
 {% endif %}
+  </form>
+</p>
+
 {% endblock %}

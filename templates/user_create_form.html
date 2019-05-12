@@ -3,13 +3,14 @@
 {% load filetransfers %}
 {% block pageheader %}{# trans 'Add user' #}{% endblock %}
 {% block content %}
-<p class="hspace">Заполните поля для ввода нового пользователя.</p>
-<form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
-  {% render_upload_data upload_data %}
-<table>
-  {{ form.as_table }}
-  {{ form_profile.as_table }}
-  <tr><th/><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
-</table>
-</form>
+<p class="mtext hspace">Заполните поля для ввода нового пользователя.</p>
+<div class="mtext hspace">
+  <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">{% render_upload_data upload_data %}
+  <table>
+    {{ form.as_table }}
+    {{ form_profile.as_table }}
+    <tr><th/><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
+  </table>
+  </form>
+</div>
 {% endblock %}

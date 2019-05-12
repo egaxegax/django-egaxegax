@@ -201,12 +201,12 @@ function vc(counter) {
     };
 }
 </script>
-<p class="hspace">Подборка фотографий, снятых на телефон, о природе, местах, людях. Смотрите, добавляйте свои работы.</p>
+
 {% if photos_count %}
   {% if album %}
-    <p class="hspace">Найдено <b>{{ photos_count }}</b> изображений в альбоме <a class="nodecor" href="">{{ album }}</a>.</p>
+    <p class="mtext hspace">Найдено <b>{{ photos_count }}</b> изображений в альбоме <a class="nodecor" href="">{{ album }}</a>.</p>
   {% else %}
-    <p class="hspace">Найдено <b>{{ photos_count }}</b> альбомов.</p>
+    <p class="mtext hspace">Подборка фотографий, снятых на телефон, о природе, местах, людях.</p>
   {% endif %}
 {% endif %}
 
@@ -253,14 +253,16 @@ function vc(counter) {
   </div>
 {% else %}
 
-  <p class="hspace">{% trans 'No photos' %}.</p>
+  <p class="mtext hspace">{% trans 'No photos' %}.</p>
 
 {% endif %}
+
 {% if request.user.is_authenticated %}
-  <p class="smaller hspace"><a href="{% url 'my.views.add_photo' %}">{% trans 'Add photo' %}</a></p>
+  <p class="hspace"><a href="{% url 'my.views.add_photo' %}">{% trans 'Add photo' %}</a></p>
 {% else %}
-  <p class="smaller hspace">{% trans 'Please authorize to upload photos' %}.</p>
+  <p class="hspace">{% trans 'Please authorize to upload photos' %}.</p>
 {% endif %}
+
 <!-- viewphoto -->
 <table id="viewtab" tabindex="0" onkeydown="(event.keyCode==27) ? cl() : (event.keyCode==37) ? eval(dw.prevlink.getAttribute('href')) : (event.keyCode==39) ? eval(dw.nextlink.getAttribute('href')) : false;">
 <tr>
@@ -268,4 +270,5 @@ function vc(counter) {
 </tr>
 </table>
 <!-- /viewphoto -->
+
 {% endblock %}

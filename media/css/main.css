@@ -36,9 +36,10 @@ input[type=text], input[type=password], input[type=number]  { height: 24px; }
 .formpost th { width: 8%; }
 .formpost input[type=text] { width: 90%; }
 .formpost textarea { width: 100%; }
-.indexlist { text-align: center; padding: 10px 4px 8px 8px; font-size: 70%; }
-.msgtext { min-height: 1em; padding: 10px; margin: 0px; }
-.msgfooter { padding: 0 10px; font-size: 70%; text-align: right; }
+.indexlist { text-align: center; padding: 10px 4px 8px 8px; }
+.mtext { font-size: larger; }
+.msgtext { font-size: larger; min-height: 1em; padding: 5px 10px 10px 10px; margin: 0px; }
+.msgfooter { padding: 0 10px; font-size: smaller; text-align: right; }
 .msgtext dt { padding: 5px 0; }
 .msgtext dd { padding-bottom: 5px; color: gray; }
 a, a:active, a:focus { color: #4d3ca0; outline:none; }
@@ -50,7 +51,7 @@ ul.nolist { list-style-type: none; }
 ul.nolist li { padding: 2px 0 0 0; }
 .nomarg { margin: 0 0 0 0; }
 .nopad { padding: 0 0 0 0; }
-.hspaced { padding: 0 2px; }
+.hspaced { padding: 0 0px; }
 .hspace { padding: 0 12px; }
 .hspace1 { padding: 0 24px; }
 .hspace2 { padding: 0 48px; }

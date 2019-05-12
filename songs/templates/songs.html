@@ -24,7 +24,9 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 {% block content %}
 
 <div class="indexlist wrap">
-  <a class="hspaced" href="{% url 'songs.views.list_art' %}">Все</a>
+  <div class="lfloat">
+    <a class="nodecor" href="{% url 'songs.views.list_art' %}">Все</a>
+  </div>
   {% for i, v in art_index.items %}
     <a class="nodecor hspaced" href="{% url 'songs.views.list_art' ind_art=i %}">{{ v|capfirst }}</a>
   {% endfor %}
@@ -35,10 +37,10 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 </div>
 
 {% if last_count %}
-<p class="hspace">
-  Подборы гитарных аккордов к песням. В базе свыше <b>25000</b> текстов. Читайте, добавляйте свои тексты.
+<p class="mtext hspace">
+  Подборы гитарных аккордов к песням. В базе свыше <b>26000</b> текстов.
 </p>
-<ul class="hr hspace2">
+<ul class="mtext hr hspace2">
 <li class="inl"><a class="nodecor" href="/posts/5691594208444416#id5691594208444416">Аккорды</a>
 <li class="inl"><a class="nodecor" href="/posts/5657300505198592#id5657300505198592">Таблица аккордов</a>
 <li class="inl"><a class="nodecor" href="/posts/5707820058017792#id5707820058017792">Транспонирование аккордов</a>
@@ -51,19 +53,19 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 {% if song_count %}
 <p>
 {% if search_count or art_key %}
-  <h2 class="inl nomarg"></h2><span class="hspace"> Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов</span>
+  <h2 class="inl nomarg"></h2><span class="mtext hspace"> Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов</span>
 {% else %}
 {% with songs.object_list|first as f %}
-  <h2 class="inl nomarg"><a class="nodecor" href="">
+  <h2 class="inl nomarg"><a class="nodecor" href="{{ request.path }}">
     <span class="hspace">{{ f.artist }}</span></a></h2>
-    <span class="hspace">Найдено <b>{{ song_count }}</b> текстов</span>
+    <span class="mtext hspace">Найдено <b>{{ song_count }}</b> текстов</span>
 {% endwith %}
 {% endif %}
 </p>
 {% endif %}
 
 {% if last_count %}
-  <p class="hspace">Последние обновления:</p>
+  <p class="mtext hspace">Последние обновления:</p>
 {% endif %}
 
 {% if songs.object_list %}
@@ -72,9 +74,9 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 
   {% if not song.date and song.content %}
     <div class="wrap">
-      <div class="about msgtext smaller">
+      <div class="about msgtext">
         <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
-        {{ song.content|markdown:"codehilite,extra" }}
+        <span class="smaller">{{ song.content|markdown:"codehilite,extra" }}</span>
       </div>
       <div class="msgfooter gray">
         {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
@@ -115,30 +117,32 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 
 {% endfor %}
 
-  <p class="smaller">
+  <p class="hspace">
   {% if songs.has_previous %}
     <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
+  {% elif songs.has_next  %}
+    <span class="lightgray">‹ {% trans 'previous' %}</span>
   {% endif %}
   {% if songs.paginator.num_pages > 1 %}
-    <span class="hspace2">
-      {% trans 'Page' %} {{ songs.number }} {% trans 'of' %} {{ songs.paginator.num_pages }}
-    </span>
+    <span class="hspace2">{{ songs.number }} {% trans 'of' %} {{ songs.paginator.num_pages }}</span>
   {% endif %}
   {% if songs.has_next %}
     <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
+  {% elif songs.has.previous %}
+    <span class="lightgray">{% trans 'next' %} ›</span>
   {% endif %}
   </p>
   
 {% else %}
 
-  <p class="hspace">{% trans 'No songs' %}.</p>
+  <p class="mtext hspace">{% trans 'No songs' %}.</p>
 
 {% endif %}
 
 {% if request.user.is_authenticated %}
-  <p class="smaller hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
+  <p class="hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
 {% else %}
-  <p class="smaller hspace">{% trans 'Please authorize to add songs' %}.</p>
+  <p class="hspace">{% trans 'Please authorize to add songs' %}.</p>
 {% endif %}
 
 {% endblock %}

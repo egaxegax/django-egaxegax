@@ -64,7 +64,7 @@ function addSongChords(opts) {
 {% block content %}
 
 <div class="indexlist wrap">
-  <a class="hspaced" href="{% url 'songs.views.list_art' %}">Все</a>
+  <a class="nodecor" href="{% url 'songs.views.list_art' %}">Все</a>
   {% for i, v in art_index.items %}
     <a class="nodecor hspaced" href="{% url 'songs.views.list_art' ind_art=i %}">{{ v|capfirst }}</a>
   {% endfor %}
@@ -82,9 +82,9 @@ function addSongChords(opts) {
 
   {% if not song.date and song.content %}
     <div class="wrap">
-      <div class="msgtext smaller">
+      <div class="about msgtext">
         <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
-        {{ song.content|markdown:"codehilite,extra" }}
+        <span class="smaller">{{ song.content|markdown:"codehilite,extra" }}</span>
       </div>
       <div class="msgfooter gray">
         {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
@@ -115,21 +115,16 @@ function addSongChords(opts) {
         {% endif %}
       </div>
     </div>
-    <div class="hspace smaller">
-      
-    </div>
   {% endif %}
 
 {% endfor %}
 
-<p class="smaller hspace">
-
+<p class="hspace">
 {% if request.user.is_authenticated %}
   <a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a>
 {% else %}
   {% trans 'Please authorize to add songs' %}.
 {% endif %}
-
 </p>
 
 {% endblock %}
