@@ -24,11 +24,10 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 {% block content %}
 
 <div class="indexlist wrap">
-  <div class="lfloat">
-    <a class="nodecor" href="{% url 'songs.views.list_art' %}">Все</a>
-  </div>
+  <a class="nodecor hspaced" href="{% url 'songs.views.list_art' %}">Все</a>
   {% for i, v in art_index.items %}
     <a class="nodecor hspaced" href="{% url 'songs.views.list_art' ind_art=i %}">{{ v|capfirst }}</a>
+    {% if forloop.counter == 26 %}<br>{% endif %}
   {% endfor %}
   <form class="search" action="{% url 'songs.views.list_songs' %}" method="get">{% csrf_token %}
     {{ form }}
@@ -128,7 +127,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
   {% endif %}
   {% if songs.has_next %}
     <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
-  {% elif songs.has.previous %}
+  {% elif songs.has_previous %}
     <span class="lightgray">{% trans 'next' %} ›</span>
   {% endif %}
   </p>

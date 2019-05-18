@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load markup %}
 {% load myfilter %}
-{% block description %}{% with posts.object_list|first as f %}{{ f.content|markdown:"codehilite,extra"|striptags|truncatewords:"200" }}{% endwith %} {% endblock %}
+{% block description %}{% with posts.object_list|first as f %}{{ f.content|markdown:"codehilite,extra"|striptags|truncatewords:"30" }}{% endwith %} {% endblock %}
 {% block keywords %}{% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}, {% endblock %}
 {% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %}, {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
@@ -86,13 +86,11 @@
     <span class="lightgray">‹ {% trans 'previous' %}</span>
   {% endif %}
   {% if posts.paginator.num_pages > 1 %}
-    <span class="hspace2">
-      {% trans 'Page' %} {{ posts.number }} {% trans 'of' %} {{ posts.paginator.num_pages }}
-    </span>
+    <span class="hspace2">{{ posts.number }} {% trans 'of' %} {{ posts.paginator.num_pages }}</span>
   {% endif %}
   {% if posts.has_next %}
     <a href="?page={{ posts.next_page_number }}">{% trans 'next' %} ›</a>
-  {% elif posts.has_next %}
+  {% elif posts.has_previous %}
     <span class="lightgray">{% trans 'next' %} ›</span>
   {% endif %}
   </p>

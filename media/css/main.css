@@ -51,7 +51,7 @@ ul.nolist { list-style-type: none; }
 ul.nolist li { padding: 2px 0 0 0; }
 .nomarg { margin: 0 0 0 0; }
 .nopad { padding: 0 0 0 0; }
-.hspaced { padding: 0 0px; }
+.hspaced { padding: 0 4px; }
 .hspace { padding: 0 12px; }
 .hspace1 { padding: 0 24px; }
 .hspace2 { padding: 0 48px; }

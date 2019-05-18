@@ -14,7 +14,6 @@
 .rside2 { min-width:600px; max-width:600px; overflow: hidden; }
 .msgtext dt { border:0; }
 .msgtext .cont img { margin: 4px 0; }
-.about p { display: inline; }
 dt .cont { display: table; width: 100%; }
 .button { margin: 40px; }
 #id_search { height: 16px; margin-left: 12px; }
@@ -25,13 +24,12 @@ dt .cont { display: table; width: 100%; }
 {% block content %}
 
 <div class="indexlist wrap">
-  <div class="lfloat">
-    <a class="nodecor" href="{% url 'books.views.list_subj' %}">Жанры</a><br>
-    <a class="nodecor" href="{% url 'books.views.list_wrt' %}">Авторы</a>
-  </div>
-  {% for i, v in wrt_index.items %}
-    <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
-  {% endfor %}
+  <a class="nodecor hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
+  <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' %}">Авт</a>
+{% for i, v in wrt_index.items %}
+  <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
+{% if forloop.counter == 26 %}<br>{% endif %}
+{% endfor %}
   <form class="search" action="{% url 'books.views.list_books' %}" method="get">{% csrf_token %}
     {{ form }}
     <input class="submit" type="submit" value="{% trans 'Search' %}" />
