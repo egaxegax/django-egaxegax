@@ -4,14 +4,14 @@
 {% block keywords %}{% trans 'Edit song' %}, {% endblock %}
 {% block title %}{% trans 'Edit song' %} - {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
-#id_artist { color: #c8c8c8; }
 #id_title { width:100%; }
+#id_url { width:100%; }
 {% endblock %}
 {% block songsclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'Edit song' #}{% endblock %}
 {% block content %}
 
-<p class="mtext hspace">Добавляйте свои подборы и тексты.</p>
+<p class="mtext hspace">Редактируйте свои подборы и тексты.</p>
 
 {% if request.user.is_authenticated %}
   <form action="{% url 'songs.views.edit_song' id=form.initial.id %}" method="post">{% csrf_token %}

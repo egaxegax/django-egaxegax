@@ -100,6 +100,9 @@ function addSongChords(opts) {
         <div class="msgcell" id="songcont">{{ song.content|safe }}</div>
         <div class="msgcell yellow" id="chordcont"></div>
       </div>
+    {% if song.url %}
+      <div class="msgtext">{{ song.url|markdown:"codehilite,extra" }}</div>
+    {% endif %}
       <div class="msgfooter gray">
         {% if song.author %}
           <a class="nodecor" href="{% url 'songs.views.user_profile' id=song.author.id %}">{{ song.author.username }}</a> {% trans 'wrote' %}

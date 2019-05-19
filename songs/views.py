@@ -74,6 +74,7 @@ def AddSongCache(song):
         'tr_title': to_translit(song.title),
         'desc': truncatewords(s, 80),
         'content': t,
+        'url': song.url,
         'author': ((hasattr(song, 'author') and song.author) and {'id': song.author.id, 'username': song.author.username}) or {},
         'date': song.date }
     cache.add('song:' + str(song.id), str(cache_song))
@@ -82,8 +83,10 @@ def AddSongListCache(mkey, song_list):
     cache_list = []
     i = 0
     for song in song_list:
-        if song.date is None: # nulls date first - about
-            if mkey != '.last_update':
+        if song.date is None: # about - nulls date first
+            if mkey == '.last_update': # skip about page
+                continue
+            else:
                 cache_list = [{
                    'id': song.id,
                    'artist': song.artist,
@@ -321,7 +324,8 @@ def edit_song(request, **kw):
                            'id': song.id,
                            'title': song.title,
                            'date': song.date,
-                           'content': UnpackContent(song)})
+                           'content': UnpackContent(song),
+                           'url': song.url })
     return render_to_response('edit_song.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
@@ -371,10 +375,9 @@ def get_song(request, **kw):
         #
         if request.GET.get('astext'): # get song text only
             rs = HttpResponse((song['artist'] + ' ' + song['title'] + '\n\n' +
-                                  striptags(song['content']
-                                            .replace('&nbsp;',' ').replace('<br/>', '\n'))).encode('cp1251')
-                                      +'\n\n(source egaxegax.appspot.com)', 
-                              content_type='text/plain')
+                  striptags(song['content'].replace('&nbsp;',' ').replace('<br/>', '\n'))).encode('cp1251')
+                        +'\n\n(source egaxegax.appspot.com)', 
+              content_type='text/plain')
             return rs
         if song['title'] != 'about': # add about to song text
             mkey = '.about' + song['artist']

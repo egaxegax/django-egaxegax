@@ -5,7 +5,7 @@ from songs.models import *
 class AddSongForm(forms.ModelForm):
     class Meta:
         model = Song
-        exclude = ['artist', 'author', 'audio']
+        exclude = ['artist', 'author']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 10}),
         }
