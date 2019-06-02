@@ -61,3 +61,4 @@ ul.nolist li { padding: 2px 0 0 0; }
 .smaller { font-size: smaller; }
 .bigger { font-size: 150%; }
 .bigger2 { font-size: 200%; }
+.counter { display: inline-block; width: 40px; }

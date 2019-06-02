@@ -108,7 +108,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
           <a class="nodecor hspace" href="{% url 'songs.views.get_song' id=song.id %}?asfile=1" title="Сохранить" >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#4d3ca0" stroke-width="3" stroke-linecap="round" stroke-linejoin="arcs" fill="none"><path transform="scale(0.85 0.85) translate(-1 0)" d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"/></svg>
           </a>
-          <span class="smaller lightgray hspace">{{ song.index }}</span>
+          <span class="counter smaller lightgray hspace">{{ song.index }}</span>
         </div>
       {% endif %}
       </dt>
