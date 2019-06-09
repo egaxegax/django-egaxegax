@@ -21,7 +21,7 @@
       <a class="nodecor" href="{% url 'mynews.views.user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>
       {% trans 'added' %} <acronym title="{{ msg.date }}">{{ msg.date|time_since }}</acronym> {% trans 'ago' %}
       {% if request.user.is_authenticated and request.user.id == msg.author.id or request.user.is_superuser %}
-        <a class="nodecor hspace" href="{% url 'mynews.views.edit_msg' id=msg.id %}">{% trans 'Edit' %}</a>
+        <a class="nodecor hspace2" href="{% url 'mynews.views.edit_msg' id=msg.id %}">{% trans 'Edit' %}</a>
         <a class="nodecor" href="{% url 'mynews.views.delete_msg' id=msg.id %}">{% trans 'Delete' %}</a>
       {% endif %}
     </div>

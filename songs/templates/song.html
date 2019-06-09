@@ -89,7 +89,7 @@ function addSongChords(opts) {
       </div>
       <div class="msgfooter gray">
         {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
-          <a class="nodecor hspace" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor hspace2" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
           <a class="nodecor" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
         {% endif %}
       </div>
@@ -112,9 +112,8 @@ function addSongChords(opts) {
         {% if song.date %}
           <acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym> {% trans 'ago' %}
         {% endif %}
-          <a class="nodecor hspace" href="{% url 'songs.views.get_song' id=song.id %}?astext=1">{% trans 'Save' %}</a>
         {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
-          <a class="nodecor hspace" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor hspace2" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
           <a class="nodecor" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
         {% endif %}
       </div>
