@@ -373,15 +373,9 @@ def get_song(request, **kw):
             AddSongCache(song)
         song = eval(cache.get('song:' + song_id))
         #
-        if request.GET.get('astext'): # get song text only
+        if request.GET.get('asfile'): # get song file
             rs = HttpResponse((song['artist'] + ' ' + song['title'] + '\r\n\r\n' +
                   striptags(song['content'].replace('&nbsp;',' ').replace('<br/>', '\r\n'))).encode('cp1251')
-                        +'\r\n\r\n(source egaxegax.appspot.com)',
-                  content_type='text/plain')
-            return rs
-        if request.GET.get('asfile'): # get song file
-            rs = HttpResponse(song['artist'] + ' ' + song['title'] + '\r\n\r\n' +
-                  striptags(song['content'].replace('&nbsp;',' ').replace('<br/>', '\r\n'))
                         +'\r\n\r\n(source egaxegax.appspot.com)', 
                   content_type='text/plain')
             rs['Content-Disposition'] = 'attachment; filename="' + song['tr_title'] + '.txt"'
