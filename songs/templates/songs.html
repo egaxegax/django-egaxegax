@@ -79,7 +79,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
       </div>
       <div class="msgfooter gray">
         {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}
-          <a class="nodecor" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
+          <a class="nodecor hspace2" href="{% url 'songs.views.edit_song' id=song.id %}">{% trans 'Edit' %}</a>
           <a class="nodecor" href="{% url 'songs.views.delete_song' id=song.id %}">{% trans 'Delete' %}</a>
         {% endif %}
       </div>
