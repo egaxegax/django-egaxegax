@@ -62,6 +62,9 @@ msgstr "Нет книг"
 msgid "Please authorize to add books"
 msgstr "Войдите, чтобы добавлять книги"
 
+msgid "Please authorize to download book"
+msgstr "Войдите, чтобы скачать книгу"
+
 msgid "Add book"
 msgstr "Добавить книгу"
 
