@@ -123,7 +123,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 
 {% endfor %}
 
-  <p class="hspace">
+  <p class="cfloat">
   {% if songs.has_previous %}
     <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
   {% elif songs.has_next  %}
