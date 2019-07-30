@@ -19,12 +19,6 @@
 
 {% if subject.subject %}
   <p><h2 class="nomarg"><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subject.id %}"><span class="hspace">{{ subject.subject }} </span></a></h2></p>
-{% else %}
-  <div class="wrap">
-    <div class="msgtext">
-      <a class="nodecor" href="{% url 'posts.views.list_subjects' %}">Список тем</a>
-    </div>
-  </div>
 {% endif %} 
 
 {% if subject.subject %}
@@ -94,6 +88,8 @@
     <span class="lightgray">{% trans 'next' %} ›</span>
   {% endif %}
   </p>
+
+  <p class="hspace"><a href="{% url 'posts.views.list_subjects' %}">Все темы</a></p>
 
 {% else %}
 
