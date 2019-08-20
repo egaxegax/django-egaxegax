@@ -4,7 +4,7 @@
 {% load myfilter %}
 {% block description %}{% with posts.object_list|first as f %}{{ f.content|markdown:"codehilite,extra"|striptags|truncatewords:"30" }}{% endwith %} {% endblock %}
 {% block keywords %}{% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'notes' %}, {% trans 'posts' %}, {% endblock %}
-{% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %}, {% trans 'notes' %}, {% trans 'posts' %} - {% endblock %}
+{% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}{% else %}{% trans 'Posts and notes' %}{% endif %} - {% trans 'posts' %} - {% endblock %}
 {% block pagestyle %}
 .subtitle { display: block; margin: 4px; }
 {% endblock %}
@@ -105,7 +105,7 @@
       <tr><th></th><td>
         <table cellspacing="0" cellpadding="0" width="100%"><tr>
           <td><input type="submit" value="{% trans 'Post' %}" /></td>
-          <td class="" align="right">{% trans 'Support syntax' %} <b>Markdown</b></td></tr>
+          <td class="" align="right">{% trans 'Support syntax' %} <a class="nodecor" title="Описание разметки Markdown" href="/posts/subj/77003">Markdown</a></td></tr>
         </table>
       </td></tr>
     </table>

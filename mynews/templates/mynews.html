@@ -13,7 +13,7 @@
 {% endblock %}
 {% block pageheader %}{# trans 'My news' #}{% endblock %}
 {% block content %}
-  <p class="mtext hspace">Кто на новенького? Последния изменения, обновления на сайте, сообщения от пользователей.</p>
+  <p class="mtext hspace">Кто на новенького? Последния изменения, обновления на сайте, сообщения.</p>
 {% for msg in news.object_list %}
   <div class="wrap">
     <div class="msgtext">{{ msg.content|markdown:"codehilite,extra" }}</div>
@@ -68,7 +68,7 @@
       <tr><th></th><td>
         <table cellspacing="0" cellpadding="0" width="100%"><tr>
           <td><input type="submit" value="{% trans 'Post' %}" /></td>
-          <td class="" align="right">{% trans 'Support syntax' %} <b>Markdown</b></td></tr>
+          <td class="" align="right">{% trans 'Support syntax' %} <a class="nodecor" title="Описание разметки Markdown" href="/posts/subj/77003">Markdown</a></td></tr>
         </table>
       </td></tr>
     </table>

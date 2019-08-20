@@ -46,13 +46,10 @@ msgid "Register"
 msgstr "Регистрация"
 
 msgid "About"
-msgstr "О САЙТЕ"
-
-msgid "Main"
-msgstr "Заходите, смотрите, пишите заметки, оставляйте комментарии"
+msgstr "О сайте"
 
 msgid "Photos"
-msgstr "ФОТО"
+msgstr "Фото"
 
 msgid "Write to"
 msgstr "Написать"
@@ -66,7 +63,7 @@ msgid "All photos"
 msgstr "Подборка фотографий, снятых на телефон, о природе, местах, людях"
 
 msgid "images, pictures, photos"
-msgstr "изображения, картинки, фото"
+msgstr "изображения, картинки"
 
 msgid "No photos"
 msgstr "Нет фотографий"

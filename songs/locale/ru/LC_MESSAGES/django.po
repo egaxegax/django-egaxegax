@@ -35,13 +35,13 @@ msgstr "Время"
 #: templates/base.html
 
 msgid "songs"
-msgstr "Подборы гитарных аккордов к песням. Читайте, добавляйте свои подборы и тексты"
+msgstr "Подборы гитарных аккордов к песням"
 
 msgid "chords"
 msgstr "аккорды, тексты песен"
 
 msgid "Chords"
-msgstr "АККОРДЫ"
+msgstr "Аккорды"
 
 msgid "Chords, lyrics"
 msgstr "Аккорды и тексты песен"
