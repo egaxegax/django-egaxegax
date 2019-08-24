@@ -4,7 +4,7 @@
 {% block description %}{% if album %}{{ album }}, {% endif %}{% trans 'All photos' %} {% endblock %}
 {% block keywords %}{% if album %}{{ album }}, {% endif %}{% trans 'images, pictures, photos' %}, {% endblock %}
 {% block title %}
-{% if album %}{{ album }}{% else %}{% trans 'Photogallery' %}{% endif %} - {% trans 'images, pictures, photos' %} - {% endblock %}
+{% if album %}{{ album }}, {% trans 'photos' %}{% else %}{% trans 'Photogallery' %}{% endif %} - {% endblock %}
 {% block pagestyle %}
 table.cont { width:100%; padding: 10px 2px; }
 table.cont td { text-align: center; vertical-align: top; }

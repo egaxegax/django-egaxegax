@@ -65,6 +65,9 @@ msgstr "Подборка фотографий, снятых на телефон,
 msgid "images, pictures, photos"
 msgstr "изображения, картинки"
 
+msgid "photos"
+msgstr "подборка фото"
+
 msgid "No photos"
 msgstr "Нет фотографий"
 

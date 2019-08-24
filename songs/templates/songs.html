@@ -7,9 +7,8 @@
 {% block keywords %}{% if song_count %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %} {{ song_count }} текстов, {% endif %}{% trans 'chords' %}, {% endblock %}
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if song_count and not search_count %}{% if art_key %}Список исполнителей{% else %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}{% endif %}{% endif %}
-{% if not song_count and not search_count %}{% trans 'Chords, lyrics' %}{% endif %}
- - {% trans 'songs' %} - {% endblock %}
+{% if song_count and not search_count %}{% if art_key %}Список исполнителей{% else %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}, {% trans 'chords' %}{% endif %}{% endif %}
+{% if not song_count and not search_count %}{% trans 'Chords, lyrics' %}{% endif %} - {% endblock %}
 {% block pagestyle %}
 .msgtext dt { border:0; }
 .about p { display: inline; }
@@ -74,7 +73,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
   {% if not song.date and song.content %}
     <div class="wrap">
       <div class="about msgtext">
-        <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt="" title="{{ song.artist }}" />
+        <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
         <span class="smaller">{{ song.content|markdown:"codehilite,extra" }}</span>
       </div>
       <div class="msgfooter gray">
@@ -88,11 +87,11 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
     <div class="wrap">
       <dl class="msgtext"><dt>
       {% if art_count %}
-        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt="" title="" />
+        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
         <a class="nodecor" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
       {% endif %}
       {% if last_count or search_count%}
-        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt="" title="" />
+        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
         <a class="nodecor pink" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
       {% endif %}
       {% if song.count %}

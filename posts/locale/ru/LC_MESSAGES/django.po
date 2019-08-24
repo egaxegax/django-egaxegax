@@ -28,11 +28,6 @@ msgstr "Время"
 msgid "Posts"
 msgstr "Статьи"
 
-#: templates/subjects.html
-
-msgid "Profile"
-msgstr "Профайл"
-
 #: templates/posts.html
 
 msgid "Posts and notes"
@@ -73,8 +68,11 @@ msgstr "Поддерживается разметка"
 
 #: templates/subjects.html
 
+msgid "Profile"
+msgstr "Профайл"
+
 msgid "Subjects"
-msgstr "Темы"
+msgstr "Темы заметок"
 
 msgid "No subjects"
 msgstr "Нет записей"
