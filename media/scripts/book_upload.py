@@ -1,9 +1,9 @@
 #!python
 # -*- coding: utf-8 -*-
 #
-# Upload books from text files with cover image and .epub file
+# Upload books from text files and .epub file located ..
 #
-# book_upload.py <path_to_files>
+# book_upload.py <path_to_files_txt>
 
 import urllib2, re, sys, os, time, zlib
 
@@ -17,7 +17,7 @@ def E_OS(text):
     return text.decode('cp1251')
   return text
 
-path = u'.'
+path = '.'
 mcount = 0 # files uploaded counter
 nstart = 0 # start counter
 

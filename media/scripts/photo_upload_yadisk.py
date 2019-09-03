@@ -1,7 +1,7 @@
 #!python
 # -*- coding: utf-8 -*-
 #
-# Upload images to GAE
+# Upload images to Yandex.Disk
 #
 # photo_upload.py <path_to_files> [<memberonly>] [<user>]
 
@@ -12,12 +12,14 @@ sys.path.insert(0, os.path.abspath(sys.argv[0] + '/../../..'))
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 
+from YaDiskClient.YaDiskClient import YaDisk
+
 def E_OS(text):
   if os.name == 'nt':
     return text.decode('cp1251')
   return text
 
-path = u'.'
+path = '.'
 if (len(sys.argv) > 1):
   path = os.path.abspath(sys.argv[1])
 
@@ -29,7 +31,7 @@ user = 'guru'
 if (len(sys.argv) > 3):
   user = sys.argv[3]
 
-uplog = file(os.path.join(path, 'up.log'), 'w')
+yadisk = YaDisk(os.getenv('YALOGIN'), os.getenv('YAPASSWD'))
 
 for root, dirs, files in os.walk(path, topdown=False):
 
@@ -42,31 +44,36 @@ for root, dirs, files in os.walk(path, topdown=False):
 
     if ext.lower() in ('.gif','.jpg','.png',):
 
+      remote_folder = 'FotoSite'
+      if os.getenv('EGAX_DEBUG') == '1':
+          remote_folder = 'Foto'
+      remote_file = name
+      remote_path = E_OS('/{folder}/{file}'.format(folder=remote_folder, file=remote_file))
+
+      yadisk.upload(remote_file, remote_path)
+      url = yadisk.publish_doc(remote_path)
+
       param = []
 
-      try:
-        param += [('img', open(name, "rb"))]
-      except:
-        print 'Error: ', sys.exc_info()[0], sys.exc_info()[1]
-
       param += [("album", E_OS(os.path.basename(cwd)))]
+      param += [("thumb_url", url)]
       param += [("title", E_OS(fname))]
       param += [("memberonly", memberonly)]
       param += [("user", user)]
 
-      print os.path.basename(cwd), name
-
+      print os.path.basename(cwd), name, url
+ 
       register_openers()
       datagen, headers = multipart_encode(param)
 
       url = "http://egaxegax.appspot.com/photos/add"
       if os.getenv('EGAX_DEBUG') == '1':
           url = "http://127.0.0.1:8800/photos/add"
-
+ 
       request = urllib2.Request(url)
       uri = re.findall(r'form action="([^\"]*)"', urllib2.urlopen(request).read())
       if uri:
           print uri
           request = urllib2.Request(uri[0], datagen, headers)
-          print >> uplog, urllib2.urlopen(request).read()
+          resp = urllib2.urlopen(request).read()
           time.sleep(3)

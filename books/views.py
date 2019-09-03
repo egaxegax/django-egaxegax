@@ -51,9 +51,12 @@ def PageList(request, qst, per_page=5):
 
 def AddWrtListCache(wrt_key, wrt_list):
     cache_list = []
+    i = 0
     for wrt in wrt_list:
+        i += 1
         cache_list.append({
            'id': wrt.id,
+           'counter': i,
            'writer': {'id': wrt.id, 'writer': wrt.writer, 'count': wrt.count},
            'tr_wrt': to_translit(wrt.writer),
            'count': wrt.count })
@@ -529,11 +532,15 @@ def delete_book(request, **kw):
             if len(book_list) == 1:
                 IncWrtCount(writer=book.writer.writer, count=-1)
                 IncSubjCount(subject=book.subject.subject, count=-1)
-                ClearWrtListCache(book.writer.writer[0].capitalize())
-                ClearBookListWrtCache(book.writer.id)
-                ClearBookListSubjCache(book.subject.id)
+#                 ClearWrtListCache(book.writer.writer[0].capitalize())
+#                 ClearBookListWrtCache(book.writer.id)
+#                 ClearBookListSubjCache(book.subject.id)                
             ClearBookCache(book.index)
             book.delete()
+            if hasattr(book, 'file') and book.file:
+                name = book.file.name.rsplit('/')[-1].replace("'","''")
+                for blob in blobstore.BlobInfo.gql("WHERE filename = '%s'" % (name,)):
+                    blob.delete()
     return HttpResponseRedirect(reverse('books.views.list_books'))
 
 def user_profile(request, **kw):

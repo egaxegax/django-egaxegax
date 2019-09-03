@@ -19,6 +19,7 @@ handlers:
 - url: /media
   static_dir: media/
   expiration: '365d'
+  secure: always
 
 - url: /.*
   script: djangoappengine/main/main.py

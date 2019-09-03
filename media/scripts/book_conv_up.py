@@ -23,7 +23,7 @@ def E_OS(text):
     return text.decode('cp1251')
   return text
 
-path = u'.'
+path = '.'
 if (len(sys.argv) > 1):
   path = os.path.abspath(E_OS(sys.argv[1]))
 

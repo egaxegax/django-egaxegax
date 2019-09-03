@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="{{ MEDIA_URL }}css/books/page_styles.css" type="text/css" />
 {% endblock %}
 {% block pagestyle%}
+.lside2 { min-width:200px; max-width:200px; }
 #id_search { height: 16px; margin-left: 12px; }
 {% endblock %}
 {% block booksclass %}wrap3{% endblock %}
@@ -47,10 +48,12 @@
 {% endif %}
 
 <div class="wrap">
-  <div class="msgtext">
-    <img id="cover-{{ book.title|to_translit }}" title="{{ book.writer.writer }} {{ book.title }}" alt="{{ book.writer.writer }} {{ book.title }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" width="160px"/><br/>
+  <dl class="msgtext"><dt>
+    <div class="lside2 cfloat">
+      <img id="cover-{{ book.title|to_translit }}" title="{{ book.writer.writer }} {{ book.title }}" alt="{{ book.writer.writer }} {{ book.title }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" width="160px"/><br/>
+    </div>
     <div class="calibre">{{ book.content|strip_anno|safe }}</div>
-  </div>
+  </dt></dl>
   <div class="msgfooter gray">
     {% trans 'Added' %}
     {% if book.author %} 
@@ -75,7 +78,7 @@
     </a>
   {% endif %}
 {% else %}
-  <p class="hspace">Войдите, чтобы читать дальше.</p>
+  <p class="hspace">{% trans 'Please authorize to get books' %}.</p>
 {% endif %}
 
 {% endblock %}

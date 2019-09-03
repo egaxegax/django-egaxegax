@@ -23,6 +23,7 @@ dt .cont { display: table; width: 100%; }
 {% endblock %}
 {% block content %}
 
+{% if request.user.is_authenticated %}
 <div class="indexlist wrap">
   <a class="nodecor hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
   <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' %}">Авторы</a>
@@ -35,6 +36,7 @@ dt .cont { display: table; width: 100%; }
     <input class="submit" type="submit" value="{% trans 'Search' %}" />
   </form>
 </div>
+{% endif %}
 
 {% if last_count %}
 <p class="mtext hspace">
@@ -85,8 +87,10 @@ dt .cont { display: table; width: 100%; }
       {% if book.count %}
         <span class="smaller">[{{ book.count }}]</span>
       {% endif %}
-        </dt>
-      </dl>
+        <div class="rfloat">
+          <span class="counter smaller lightgray hspace">{{ book.counter }}</span>
+        </div>
+      </dt></dl>
     </div>
   {% endfor %}
 
@@ -122,42 +126,48 @@ dt .cont { display: table; width: 100%; }
     <div class="wrap">
     <dl class="msgtext"><dt>
       <div class="cont">
-  	  <div class="lfloat lside2 cfloat">
-  	    <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
-  	      {% if subject or search_count %}
-  	        <!--div class="writer gray smaller">{{ book.writer.writer|strans }}</div-->
-  	      {% endif %}
-  	        <img id="thumb{{ forloop.counter }}" title="{{ book.writer.writer }} {{ book.title }}" alt="{{ book.writer.writer }} {{ book.title }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" width="160px"/><br/>
-  	        <!--div class="gray smaller">{{ book.title }}</div-->
-	      </div>
-	    </a>
+  	    <div class="lfloat lside2 cfloat">
+  	      <a id="thumbref{{ forloop.counter }}" class="nodecor" href="{% url 'books.views.read_book' ind=book.index part=book.part %}">
+            <img id="thumb{{ forloop.counter }}" title="{{ book.writer.writer }} {{ book.title }}" alt="{{ book.writer.writer }} {{ book.title }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" width="160px"/><br/>
+          </a>
+	    </div>
 	    <div class="lfloat rside2">
           <p>
             <a class="nodecor" href="{% url 'books.views.list_books' tr_wrt=book.tr_wrt id_wrt=book.writer.id %}">{{ book.writer.writer|strans }}</a>
             <a href="{% url 'books.views.read_book' tr_wrt=book.tr_wrt tr_titl=book.tr_titl ind=book.index part=book.part %}">{{ book.title|escape }}</a>
           </p>
-        <div class="smaller gray">Жанр: <a class="nodecor" href="{% url 'books.views.list_books' tr_subj=book.tr_subj id_subj=book.subject.id %}">{% trans book.subject.subject %}</a></div>
-        <div class="button">
-          <a class="hspace2" href="{% url 'books.views.read_book' tr_wrt=book.tr_wrt tr_titl=book.tr_titl ind=book.index part=book.part %}">Читать</a>
-        {% if request.user.is_authenticated %}
-          <a class="hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
-        {% else %}
-          <a class="hspace" title="{% trans 'Please authorize to download book' %}">Скачать</a>&nbsp;
-        {% endif %}
+          <div class="smaller gray">Жанр: <a class="nodecor" href="{% url 'books.views.list_books' tr_subj=book.tr_subj id_subj=book.subject.id %}">{% trans book.subject.subject %}</a></div>
+          <div class="smaller">
+            <p>{{ book.content|strip_anno|striptags|strip_text|truncatewords:"30" }}</p>
+          </div>        
+          <div class="button">
+          {% if request.user.is_authenticated %}
+            <a class="hspace2" href="{% url 'books.views.read_book' tr_wrt=book.tr_wrt tr_titl=book.tr_titl ind=book.index part=book.part %}">Читать</a>
+            <a class="hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
+          {% if request.user.id == book.author.id or request.user.is_superuser %}
+            <a class="pink hspace" href="{% url 'books.views.edit_book' id=book.id %}">Править</a>
+            <a class="pink hspace" href="{% url 'books.views.delete_book' id=book.id %}">Удалить</a>
+          {% endif %}
+          {% else %}
+            <a class="gray hspace2" title="{% trans 'Please authorize to get books' %}">Читать</a>
+            <a class="gray hspace"  title="{% trans 'Please authorize to get books' %}">Скачать</a>&nbsp;
+          {% endif %}
+          </div>
         </div>
-      </div>
-      <p class="counter smaller rfloat lightgray hspace">{{ book.counter }}</p>
+        <p class="counter smaller rfloat lightgray hspace">{{ book.counter }}</p>
 	  </div>
     </dt></dl>
     </div>
   {% endfor %}
 
-  {% if books.has_next or last_count or search_count %}
-    <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% elif writer %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">      
-      <div class="wrap cfloat">
-        <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" />
-      </div>
-    </a>
+  {% if request.user.is_authenticated %}
+    {% if books.has_next or last_count or search_count %}
+      <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% elif writer %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">      
+        <div class="wrap cfloat">
+          <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" />
+        </div>
+      </a>
+    {% endif %}
   {% endif %}
 
 {% endif %}
@@ -175,7 +185,7 @@ dt .cont { display: table; width: 100%; }
     <a class="hspace" href="{% url 'books.views.edit_wrt' id=writer.id %}">Править автора</a>
   {% endif %}
 {% else %}
-  {% trans 'Please authorize to add books' %}.
+  {% trans 'Please authorize to get books' %}.
 {% endif %}
 </p>
 
