@@ -2,6 +2,7 @@ a {
     text-decoration: none;
     font-weight:normal;
 }
+h1,h2 {font-size: 1.5em; }
 .calibre {
     display: block;
     font-size: 1em;

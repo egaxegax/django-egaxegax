@@ -22,7 +22,7 @@
 
 <div class="indexlist wrap">
   <a class="nodecor hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
-  <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' %}">Авт</a>
+  <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' %}">Авторы</a>
 {% for i, v in wrt_index.items %}
   <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
 {% if forloop.counter == 26 %}<br>{% endif %}
@@ -49,9 +49,11 @@
 
 <div class="wrap">
   <dl class="msgtext"><dt>
+  {% if book.npart == 0 %}
     <div class="lside2 cfloat">
       <img id="cover-{{ book.title|to_translit }}" title="{{ book.writer.writer }} {{ book.title }}" alt="{{ book.writer.writer }} {{ book.title }}" src="{% url 'books.views.read_book' ind=book.index part='cover.jpeg' %}" width="160px"/><br/>
     </div>
+  {% endif %}
     <div class="calibre">{{ book.content|strip_anno|safe }}</div>
   </dt></dl>
   <div class="msgfooter gray">
