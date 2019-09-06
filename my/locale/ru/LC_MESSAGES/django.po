@@ -49,15 +49,12 @@ msgid "About"
 msgstr "О сайте"
 
 msgid "Photos"
-msgstr "Фото"
+msgstr "Фотки"
 
 msgid "Write to"
 msgstr "Написать"
 
 #: templates/photos.html
-
-msgid "Photogallery"
-msgstr "Фотогалерея"
 
 msgid "All photos"
 msgstr "Подборка фотографий, снятых на телефон, о природе, местах, людях"

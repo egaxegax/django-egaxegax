@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %}{% trans 'Log in' %} - {% endblock %}
+{% block title %}
+
+{% if request.GET.b == '/news/' %}
+{% trans 'My news' %},
+{% elif request.GET.b == '/posts/' %}
+{% trans 'Posts and notes' %},
+{% elif request.GET.b == '/photos/' %}
+{% trans 'Photos' %},
+{% elif request.GET.b == '/songs/' %}
+{% trans 'Chords, lyrics' %},
+{% elif request.GET.b == '/books/' %}
+{% trans 'Books' %},
+{% endif %}войти -
+
+{% endblock %}
+
 {% block pageheader %}{# trans 'Log in' #}{% endblock %}
 {% block content %}
 

@@ -4,7 +4,7 @@
 {% block description %}{% if album %}{{ album }}, {% endif %}{% trans 'All photos' %} {% endblock %}
 {% block keywords %}{% if album %}{{ album }}, {% endif %}{% trans 'images, pictures, photos' %}, {% endblock %}
 {% block title %}
-{% if album %}{{ album }}, {% trans 'photos' %}{% else %}{% trans 'Photogallery' %}{% endif %} - {% endblock %}
+{% if album %}{{ album }}, {% trans 'photos' %}{% else %}{% trans 'Photos' %}{% endif %} - {% endblock %}
 {% block pagestyle %}
 table.cont { width:100%; padding: 10px 2px; }
 table.cont td { text-align: center; vertical-align: top; }
@@ -22,7 +22,7 @@ table.cont td { text-align: center; vertical-align: top; }
 .nav { fill: rgba(255,255,255,0.6); }
 {% endblock %}
 {% block myclass %}wrap3{% endblock %}
-{% block pageheader %}{# trans 'Photogallery' #}{% endblock %}
+{% block pageheader %}{# trans 'Photos' #}{% endblock %}
 {% block content %}
 <script src="/media/js/dbcartasvg.js"></script>
 <script>
