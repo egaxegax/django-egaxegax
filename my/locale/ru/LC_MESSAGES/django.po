@@ -1,7 +1,4 @@
-# egaxegax.appspot.com.
-# Copyright (C) 2011
-# This file is distributed under the same license as the Django package.
-# egax@bk.ru, 2012.
+# egaxegax@gmail.com, 2019.
 #
 #, fuzzy
 msgid ""

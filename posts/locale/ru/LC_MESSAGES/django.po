@@ -1,6 +1,3 @@
-# egaxegax.appspot.com.
-# Copyright (C) 2011
-# This file is distributed under the same license as the Django package.
 # egaxegax@gmail.com, 2013.
 #
 #, fuzzy
