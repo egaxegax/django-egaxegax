@@ -18,9 +18,11 @@
   <div class="wrap">
     <div class="msgtext">{{ msg.content|markdown:"codehilite,extra" }}</div>
     <div class="msgfooter">
-      <a class="nodecor" href="{% url 'mynews.views.user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>
-      {% trans 'added' %} <acronym title="{{ msg.date }}">{{ msg.date|time_since }}</acronym> {% trans 'ago' %}
-      {% if request.user.is_authenticated and request.user.id == msg.author.id or request.user.is_superuser %}
+      {% if msg.author %}
+        <a class="nodecor" href="{% url 'mynews.views.user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>
+      {% endif %} {% trans 'Added' %}
+        <acronym title="{{ msg.date }}">{{ msg.date|time_since }}</acronym> {% trans 'ago' %}
+      {% if request.user.is_authenticated and request.user.id == msg.author.id and msg.id or request.user.is_superuser and msg.id %}
         <a class="nodecor hspace2" href="{% url 'mynews.views.edit_msg' id=msg.id %}">{% trans 'Edit' %}</a>
         <a class="nodecor" href="{% url 'mynews.views.delete_msg' id=msg.id %}">{% trans 'Delete' %}</a>
       {% endif %}
@@ -62,19 +64,10 @@
 
 <p>
   <form action="{% url 'mynews.views.add_msg' %}" method="post">{% csrf_token %}
-{% if request.user.is_authenticated %}
     <table class="mtext formpost">
       {{ form }}
-      <tr><th></th><td>
-        <table cellspacing="0" cellpadding="0" width="100%"><tr>
-          <td><input type="submit" value="{% trans 'Post' %}" /></td>
-          <td class="" align="right">{% trans 'Support syntax' %} <a class="nodecor" title="Описание разметки Markdown" href="/posts/subj/77003">Markdown</a></td></tr>
-        </table>
-      </td></tr>
+      <tr><th></th><td><input type="submit" value="{% trans 'Add' %}" /></td></td></tr>
     </table>
-{% else %}
-  <p class="hspace">{% trans 'Please authorize to post messages' %}.</p>
-{% endif %}
   </form>
 </p>
     

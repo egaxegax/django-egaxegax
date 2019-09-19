@@ -73,13 +73,23 @@ def list_msg(request, **kw):
 
 def add_msg(request):
     if request.method == 'POST':
-        form = AddMsgForm(request.POST)       
+        form = AddMsgForm(request.POST)
         if form.is_valid():
             msg = form.save(commit=False)
             if request.user.is_authenticated():
+                ClearMsgListCache()
                 msg.author = request.user
-            msg.save()
-            ClearMsgListCache()
+                msg.save()
+            elif msg.content.strip():
+                allkey = '.last_update'
+                cache_list = []
+                if cache.has_key('news:' + allkey):
+                    cache_list = eval(cache.get('news:' + allkey))
+                cache_list = [{
+                   'content': msg.content,
+                   'date': datetime.datetime.today() }] + cache_list
+                ClearMsgListCache()   
+                cache.add('news:' + allkey, str(cache_list))
     return HttpResponseRedirect(reverse('mynews.views.list_msg'))
 
 def edit_msg(request, **kw):

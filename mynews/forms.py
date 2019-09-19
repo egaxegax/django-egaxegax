@@ -8,5 +8,5 @@ class AddMsgForm(forms.ModelForm):
         model = News
         exclude = ['author', 'date']
         widgets = {
-            'content': forms.Textarea(attrs={'rows': 10}),
+            'content': forms.Textarea(attrs={'rows': 5}),
         }

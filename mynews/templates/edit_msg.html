@@ -15,7 +15,7 @@
 {% if request.user.is_authenticated %}
     <table class="formpost">
       {{ form }}
-       <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
+      <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
 {% else %}

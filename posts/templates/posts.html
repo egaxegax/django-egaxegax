@@ -55,10 +55,10 @@
       {% endif %}
       <div class="gray">
         {% if post.author %}
-          <a class="nodecor" href="{% url 'posts.views.user_profile' id=post.author.id %}">{{ post.author.username }}</a> {% trans 'wrote' %}
+          <a class="nodecor" href="{% url 'posts.views.user_profile' id=post.author.id %}">{{ post.author.username }}</a>
         {% else %}
-          {% trans 'An anonymous person' %} {% trans 'wrote' %}
-        {% endif %}
+          {% trans 'An anonymous person' %}
+        {% endif %} {% trans 'wrote' %}
         {% if post.date %}
           <acronym title="{{ post.date }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
         {% endif %}
