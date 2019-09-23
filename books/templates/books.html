@@ -23,6 +23,7 @@ dt .cont { display: table; width: 100%; }
 {% endblock %}
 {% block content %}
 
+{% if request.user.is_authenticated %}
 <div class="indexlist wrap">
   <a class="nodecor hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
   <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' %}">Авторы</a>
@@ -35,6 +36,7 @@ dt .cont { display: table; width: 100%; }
     <input class="submit" type="submit" value="{% trans 'Search' %}" />
   </form>
 </div>
+{% endif %}
 
 {% if last_count %}
 <p class="mtext hspace">
