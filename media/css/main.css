@@ -11,7 +11,7 @@ h3 { font-weight: normal; margin-top: 5px; }
   border-radius: 4px;
   box-shadow: 1px 1px 3px 0px #dfdfdf; }
 .wrap3 { 
-  background: url(/media/img/spot.png) 40% 0 no-repeat; }
+  background: #fff; border-radius: 50%; }
 .wrapbg { 
   border-radius: 2px;
   background-color: rgb(210,224,240); }

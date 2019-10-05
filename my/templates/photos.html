@@ -232,7 +232,7 @@ function vc(counter) {
         </td>
       {% else %}
         <td class="albcont">
-          <a class="nodecor" href="{% url 'my.views.list_photos' id_album=photo.id %}">
+          <a class="nodecor" href="{% if not photo.memberonly or request.user.is_superuser %}{% url 'my.views.list_photos' id_album=photo.id %}{% endif %}">
           <div class="imcont {% if photo.memberonly %}mb{% endif %}">
             <img class="rounded1 bigger" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_im_thumb:'400' }}{% endif %}" title="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.title }}{% endif %}" alt="{% if photo.memberonly %}&#128274;{% else %}&nbsp;{% endif %}"/><br/>
             <span class="caption mid bigger white">{% if not photo.memberonly or request.user.is_superuser %}{{ photo.album }}{% endif %}</span>
