@@ -15,12 +15,15 @@ RU: Содержит блог с поддержкой синтаксиса Markd
 
 ## Install
 
-To run local version install python27 and module Pillow (former PIL).<br>
-Download and install the original App Engine SDK for Python (google_appengine_1.9.x.zip).<br>
-Set environment and run as standart Django project. E.g. in Windows shell:
+To run local version install python27.<br>
+Download and install the Google Cloud SDK.<br>
+Set environments and run as standart Django project. E.g. in Windows shell:
 
-    set PATH=c:\Python27;%PATH%
-    set PATH=..\google_appengine;%PATH%
+    set PATH=%PATH%;c:\Python27;..\GoogleCloudSDK\google-cloud-sdk\platform\google_appengine
     python manage.py runserver 8080
+
+or run in from gcloud shell
+
+    dev_appserver django-egaxegax
 
 Try in browser http://127.0.0.1:8080/
