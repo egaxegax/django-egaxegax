@@ -13,20 +13,17 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
-    'django.contrib.admin',
-    'markup_deprecated',
+#    'django.contrib.admin',
     'djangotoolbox',
     'djangoappengine',
     'captcha',
-    'mathfilters',
-    'myfilter',
     'filetransfers',
-    'upload',
-    'my',
-    'mynews',
+    'markup_deprecated',
+    'books',
+    'fotos',
+    'news',
     'posts',
     'songs',
-    'books',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -44,15 +41,15 @@ LOGIN_REDIRECT_URL = '/'
 
 PROJECT_ROOT = os.path.dirname(__file__)
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATIC_URL = '/media/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'media')
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_URL = '/static/'
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'static')
 TEMPLATE_DIRS = (os.path.join(PROJECT_ROOT, 'templates'),)
 
 ROOT_URLCONF = 'urls'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = '*'

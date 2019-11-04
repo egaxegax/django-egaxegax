@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load markup %}
-{% load myfilter %}
+{% load customfilters %}
 {% block description %}{% if not last_count and book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %} {% endblock %}
 {% block keywords %}{% if not last_count and book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %}, {% endblock %}
 {% block title %}
@@ -33,7 +33,7 @@ dt .cont { display: table; width: 100%; }
 {% endfor %}
   <form class="search" action="{% url 'books.views.list_books' %}" method="get">{% csrf_token %}
     {{ form }}
-    <input class="submit" type="submit" value="{% trans 'Search' %}" />
+    <input class="submit" type="submit" value="Найти" />
   </form>
 </div>
 {% endif %}
@@ -185,7 +185,7 @@ dt .cont { display: table; width: 100%; }
     <a class="hspace" href="{% url 'books.views.edit_wrt' id=writer.id %}">Править автора</a>
   {% endif %}
 {% else %}
-  {% trans 'Please authorize to get books' %}.
+  {% trans 'Please authorize to get books' %}
 {% endif %}
 </p>
 

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% load myfilter %}
+{% load customfilters %}
 {% block description %}{{ book.content|strip_anno|striptags|strip_text|truncatewords:"40" }} {% endblock %}
 {% block keywords %}{{ book.writer.writer|strans }}, {{ book.title }}, {% trans 'books' %}, {% endblock %}
 {% block title %}{{ book.writer.writer|strans }} - {{ book.title }}, {% trans 'books' %} - {% endblock %}
@@ -29,7 +29,7 @@
 {% endfor %}
   <form class="search" action="{% url 'books.views.list_books' %}" method="get">{% csrf_token %}
     {{ form }}
-    <input class="submit" type="submit" value="{% trans 'Search' %}" />
+    <input class="submit" type="submit" value="Найти" />
   </form>
 </div>
 
@@ -80,7 +80,7 @@
     </a>
   {% endif %}
 {% else %}
-  <p class="hspace">{% trans 'Please authorize to get books' %}.</p>
+  <p class="hspace">{% trans 'Please authorize to get books' %}</p>
 {% endif %}
 
 {% endblock %}

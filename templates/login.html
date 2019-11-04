@@ -16,7 +16,7 @@
 
 {% endblock %}
 
-{% block pageheader %}{# trans 'Log in' #}{% endblock %}
+{% block pageheader %}{% endblock %}
 {% block content %}
 
 <p class="mtext hspace">Введите свои учетные данные.</p>
@@ -25,7 +25,7 @@
   <form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
   <table class="mtext">
     {{ form }}
-    <tr><th/><td><input type="submit" value="{% trans 'Log in' %}" /></td></tr>
+    <tr><th/><td><input type="submit" value="Войти" /></td></tr>
   </table>
   <input type="hidden" name="next" value="{{ request.GET.b }}">
   </form>

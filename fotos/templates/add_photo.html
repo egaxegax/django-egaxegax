@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load filetransfers %}
+{% block description %}{% trans 'Add photo' %} {% endblock %}
+{% block keywords %}{% trans 'Add photo' %}, {% endblock %}
+{% block title %}{% trans 'Add photo' %} - {% endblock %}
+{% block myclass %}wrap3{% endblock %}
+{% block pageheader %}{# trans 'Add photo' #}{% endblock %}
+{% block content %}
+<script type="text/javascript">
+function toTranslit(text) {
+  return text.replace(/([А-ЯЁа-яё])|([\s_-])|([^A-Za-z\d])/g,
+    function (all, ch, space, words, i) {
+      if (space || words) {
+          return space ? space : ' ';
+      }
+      var code = ch.charCodeAt(0),
+          index = code == 1025 || code == 1105 ? 0 :
+              code > 1071 ? code - 1038 : code - 1039,
+          t = ['YO', 'A', 'B', 'V', 'G', 'D', 'E', 'ZH', 'Z', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+               'R', 'S', 'T', 'U', 'F', 'H', 'C', 'CH', 'SH', 'SHCH', '\'\'', 'Y\'', '\'', 'E\'', 'YU', 'YA',          
+               'yo', 'a', 'b', 'v', 'g', 'd', 'e', 'zh', 'z', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+               'r', 's', 't', 'u', 'f', 'h', 'c', 'ch', 'sh', 'shch', '\'\'', 'y\'', '\'', 'e\'', 'yu', 'ya'];
+      return t[index];
+    });
+}
+</script>
+<p class="mtext hspace">Добавляйте свои фото и картинки.</p>
+  <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
+    {% render_upload_data upload_data %}
+{% if request.user.is_authenticated %}
+    <table class="formpost">
+      {{ form.as_table }}
+      <tr><th></th><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
+    </table>
+{% else %}
+  <p class="hspace">{% trans "Please authorize to add photos" %}</p>
+{% endif %}
+    {{ form.title_hid }}{{ form.album_hid }}
+  </form>
+{% endblock %}

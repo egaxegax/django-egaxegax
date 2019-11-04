@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% load myfilter %}
+{% load customfilters %}
 {% block description %}Жанры, {% trans 'books' %} {% endblock %}
 {% block keywords %}Жанры, {% trans 'books' %}, {% endblock %}
 {% block title %}
@@ -30,7 +30,7 @@
 {% if request.user.is_authenticated %}
   <a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a>
 {% else %}
-  {% trans 'Please authorize to add books' %}.
+  {% trans 'Please authorize to add books' %}
 {% endif %}
 </p>
 

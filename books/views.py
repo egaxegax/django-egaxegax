@@ -13,7 +13,7 @@ from google.appengine.api import images
 from google.appengine.ext import blobstore
 from books.forms import *
 from books.models import *
-from myfilter.templatetags.myfilter import *
+from templatetags.customfilters import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 from math import ceil

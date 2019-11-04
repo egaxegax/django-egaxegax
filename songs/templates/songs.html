@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load markup %}
-{% load myfilter %}
-{% load mathfilters %}
+{% load customfilters %}
 {% block description %}{% if song_count and not art_count %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %} {{ song_count }} текстов. {% endif %}{% trans 'songs' %} {% endblock %}
 {% block keywords %}{% if song_count %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %} {{ song_count }} текстов, {% endif %}{% trans 'chords' %}, {% endblock %}
 {% block title %}
@@ -30,7 +29,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
   {% endfor %}
   <form class="search" action="{% url 'songs.views.list_songs' %}" method="get">{% csrf_token %}
     {{ form }}
-    <input class="submit" type="submit" value="{% trans 'Search' %}" />
+    <input class="submit" type="submit" value="Найти" />
   </form>
 </div>
 
@@ -147,7 +146,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 {% if request.user.is_authenticated %}
   <p class="hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
 {% else %}
-  <p class="hspace">{% trans 'Please authorize to add songs' %}.</p>
+  <p class="hspace">{% trans 'Please authorize to add songs' %}</p>
 {% endif %}
 
 {% endblock %}

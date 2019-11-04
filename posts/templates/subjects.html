@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load markup %}
-{% load myfilter %}
+{% load customfilters %}
 {% block description %}{% trans 'Posts and notes' %} {% endblock %}
 {% block keywords %}{% trans 'posts' %}, {% endblock %}
 {% block title %}{% trans 'Subjects' %}, {% trans 'posts' %} - {% endblock %}
@@ -68,7 +68,7 @@
       </td></tr>
     </table>
 {% else %}
-  <p class="hspace">{% trans 'Please authorize to post messages' %}.</p>
+  <p class="hspace">{% trans 'Please authorize to post messages' %}</p>
 {% endif %}
   </form>
 </p>

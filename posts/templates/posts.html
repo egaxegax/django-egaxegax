@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load markup %}
-{% load myfilter %}
+{% load customfilters %}
 {% block description %}{% with posts.object_list|first as f %}{{ f.content|markdown:"codehilite,extra"|striptags|truncatewords:"30" }}{% endwith %} {% endblock %}
 {% block keywords %}{% if subject.title %}{{ subject.title }}, {% endif %}{% if subject.subject %}{{ subject.subject }}, {% endif %}{% trans 'posts' %}, {% endblock %}
 {% block title %}{% if subject.title %}{{ subject.title }} - {% endif %}{% if subject.subject %}{{ subject.subject }}, {% trans 'posts' %}{% else %}{% trans 'Posts and notes' %}{% endif %} - {% endblock %}
@@ -55,10 +55,8 @@
       {% endif %}
       <div class="gray">
         {% if post.author %}
-          <a class="nodecor" href="{% url 'posts.views.user_profile' id=post.author.id %}">{{ post.author.username }}</a>
-        {% else %}
-          {% trans 'An anonymous person' %}
-        {% endif %} {% trans 'wrote' %}
+          <a class="nodecor hspace" href="{% url 'posts.views.user_profile' id=post.author.id %}">{{ post.author.username }}</a>
+        {% endif %}
         {% if post.date %}
           <acronym title="{{ post.date }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
         {% endif %}
@@ -110,7 +108,7 @@
       </td></tr>
     </table>
 {% else %}
-  <p class="hspace">{% trans 'Please authorize to post messages' %}.</p>
+  <p class="hspace">{% trans 'Please authorize to post messages' %}</p>
 {% endif %}
   </form>
 </p>

@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.utils import timezone
 from songs.forms import *
 from songs.models import *
-from myfilter.templatetags.myfilter import *
+from templatetags.customfilters import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 import os.path, datetime, time, sys, re, base64, zlib

@@ -65,9 +65,6 @@ msgstr "назад"
 msgid "No songs"
 msgstr "Нет песен"
 
-msgid "Please authorize to add songs"
-msgstr "Войдите, чтобы добавлять песни"
-
 msgid "Add song"
 msgstr "Добавить песню"
 
@@ -104,3 +101,8 @@ msgstr "Найти по названию"
 msgid "Search result"
 msgstr "Найдено"
 
+msgid "Please authorize to add songs"
+msgstr "Войдите, чтобы добавлять песни"
+
+msgid "Please authorize to edit songs"
+msgstr "Войдите, чтобы править песни"
