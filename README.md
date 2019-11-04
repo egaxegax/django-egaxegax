@@ -13,7 +13,7 @@ Contains apps:
 
 RU: Содержит блог с поддержкой синтаксиса Markdown, хранилище фотографий.
 
-## Install
+## Install and run
 
 To run local version install python27.<br>
 Download and install the Google Cloud SDK.<br>
@@ -22,7 +22,7 @@ Set environments and run as standart Django project. E.g. in Windows shell:
     set PATH=%PATH%;c:\Python27;..\GoogleCloudSDK\google-cloud-sdk\platform\google_appengine
     python manage.py runserver 8080
 
-or run in from gcloud shell
+or run from gcloud shell
 
     dev_appserver django-egaxegax
 
