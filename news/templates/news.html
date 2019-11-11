@@ -20,6 +20,8 @@
     <div class="msgfooter">
       {% if msg.author %}
         <a class="nodecor hspace" href="{% url 'news.views.user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>
+      {% else %}
+        <a class="gray nodecor lfloat">Реклама</a>
       {% endif %}
         <acronym title="{{ msg.date }}">{{ msg.date|time_since }}</acronym> {% trans 'ago' %}
       {% if request.user.is_authenticated and request.user.id == msg.author.id and msg.id or request.user.is_superuser and msg.id %}

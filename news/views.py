@@ -43,23 +43,16 @@ def AddMsgListCache(theme, msg_list):
     cache.add('news:' + theme, str(cache_list))
 
 def ClearMsgListCache():
-    cache.delete_many(['news:.full_list', 'news:.last_update'])
+    cache.delete_many(['news:.full_list'])
 
 # Controllers
 
 def list_msg(request, **kw):
     per_page = 7
-    if kw.has_key('all'):
-        per_page = 11
-        allkey = '.full_list'
-        if not cache.has_key('news:' + allkey):
-            msg_list = News.objects.order_by('-date')
-            AddMsgListCache(allkey, msg_list)
-    else:
-        allkey = '.last_update'
-        if not cache.has_key('news:' + allkey):
-            msg_list = News.objects.order_by('-date')
-            AddMsgListCache(allkey, msg_list)
+    allkey = '.full_list'
+    if not cache.has_key('news:' + allkey):
+        msg_list = News.objects.order_by('-date')
+        AddMsgListCache(allkey, msg_list)
     msg_list = eval(cache.get('news:' + allkey))
     return render_to_response('news.html', 
                               context_instance=RequestContext(request,
@@ -81,7 +74,7 @@ def add_msg(request):
                 msg.author = request.user
                 msg.save()
             elif msg.content.strip():
-                allkey = '.last_update'
+                allkey = '.full_list'
                 cache_list = []
                 if cache.has_key('news:' + allkey):
                     cache_list = eval(cache.get('news:' + allkey))
