@@ -133,7 +133,7 @@ def get_avatar(request, **kw):
     if profile.avatar:
         return serve_file(request, profile.avatar)
     else:
-        return HttpResponseRedirect('/media/img/anon.png')
+        return HttpResponseRedirect('/static/img/anon.png')
 
 def index(request):
     return render_to_response('index.html', 
