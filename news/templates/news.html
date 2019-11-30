@@ -17,7 +17,7 @@
 {% for msg in news.object_list %}
   <div class="wrap">
     <div class="msgtext">{{ msg.content|markdown:"codehilite,extra" }}</div>
-    <div class="msgfooter">
+    <div class="msgfooter gray">
       {% if msg.author %}
         <a class="nodecor hspace" href="{% url 'news.views.user_profile' id=msg.author.id %}">{{ msg.author.username }}</a>
       {% else %}

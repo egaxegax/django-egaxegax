@@ -82,7 +82,7 @@ def add_msg(request):
                    'content': msg.content,
                    'date': datetime.datetime.today() }] + cache_list
                 ClearMsgListCache()   
-                cache.add('news:' + allkey, str(cache_list), 60*60*24) # cache timeout 24 hours
+                cache.add('news:' + allkey, str(cache_list), 60*60*3) # cache timeout 24 hours            
     return HttpResponseRedirect(reverse('news.views.list_msg'))
 
 def edit_msg(request, **kw):
