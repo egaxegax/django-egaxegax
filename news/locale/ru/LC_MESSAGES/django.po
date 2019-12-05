@@ -1,34 +1,18 @@
-# egaxegax@gmail.com, 2013
-#
-#, fuzzy
-msgid ""
-msgstr ""
-"Project-Id-Version: 1.0\n"
-"Language: \n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-
 #: models.py
 
 msgid "content"
 msgstr "Текст"
 
-#: templates/base.html
-
-msgid "News"
-msgstr "Новости"
-
 #: templates/mynews.html
 
 msgid "My news"
-msgstr "Что нового"
+msgstr "Записки"
 
 msgid "updates, comments, news"
 msgstr "сообщения, комментарии, новости"
 
 msgid "All news"
-msgstr "Все новости"
+msgstr "Все записи"
 
 msgid "No posts"
 msgstr "Нет записей"

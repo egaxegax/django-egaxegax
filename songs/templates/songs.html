@@ -7,7 +7,7 @@
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
 {% if song_count and not search_count %}{% if art_key %}Список исполнителей{% else %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}, {% trans 'chords' %}{% endif %}{% endif %}
-{% if not song_count and not search_count %}{% trans 'Chords, lyrics' %}{% endif %} - {% endblock %}
+{% if not song_count and not search_count %}{% trans 'Chords' %}{% endif %} - {% endblock %}
 {% block pagestyle %}
 .msgtext dt { border:0; }
 .about p { display: inline; }
@@ -35,7 +35,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 
 {% if last_count %}
 <p class="mtext hspace">
-  Подборы гитарных аккордов к песням. В базе свыше <b>26000</b> текстов.
+  Подборы гитарных аккордов к песням и просто стихи. В базе свыше <b>26000</b> текстов.
 </p>
 <ul class="mtext hr hspace2">
 <li class="inl"><a class="nodecor" href="/posts/5691594208444416#id5691594208444416">Аккорды</a>
