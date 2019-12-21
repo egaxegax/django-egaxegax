@@ -51,7 +51,7 @@
     </div>
     <div class="msgfooter">
       {% if not subject.subject and post.subject %}
-        <div><a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a></div>
+        <a class="nodecor lfloat" href="{% url 'posts.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a>
       {% endif %}
       <div class="gray">
         {% if post.author %}
