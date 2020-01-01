@@ -78,9 +78,13 @@ def add_msg(request):
                 cache_list = []
                 if cache.has_key('news:' + allkey):
                     cache_list = eval(cache.get('news:' + allkey))
-                cache_list = [{
-                   'content': msg.content,
-                   'date': datetime.datetime.today() }] + cache_list
+                    msg = {
+                       'content': msg.content,
+                       'date': datetime.datetime.today() }
+                    if cache_list and not cache_list[0].get('author'):
+                        cache_list[0] = msg
+                    else:
+                        cache_list = [msg] + cache_list
                 ClearMsgListCache()   
                 cache.add('news:' + allkey, str(cache_list), 60*60*3) # cache timeout 24 hours            
     return HttpResponseRedirect(reverse('news.views.list_msg'))
