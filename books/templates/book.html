@@ -63,7 +63,7 @@
     {% else %}
       {% trans 'An anonymous person' %}
     {% endif %}
-    <acronym title="{{ book.date }}">{{ book.date|time_since }}</acronym> {% trans 'ago' %}
+    <acronym title="{{ book.date }}">{{ book.date|time_since }}</acronym>
     {% if request.user.is_authenticated and request.user.id == book.author.id or request.user.is_superuser %}
       <a class="nodecor hspace2" href="{% url 'books.views.edit_book' id=book.id %}">{% trans 'Edit' %}</a>
       <a class="nodecor" href="{% url 'books.views.delete_book' id=book.id %}">{% trans 'Delete' %}</a>

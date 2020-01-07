@@ -51,14 +51,14 @@
     </div>
     <div class="msgfooter">
       {% if not subject.subject and post.subject %}
-        <a class="nodecor lfloat" href="{% url 'posts.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a>
+        <a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=post.subject.id %}">{{ post.subject.subject|escape }}</a>
       {% endif %}
       <div class="gray">
         {% if post.author %}
           <a class="nodecor hspace" href="{% url 'posts.views.user_profile' id=post.author.id %}">{{ post.author.username }}</a>
         {% endif %}
         {% if post.date %}
-          <acronym title="{{ post.date }}">{{ post.date|time_since }}</acronym> {% trans 'ago' %}
+          <acronym title="{{ post.date }}">{{ post.date|time_since }}</acronym>
         {% endif %}
         {% if request.user.is_authenticated and request.user.id == post.author.id or request.user.is_superuser %}
           <a class="nodecor hspace2" href="{% url 'posts.views.edit_post' id=post.id %}">{% trans 'Edit' %}</a>

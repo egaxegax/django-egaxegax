@@ -14,7 +14,7 @@ div.myview { height: 300px; }
  <dl class="myview msgtext">
    <dt>{% trans 'avatar'|capfirst %}&nbsp; <img width="26px" height="26px" src="{% url 'fotos.views.get_avatar' id=record.id %}" title="{{ record.username }}"/></dt>
    <dt>{% trans 'name'|capfirst %}&nbsp; <span class="smaller">{{ record.username }}</span></dt>
-   <dt>{% trans 'last login'|capfirst %}&nbsp; <span class="smaller"><acronym title="{{ record.last_login }}">{{ record.last_login|time_since }}</acronym> {% trans 'ago' %}</span></dt>
+   <dt>{% trans 'last login'|capfirst %}&nbsp; <span class="smaller"><acronym title="{{ record.last_login }}">{{ record.last_login|time_since }}</acronym></span></dt>
    <dt>{% trans 'date joined'|capfirst %}&nbsp; <span class="smaller">{{ record.date_joined }}</span></dt>
    <dt>{% trans 'posts'|capfirst %}&nbsp; <span class="smaller">{{ record_count }}</span></dt>
  </dl>

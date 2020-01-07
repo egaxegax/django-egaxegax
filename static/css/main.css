@@ -1,7 +1,4 @@
-/* 
-* main stylesheets here 
-*/
-body { font-family: arial; font-weight:400; background-color: #fff; color: #222; }
+body { font-family: arial; font-weight:400; font-size: 16px; background-color: #fff; color: #222; }
 h2 { font-size: 150%; font-family: arial; font-weight: normal; padding: 0 0 0 20px; }
 h3 { font-weight: normal; margin-top: 5px; }
 .wrap { background-color: #fff; padding: 5px 10px 2px 10px; margin: 0 0 10px;

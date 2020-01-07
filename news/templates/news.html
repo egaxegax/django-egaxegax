@@ -23,7 +23,7 @@
       {% else %}
         <a class="gray nodecor lfloat">@spam</a>
       {% endif %}
-        <acronym title="{{ msg.date }}">{{ msg.date|time_since }}</acronym> {% trans 'ago' %}
+        <acronym title="{{ msg.date }}">{{ msg.date|time_since }}</acronym>
       {% if request.user.is_authenticated and request.user.id == msg.author.id and msg.id or request.user.is_superuser and msg.id %}
         <a class="nodecor hspace2" href="{% url 'news.views.edit_msg' id=msg.id %}">{% trans 'Edit' %}</a>
         <a class="nodecor" href="{% url 'news.views.delete_msg' id=msg.id %}">{% trans 'Delete' %}</a>
@@ -66,10 +66,14 @@
 
 <p>
   <form action="{% url 'news.views.add_msg' %}" method="post">{% csrf_token %}
+  {% if request.user.is_authenticated %}
     <table class="mtext formpost">
       {{ form }}
       <tr><th></th><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
+  {% else %}
+    <p class="hspace">{% trans 'Please authorize to post messages' %}</p>
+  {% endif %}
   </form>
 </p>
     

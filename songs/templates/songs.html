@@ -113,7 +113,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
       {% endif %}
       </dt>
       {% if last_count %}
-        <dd class="smaller">{{ song.date|time_since }} {% trans 'ago' %}</dd>
+        <dd class="smaller"><acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym></dd>
       {% endif %}
       </dl>
     </div>

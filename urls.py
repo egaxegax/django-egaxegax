@@ -21,5 +21,5 @@ urlpatterns = [
         'template_name': 'login.html',}),
     url(r'^accounts/logout/?$', 'django.contrib.auth.views.logout',
         {'redirect_field_name': 'b',}),
-#     url(r'^captcha/', include('captcha.urls')),
+    url(r'^captcha/', include('captcha.urls')),
 ]
