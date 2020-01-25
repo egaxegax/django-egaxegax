@@ -7,7 +7,7 @@
 
 import urllib2, re, sys, os, time, zlib, base64
 
-sys.path.insert(0, os.path.abspath(sys.argv[0] + '/../../..'))
+sys.path.insert(0, os.path.abspath(sys.argv[0] + '/../../../vendor'))
 
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers

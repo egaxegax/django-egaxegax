@@ -7,7 +7,7 @@
 import sys, os, re, datetime
 import zlib, zipfile
 
-pth = os.path.abspath(sys.argv[0] + '../../../../')
+pth = os.path.abspath(sys.argv[0] + '/../../../vendor')
 
 sys.path.insert(0, pth)
 sys.path.insert(0, pth + '/django/utils')
