@@ -122,7 +122,7 @@ function addSongChords(opts) {
 
 <p class="hspace">
 {% if request.user.is_authenticated %}
-  <a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a>
+  <a class="mtext" href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a>
 {% else %}
   {% trans 'Please authorize to add songs' %}
 {% endif %}
