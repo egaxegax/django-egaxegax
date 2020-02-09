@@ -36,7 +36,7 @@
 
 {% if list_all %}
 
-  <p class="cfloat">
+  <p class="mtext cfloat">
   {% if news.has_previous %}
     <a href="?page={{ news.previous_page_number }}">‹ {% trans 'previous' %}</a>
   {% elif news.has_next  %}
@@ -54,7 +54,7 @@
 
 {% else %}
 
-  <p class="hspace"><a href="{% url 'news.views.list_msg' all='all' %}">{% trans 'All news' %}</a></p>
+  <p class="mtext hspace"><a href="{% url 'news.views.list_msg' all='all' %}">{% trans 'All news' %}</a></p>
 
 {% endif %}
 

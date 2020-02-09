@@ -180,7 +180,7 @@ dt .cont { display: table; width: 100%; }
 
 <p class="hspace">
 {% if request.user.is_authenticated %}
-  <a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a>
+  <a class="mtext" href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a>
   {% if writer %}
     <a class="hspace" href="{% url 'books.views.edit_wrt' id=writer.id %}">Править автора</a>
   {% endif %}

@@ -121,7 +121,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 
 {% endfor %}
 
-  <p class="cfloat">
+  <p class="mtext cfloat">
   {% if songs.has_previous %}
     <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
   {% elif songs.has_next  %}
@@ -143,10 +143,12 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 
 {% endif %}
 
+<p class="hspace">
 {% if request.user.is_authenticated %}
-  <p class="hspace"><a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
+  <a class="mtext" href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
 {% else %}
-  <p class="hspace">{% trans 'Please authorize to add songs' %}</p>
+  {% trans 'Please authorize to add songs' %}
 {% endif %}
+</p>
 
 {% endblock %}

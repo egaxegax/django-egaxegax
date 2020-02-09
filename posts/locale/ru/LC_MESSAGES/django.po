@@ -47,6 +47,11 @@ msgstr "Войдите, чтобы оставлять сообщения"
 msgid "Support syntax"
 msgstr "Поддерживается разметка"
 
+#: templates/base.html
+
+msgid "All subjects"
+msgstr "Все темы"
+
 #: templates/subjects.html
 
 msgid "Profile"

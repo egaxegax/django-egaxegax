@@ -71,7 +71,7 @@
 
 {% if posts.object_list %}
 
-  <p class="cfloat">
+  <p class="mtext cfloat">
   {% if posts.has_previous %}
     <a href="?page={{ posts.previous_page_number }}">‹ {% trans 'previous' %}</a>
   {% elif posts.has_next %}
@@ -87,7 +87,7 @@
   {% endif %}
   </p>
 
-  <p class="hspace"><a href="{% url 'posts.views.list_subjects' %}">Все темы</a></p>
+  <p class="mtext hspace"><a href="{% url 'posts.views.list_subjects' %}">{% trans 'All subjects' %}</a></p>
 
 {% else %}
 

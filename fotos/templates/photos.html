@@ -257,11 +257,13 @@ function vc(counter) {
 
 {% endif %}
 
+<p class="hspace">
 {% if request.user.is_authenticated %}
-  <p class="hspace"><a href="{% url 'fotos.views.add_photo' %}">{% trans 'Add photo' %}</a></p>
+  <a class="mtext" href="{% url 'fotos.views.add_photo' %}">{% trans 'Add photo' %}</a>
 {% else %}
-  <p class="hspace">{% trans 'Please authorize to add photos' %}</p>
+  {% trans 'Please authorize to add photos' %}
 {% endif %}
+</p>
 
 <!-- viewphoto -->
 <table id="viewtab" tabindex="0" onkeydown="(event.keyCode==27) ? cl() : (event.keyCode==37) ? eval(dw.prevlink.getAttribute('href')) : (event.keyCode==39) ? eval(dw.nextlink.getAttribute('href')) : false;">
