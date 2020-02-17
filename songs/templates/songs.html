@@ -10,7 +10,6 @@
 {% if not song_count and not search_count %}{% trans 'Chords' %}{% endif %} - {% endblock %}
 {% block pagestyle %}
 .msgtext dt { border:0; }
-.about p { display: inline; }
 ul.hr { display: table; }
 ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 #id_search { height: 16px; margin-left: 12px; }
@@ -72,8 +71,8 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
   {% if not song.date and song.content %}
     <div class="wrap">
       <div class="about msgtext">
-        <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
-        <span class="smaller">{{ song.content|markdown:"codehilite,extra" }}</span>
+        <img align="left" class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
+        {{ song.content|markdown:"codehilite,extra" }}
       </div>
       <div class="msgfooter gray">
         {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}

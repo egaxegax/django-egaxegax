@@ -111,8 +111,8 @@ dt .cont { display: table; width: 100%; }
   {% if writer.content %}
     <div class="wrap">
       <div class="about msgtext">
-        <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/books/{{ writer.tr_wrt }}.jpg" alt=" " title="" />
-        <span class="smaller">{{ writer.content|markdown:"codehilite,extra" }}</span>
+        <img align="left" class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/books/{{ writer.tr_wrt }}.jpg" alt=" " title="" />
+        {{ writer.content|markdown:"codehilite,extra" }}
       </div>
       <div class="msgfooter gray">
         {% if request.user.is_authenticated %}

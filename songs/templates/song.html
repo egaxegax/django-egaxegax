@@ -9,7 +9,6 @@
 #id_search { height: 16px; margin-left: 10px; }
 .msgcont { line-height: 1.5em; width: 100; }
 .msgcont b { font-weight: 500; color: #5645ad; }
-.msgtext p { display: inline; }
 .msgcell { display: table-cell; vertical-align: top; width: 50%; }
 #chordcont { text-align: center; }
 {% endblock %}
@@ -84,8 +83,8 @@ function addSongChords(opts) {
   {% if not song.date and song.content %}
     <div class="wrap">
       <div class="about msgtext">
-        <img class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
-        <span class="smaller">{{ song.content|markdown:"codehilite,extra" }}</span>
+        <img align="left" class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
+        {{ song.content|markdown:"codehilite,extra" }}
       </div>
       <div class="msgfooter gray">
         {% if request.user.is_authenticated and request.user.id == song.author.id or request.user.is_superuser %}

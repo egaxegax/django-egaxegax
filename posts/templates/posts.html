@@ -25,7 +25,7 @@
   {% if posts_title|length > 1 %}
     <div class="wrap">
       <div class="msgtext">
-        <a class="nodecor" href="#" onclick="if(document.getElementById('posttitle').style.display=='none') { document.getElementById('posttitle').style.display = ''; } else { document.getElementById('posttitle').style.display = 'none'; } return false;">Список глав</a>
+        <a class="nodecor" href="#" onclick="if(document.getElementById('posttitle').style.display=='none') { document.getElementById('posttitle').style.display = ''; } else { document.getElementById('posttitle').style.display = 'none'; } return false;">Содержимое</a>
           <span class="smaller"> [{{ posts_title|length }}]</span>
         <div id="posttitle" style="display:none">
           {% for title, post_id in posts_title %}
