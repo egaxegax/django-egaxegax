@@ -14,9 +14,11 @@
 .rside2 { min-width:600px; max-width:600px; overflow: hidden; }
 .msgtext dt { border:0; }
 .msgtext .cont img { margin: 4px 0; }
+.about { display: table; }
+.about * { display: table-cell; vertical-align: middle; }
 dt .cont { display: table; width: 100%; }
 .button { margin: 40px; }
-#id_search { height: 16px; margin-left: 12px; }
+id_search { height: 16px; margin-left: 12px; }
 {% endblock %}
 {% block booksclass %}wrap3{% endblock %}
 {% block pageheader %}
@@ -85,7 +87,7 @@ dt .cont { display: table; width: 100%; }
         <a class="nodecor" href="{% url 'books.views.list_books' tr_wrt=book.tr_wrt id_wrt=book.id %}">{{ book.writer.writer }}</a>
       {% endif %}
       {% if book.count %}
-        <span class="smaller">[{{ book.count }}]</span>
+        [{{ book.count }}]
       {% endif %}
         <div class="rfloat">
           <span class="counter smaller lightgray hspace">{{ book.counter }}</span>
@@ -111,7 +113,7 @@ dt .cont { display: table; width: 100%; }
   {% if writer.content %}
     <div class="wrap">
       <div class="about msgtext">
-        <img align="left" class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/books/{{ writer.tr_wrt }}.jpg" alt=" " title="" />
+        <img class="hmarg rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/books/{{ writer.tr_wrt }}.jpg" alt=" " title="" />
         {{ writer.content|markdown:"codehilite,extra" }}
       </div>
       <div class="msgfooter gray">

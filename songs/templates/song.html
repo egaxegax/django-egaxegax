@@ -10,6 +10,8 @@
 .msgcont { line-height: 1.5em; width: 100; }
 .msgcont b { font-weight: 500; color: #5645ad; }
 .msgcell { display: table-cell; vertical-align: top; width: 50%; }
+.about { display: table; }
+.about * { display: table-cell; vertical-align: middle; }
 #chordcont { text-align: center; }
 {% endblock %}
 {% block songsclass %}wrap3{% endblock %}
@@ -83,7 +85,7 @@ function addSongChords(opts) {
   {% if not song.date and song.content %}
     <div class="wrap">
       <div class="about msgtext">
-        <img align="left" class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
+        <img class="hmarg rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
         {{ song.content|markdown:"codehilite,extra" }}
       </div>
       <div class="msgfooter gray">

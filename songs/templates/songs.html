@@ -10,6 +10,8 @@
 {% if not song_count and not search_count %}{% trans 'Chords' %}{% endif %} - {% endblock %}
 {% block pagestyle %}
 .msgtext dt { border:0; }
+.about { display: table; }
+.about * { display: table-cell; vertical-align: middle; }
 ul.hr { display: table; }
 ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 #id_search { height: 16px; margin-left: 12px; }
@@ -71,7 +73,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
   {% if not song.date and song.content %}
     <div class="wrap">
       <div class="about msgtext">
-        <img align="left" class="rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
+        <img class="hmarg rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
         {{ song.content|markdown:"codehilite,extra" }}
       </div>
       <div class="msgfooter gray">
@@ -93,12 +95,12 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
         <a class="nodecor pink" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
       {% endif %}
       {% if song.count %}
-        <span class="smaller">[{{ song.count }}]</span>
+        [{{ song.count }}]
       {% else %}
         <a class="nodecor" href="{% url 'songs.views.get_song' tr_art=song.tr_art tr_title=song.tr_title id=song.id %}">{{ song.title|escape }}</a>
       {% endif %}
       {% if not art_count and song.audio %}
-        <span class="smaller">[<a class="nodecor" title="{% trans 'Listen' %}" href="{% url 'songs.views.get_song' id=song.id %}?a=1">{% trans 'Listen' %}</a>]</span>
+        [<a class="nodecor" title="{% trans 'Listen' %}" href="{% url 'songs.views.get_song' id=song.id %}?a=1">{% trans 'Listen' %}</a>]
       {% endif %}
       {% if not last_count %}
         <div class="rfloat">
