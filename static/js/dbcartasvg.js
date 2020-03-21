@@ -1,10 +1,10 @@
-/*
- * dbCartajs HTML5 SVG vector object map. Build 170604.
- * It uses Proj4js transformations.
- *
- * Source at https://github.com/egaxegax/dbCartajs.git.
- * egax@bk.ru, 2015-2017.
- */
+//
+// dbcartajs. HTML5 SVG vector map and image viewer. Build 200321
+// It uses Proj4js transformations
+//
+// Source at https://github.com/egaxegax/dbCartajs.git
+// egax@bk.ru, 2015-20
+//
 var SVG_NS = 'http://www.w3.org/2000/svg';
 
 function dbCartaSvg(cfg) {
@@ -59,27 +59,23 @@ function dbCartaSvg(cfg) {
   });
   // add props
   extend(this, {
-    /**
-     * Public
-     */
+    // Public
     root: root, // svg node
     vp: vp, // g node (rotate, scale, translate)
     extend: extend,
     attr: attr,
     append: append,
-    /**
-     * Config.
-     * cfg {
-     *   pid: parent id
-     *   width, height: map size
-     *   draggable: move map by cursor
-     *   boundbg: bgcolor for sphere bound
-     *   scalebg: bgcolor for paintBar
-     *   sbar: show scale bar?
-     *   sbarpos: bar pos {left|right}
-     *   sbarsize: bar size {height/6}
-     * }
-     */
+    // Config
+    // cfg {
+    //   pid: parent id
+    //   width, height: map size
+    //   draggable: move map by cursor
+    //   boundbg: bgcolor for sphere bound
+    //   scalebg: bgcolor for paintBar
+    //   sbar: show scale bar?
+    //   sbarpos: bar pos {left|right}
+    //   sbarsize: bar size {height/6}
+    // }
     cfg: {
       draggable: cfg.draggable == undefined ? true : cfg.draggable,
       boundbg: cfg.boundbg || 'rgb(90,140,190)',
@@ -88,9 +84,7 @@ function dbCartaSvg(cfg) {
       sbarpos: cfg.sbarpos || 'right',
       sbarsize: cfg.sbarsize||4
     },
-    /**
-     * Interval vars
-     */
+    // Interval vars
     m: {
       delta: root.getAttribute('width') / 360.0,
       halfX: root.getAttribute('width') / 2.0,
@@ -100,9 +94,9 @@ function dbCartaSvg(cfg) {
       offset: [0, 0],
       touches: []
     },
-    /*
-     * Proj4 defs
-     */
+    //
+    // Proj4 defs
+    //
     projlist: function(){
       if ('Proj4js' in window){
         return {
@@ -119,9 +113,9 @@ function dbCartaSvg(cfg) {
     }(),
     projload: {},
     project: 0,
-    /**
-    * Convert pixels to points.
-    */
+    //
+    // Convert pixels to points
+    //
     canvasXY: function(ev) {
       var node = cont,
           pts = [ev.clientX, ev.clientY];
@@ -136,9 +130,9 @@ function dbCartaSvg(cfg) {
       }
       return pts;
     },
-    /**
-    * Return meridians coords.
-    */
+    //
+    // Return meridians coords
+    //
     createMeridians: function() {
       var lonlat = [];
       var x = -180,
@@ -168,16 +162,16 @@ function dbCartaSvg(cfg) {
       return lonlat;
     },
     // - transforms ---------------------------------
-    /**
-     * Rotate map on ANGLE in degrees.
-     */
+    //
+    // Rotate map on ANGLE in degrees
+    //
     rotateCarta: function(angle) {
       this.m.rotate += angle;
       this.scaleCarta(this.m.scale);
     },
-    /**
-    * Change map scale to SCALE.
-    */
+    //
+    // Change map scale to SCALE
+    //
     scaleCarta: function(scale) {
       var centerof = this.centerOf();
       var cx = centerof[0]/scale - centerof[0],
@@ -189,9 +183,9 @@ function dbCartaSvg(cfg) {
       });
       this.m.scale = scale;
     },
-    /**
-    * Center map by points PTS.
-    */
+    //
+    // Center map by points PTS
+    //
     centerCarta: function(pts) {
       var scale = this.m.scale;
       var centerof = this.centerOf();
@@ -206,28 +200,43 @@ function dbCartaSvg(cfg) {
       });
       this.m.offset = [ offx, offy ];
     },
-    /**
-     * Select obj under mouse cursor like html MAP-AREA.
-     */
+    //
+    // Select obj under mouse cursor like html MAP-AREA
+    //
     doMap: function(ev, at) {
-      this.mousemove(ev);
+      this.mousemove(ev[0] || ev);
       if (!this.m.pmap) {
-        var mattr = {};
-        for (var prop in at) { // save current
-          mattr[prop] = ev.target.getAttribute(prop);
+        var elems = [];
+        if(!ev.length) {
+          ev = [ev];
         }
-        if (!mattr['transform']) mattr['transform'] = 'scale(1)';
-        attr(ev.target, at); // set new
-        this.m.pmap = {
-          ev: ev,
-          attr: mattr
+        if(!at.length) {
+          at = [at];
+        }
+        for(var i=0; i<ev.length; i++) {
+          var el = ev[i].target,
+              ats = at[i],
+              mattr = {}
+          if(!el || !ats) continue;
+          for (var prop in ats) { // save current
+            mattr[prop] = el.getAttribute(prop);
+          }
+          if (!mattr['transform']) mattr['transform'] = 'scale(1)';
+          attr(el, ats); // set new
+          elems.push({
+            el: el,
+            attr: mattr
+          });
         };
+        this.m.pmap = {
+          elems: elems
+        }
       };
       this.m.pmap.i = 1; // set counter
     },
-    /**
-    * Append Sphere radii bounds.
-    */
+    //
+    // Append Sphere radii bounds
+    //
     paintBound: function() {
       var centerof = this.centerOf();
       var rx, ry, proj = this.initProj();
@@ -248,9 +257,9 @@ function dbCartaSvg(cfg) {
         });
       }
     },
-    /**
-    * Append right bar with scale buttons.
-    */
+    //
+    // Append right bar with scale buttons
+    //
     paintBar: function() {
       if (!this.cfg.sbar) return;
       var sz = this.sizeOf(),
@@ -288,7 +297,7 @@ function dbCartaSvg(cfg) {
       var dx = tleft + w/2,
           dy = ttop + h/4,
           path = 'M ' + pts[0] + ' ' + pts[1] + ' L ' + pts.join(' ') + ' z';
-      append(root, 'path', {
+      return append(root, 'path', {
         fill: this.cfg.scalebg,
         d: path,
         transform: 'translate (' + dx + ',' + dy + ')'
@@ -303,9 +312,9 @@ function dbCartaSvg(cfg) {
       return [ (rect[0] + rect[2]) / 2.0,
                (rect[1] + rect[3]) / 2.0 ];
     },
-    /**
-    * Map visible borders in degrees.
-    */
+    //
+    // Map visible borders in degrees
+    //
     viewsizeOf: function() {
       var rect = this.sizeOf();
       var left = this.fromPoints([rect[0], rect[1]], false),
@@ -322,9 +331,9 @@ function dbCartaSvg(cfg) {
                (rect[1] + rect[3]) / 2.0 ];
     },
     // - checks ------------------------
-    /**
-     * Check click on right bar and do action.
-     */
+    //
+    // Check click on right bar and do action
+    //
     chkBar: function(pts, doaction) {
       if (!this.cfg.sbar) return;
       var sz = this.sizeOf(),
@@ -350,7 +359,7 @@ function dbCartaSvg(cfg) {
         zoom = (zoom > 1 ? zoom : 1/(2-zoom));
         this.scaleCarta(zoom);
         if (zoom == 1) {
-          var centerof = this.centerOf();
+//          var centerof = this.centerOf();
 //          this.centerCarta(centerof[0] + this.m.offset[0] - this.m.scaleoff[0], 
 //                           centerof[1] + this.m.offset[1] - this.m.scaleoff[1], true);
         }
@@ -373,9 +382,9 @@ function dbCartaSvg(cfg) {
       this.m.halfY = h / 2.0;
     },
     // - reproject ------------------------
-    /**
-    * Change project to NEW_PROJECT and center by visible centre.
-    */
+    //
+    // Change project to NEW_PROJECT and center by visible centre
+    //
     changeProject: function(new_project) {
       // curr. centerof
       var centerof = this.centerOf();
@@ -396,10 +405,10 @@ function dbCartaSvg(cfg) {
 //        this.centerCarta([centerof[0] + this.m.offset[0], centerof[1] + this.m.offset[1]]);
       }
     },
-    /**
-    * Change project. to PROJECT with DEFS (see Proj4js proj. definitions).
-    * If no args return current projection info (Proj4js.Proj obj.).
-    */
+    //
+    // Change project. to PROJECT with DEFS (see Proj4js proj. definitions)
+    // If no args return current projection info (Proj4js.Proj obj.)
+    //
     initProj: function(project, defs) {
       if ('Proj4js' in window) {
         if (project !== undefined) {
@@ -439,10 +448,10 @@ function dbCartaSvg(cfg) {
       if (m[2]) pts.push(m[2]); // bezier flag
       return pts;
     },
-    /**
-     * Convert points to degrees.
-     * Use projection transform. DOTRANSFORM [0|1] and matrix transform. DONTSCALE [0|1].
-     */
+    //
+    // Convert points to degrees
+    // Use projection transform. DOTRANSFORM [0|1] and matrix transform. DONTSCALE [0|1]
+    //
     fromPoints: function(pts, dotransform, dontscale) {
       if (dontscale) { // dont use matrix transformations
         var coords = [ (pts[0] - this.m.halfX) / this.m.delta,
@@ -456,9 +465,9 @@ function dbCartaSvg(cfg) {
       }
       return coords;
     },
-    /**
-     * Return spherical arc between CRD1 and CRD2 in degrees.
-     */
+    //
+    // Return spherical arc between CRD1 and CRD2 in degrees
+    //
     distance: function(coord1, coord2) {
       var x = coord1[0] * Math.PI/180.0,
           y = coord1[1] * Math.PI/180.0,
@@ -466,9 +475,9 @@ function dbCartaSvg(cfg) {
           y1 = coord2[1] * Math.PI/180.0;
       return Math.acos(Math.cos(y) * Math.cos(y1) * Math.cos(x - x1) + Math.sin(y) * Math.sin(y1)) * 180.0/Math.PI;
     },
-    /**
-    * Interpolate (and convert to points if DOPOINTS) coords with STEP in degrees.
-    */
+    //
+    // Interpolate (and convert to points if DOPOINTS) coords with STEP in degrees
+    //
     interpolateCoords: function(coords, dopoints, step) {
       var i, pts, interpol_pts = [];
       for (var j in coords) {
@@ -498,9 +507,9 @@ function dbCartaSvg(cfg) {
       }
       return interpol_pts;
     },
-    /**
-     * Reproject COORDS from SOURCE to DEST proj4 string definition.
-     */
+    //
+    // Reproject COORDS from SOURCE to DEST proj4 string definition
+    //
     transformCoords: function(sourcestr, deststr, coords) {
       if ('Proj4js' in window) {
         var sourceproj = this.projload[sourcestr],
@@ -523,9 +532,9 @@ function dbCartaSvg(cfg) {
       } else
         return coords;
     },
-    /**
-    * Return new COORDS rotated around Z-axis with ANGLE relative to CENTEROF.
-    */
+    //
+    // Return new COORDS rotated around Z-axis with ANGLE relative to CENTEROF
+    //
     rotateCoords: function(coords, angle, centerof) {
       var roll = angle * Math.PI/180,
           x = coords[0], y = coords[1], cx = centerof[0], cy = centerof[1],
@@ -538,6 +547,22 @@ function dbCartaSvg(cfg) {
       }
       return coords;
     },
+    savetoimage: function() {
+      if (this.cfg.sbar) this.cfg.sbar.setAttribute('fill', 'none');
+      var xml  = new XMLSerializer().serializeToString(root),
+          data = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(xml))),
+          img  = new Image();
+      if (this.cfg.sbar) this.cfg.sbar.setAttribute('fill', this.cfg.scalebg);
+      img.src = data;
+      img.onload = function() {
+        var a = document.createElement('a');
+        a.download = 'image.svg';
+        a.href = data;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+    },
     // - handlers -----------------------------
     mousemove: function(ev) {
       var spts = this.canvasXY(ev),
@@ -547,7 +572,9 @@ function dbCartaSvg(cfg) {
       }
       if (this.m.pmap) {
         if (this.m.pmap.i === 0) {
-          attr(this.m.pmap.ev.target, this.m.pmap.attr);
+          for(var i=0; i<this.m.pmap.elems.length; i++) {
+            attr(this.m.pmap.elems[i].el, this.m.pmap.elems[i].attr);
+          }
           delete this.m.pmap;
         } else
           this.m.pmap.i = 0;
@@ -613,7 +640,7 @@ function dbCartaSvg(cfg) {
       if (touches.length)
         self.mousedown(touches[0]);
     },
-    touchend: function(ev) {
+    touchend: function(ev) { 
       var touches = ev.changedTouches;
       for (var i=0; i<touches.length; i++) {
         for (var j=0; j<self.m.touches.length; j++) {
@@ -639,8 +666,8 @@ function dbCartaSvg(cfg) {
   root.addEventListener('touchmove', root.touchmove, false);
   root.addEventListener('touchstart', root.touchstart, false);
   root.addEventListener('touchend', root.touchend, false);
-  root.addEventListener("touchleave", root.touchend, false);
+  root.addEventListener('touchleave', root.touchend, false);
 
-  this.paintBar();
+  this.cfg.sbar = this.paintBar();
   return this;
 }

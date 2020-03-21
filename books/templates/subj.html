@@ -17,7 +17,7 @@
     <div class="wrap">
     <dl class="msgtext"><dt>
       <a class="nodecor" href="{% url 'books.views.list_books' tr_subj=subj.tr_subj id_subj=subj.id %}">
-        {{ subj.subject }} </a><span class="smaller"> [{{ subj.count }}]</span>
+        {{ subj.subject }} </a> [{{ subj.count }}] </span>
         <div class="gray smaller">{% trans subj.subject%}</div></dt>
       </dl>
     </div>
