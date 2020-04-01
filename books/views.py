@@ -17,7 +17,7 @@ from templatetags.customfilters import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 from math import ceil
-import datetime, time, sys, os.path, re
+import datetime, re
 import zlib, zipfile, base64, mimetypes
 
 wrt_index = {

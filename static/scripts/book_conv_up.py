@@ -1,5 +1,4 @@
 #!python
-# -*- coding: utf-8 -*-
 #
 # Extract .epub to text files for form upload.
 #

@@ -1,5 +1,4 @@
 #!python
-# -*- coding: utf-8 -*-
 #
 # Upload song text from .txt
 #
@@ -64,7 +63,7 @@ for root, dirs, files in os.walk(path, topdown=False):
       param = []
       param += [("artist", E_OS(artist))]
       param += [("title", E_OS(title))]
-      param += [("content", ( file(name).read() ))]
+      param += [("content", ( E_OS(file(name).read()) ))]
 
       register_openers()
       datagen, headers = multipart_encode(param)

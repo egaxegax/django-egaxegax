@@ -29,7 +29,7 @@ function toTranslit(text) {
   <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
     {% render_upload_data upload_data %}
 {% if request.user.is_authenticated %}
-    <table class="formpost">
+    <table class="mtext formpost">
       {{ form.as_table }}
       <tr><th></th><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
     </table>

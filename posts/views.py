@@ -10,7 +10,7 @@ from django.template.context import RequestContext
 from django.utils import timezone
 from posts.forms import *
 from posts.models import *
-import datetime, time, sys
+import datetime, base64, zlib
 
 def ZI(s):
     try:
@@ -52,7 +52,7 @@ def AddPostCache(post):
        'author': (hasattr(post, 'author') and {'id': post.author.id, 'username': post.author.username}) or {},
        'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
        'title': post.title,
-       'content': post.content,
+       'content': UnpackContent(post),
        'date': post.date }]
     cache.add('post:' + str(post.id), str(cache_post))
 
@@ -64,9 +64,9 @@ def AddPostListCache(subj_id, posts_list):
            'author': (hasattr(post, 'author') and {'id': post.author.id, 'username': post.author.username}) or {},
            'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
            'title': post.title,
-           'content': post.content,
+           'content': UnpackContent(post),
            'date': post.date }
-        if cache_post['date'] is None:  # post with none date is first
+        if cache_post['date'] is None:  # post with None date is first
             if subj_id != '.full_list':
                 cache_list = [cache_post] + cache_list
         else:
@@ -81,6 +81,20 @@ def ClearPostCache(post):
 
 def ClearPostListCache(subj_id):
     cache.delete_many(['posts:.full_list', 'posts:' + str(subj_id)])
+
+# pack/unpack text
+def PackContent(post):
+    return "base64,"+base64.b64encode(zlib.compress(post.content.strip('\r\n').encode('utf-8')))
+
+def UnpackContent(post):
+    t = post.content
+    if t[:7]=='base64,':
+        try:   t = zlib.decompress(base64.b64decode(t[7:])).decode('utf-8')
+        except: pass
+    else: # repack
+        post.content = PackContent(post)
+        post.save(force_update=True)
+    return t
 
 # increment subject count
 def IncSubjCount(**kw):
@@ -181,6 +195,7 @@ def add_post(request):
         form = AddPostForm(request.POST)       
         if form.is_valid():
             post = form.save(commit=False)
+            post.content = PackContent(post)
             post.author = request.user
             if post.title[:5] != 'about':
                 post.date = timezone.now()
@@ -221,7 +236,7 @@ def edit_post(request, **kw):
                           'subject': post.subject,
                           'title': post.title,
                           'date': post.date,
-                          'content': post.content}) 
+                          'content': UnpackContent(post)}) 
     return render_to_response('edit_post.html', 
                               context_instance=RequestContext(request,
                               {'request': request,

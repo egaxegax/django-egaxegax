@@ -15,7 +15,7 @@ from songs.models import *
 from templatetags.customfilters import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
-import os.path, datetime, time, sys, re, base64, zlib
+import datetime, re, base64, zlib
 
 art_index = {
     20:'a',21:'b',22:'c',23:'d',24:'e',25:'f',26:'g',27:'h',28:'i',29:'j',30:'k',31:'l',32:'m',33:'n',34:'o',35:'p',36:'q',37:'r',38:'s',39:'t',40:'u',41:'v',42:'w',43:'x',44:'y',45:'z',
@@ -146,7 +146,7 @@ def UnpackContent(song):
     t = song.content
     if t[:7]=='base64,':
         try:   t = zlib.decompress(base64.b64decode(t[7:])).decode('cp1251')
-        except zlib.error, TypeError: pass
+        except: pass
     else: # repack
         song.content = PackContent(song)
         song.save(force_update=True)

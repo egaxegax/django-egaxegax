@@ -10,7 +10,7 @@ from django.template.context import RequestContext
 from django.template.defaultfilters import timesince
 from news.forms import *
 from news.models import *
-import datetime, time
+import datetime
 
 def ZI(s):
     try:

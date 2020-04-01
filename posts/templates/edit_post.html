@@ -16,7 +16,7 @@
 <p>
   <form action="{% url 'posts.views.edit_post' id=form.initial.id %}" method="post">{% csrf_token %}
 {% if request.user.is_authenticated %}
-    <table class="formpost">
+    <table class="mtext formpost">
       {{ form }}
        <input type="hidden" id="id_id" name="id" value="{{ form.initial.id }}" />
       <tr><th/><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>

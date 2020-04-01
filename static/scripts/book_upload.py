@@ -1,5 +1,4 @@
 #!python
-# -*- coding: utf-8 -*-
 #
 # Upload books from text files and .epub file located ..
 #
