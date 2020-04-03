@@ -146,7 +146,7 @@ id_search { height: 16px; margin-left: 12px; }
           </div>        
           <div class="button">
           {% if request.user.is_authenticated %}
-            <a class="hspace2" href="{% url 'books.views.read_book' tr_wrt=book.tr_wrt tr_titl=book.tr_titl ind=book.index part=book.part %}">Читать</a>
+            <a class="hspace" href="{% url 'books.views.read_book' tr_wrt=book.tr_wrt tr_titl=book.tr_titl ind=book.index part=book.part %}">Читать</a>
             <a class="hspace" href="{% url 'books.views.get_file' ind=book.index %}">Скачать</a>&nbsp;
           {% if request.user.id == book.author.id or request.user.is_superuser %}
             <a class="pink hspace" href="{% url 'books.views.edit_book' id=book.id %}">Править</a>
@@ -184,7 +184,7 @@ id_search { height: 16px; margin-left: 12px; }
 {% if request.user.is_authenticated %}
   <a class="mtext" href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a>
   {% if writer %}
-    <a class="hspace" href="{% url 'books.views.edit_wrt' id=writer.id %}">Править автора</a>
+    <a class="mtext hspace" href="{% url 'books.views.edit_wrt' id=writer.id %}">Править автора</a>
   {% endif %}
 {% else %}
   {% trans 'Please authorize to get books' %}
