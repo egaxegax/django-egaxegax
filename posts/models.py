@@ -12,7 +12,7 @@ class Greeting_Subject(models.Model):
 class Greeting(models.Model):
     class Meta:
         db_table = 'guestbook_greeting'
-    author = models.ForeignKey(User, verbose_name=_('user'))
+    author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
     subject = models.ForeignKey(Greeting_Subject, null=True, blank=True, verbose_name=_('subject'))
     title = models.CharField(max_length=150, null=True, blank=True, verbose_name=_('title'))
     content = models.TextField(verbose_name=_('content'))

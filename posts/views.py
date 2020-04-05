@@ -49,7 +49,7 @@ def AddSubjListCache(subj_list):
 def AddPostCache(post):
     cache_post = [{
        'id': post.id,
-       'author': (hasattr(post, 'author') and {'id': post.author.id, 'username': post.author.username}) or {},
+       'author': (hasattr(post, 'author') and post.author and {'id': post.author.id, 'username': post.author.username}) or {},
        'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
        'title': post.title,
        'content': UnpackContent(post),
@@ -61,7 +61,7 @@ def AddPostListCache(subj_id, posts_list):
     for post in posts_list:
         cache_post = {
            'id': post.id,
-           'author': (hasattr(post, 'author') and {'id': post.author.id, 'username': post.author.username}) or {},
+           'author': (hasattr(post, 'author') and post.author and {'id': post.author.id, 'username': post.author.username}) or {},
            'subject': (hasattr(post, 'subject') and post.subject and {'id': post.subject.id, 'subject': post.subject.subject, 'count': post.subject.count}) or {},
            'title': post.title,
            'content': UnpackContent(post),
@@ -196,9 +196,12 @@ def add_post(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.content = PackContent(post)
-            post.author = request.user
+            if isinstance(request.user, User):
+                post.author = request.user
             if post.title[:5] != 'about':
                 post.date = timezone.now()
+            if post.title[:3] == '___':
+                post.title = None
             if form_subject.is_valid():
                 subject = IncSubjCount(subject=request.POST['subject'])
                 post.subject = subject
@@ -217,7 +220,8 @@ def edit_post(request, **kw):
         form = EditPostForm(request.POST, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
-            post.author = request.user
+            if isinstance(request.user, User):
+                post.author = request.user
 #            post.date = datetime.datetime.today()
             post.save(force_update=True)
             if post.subject:

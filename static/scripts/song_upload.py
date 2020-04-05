@@ -4,7 +4,7 @@
 #
 # song_upload.py <path_to_files>
 
-import urllib2, re, sys, os, time, zlib, base64
+import urllib2, sys, os, time
 
 sys.path.insert(0, os.path.abspath(sys.argv[0] + '/../../../vendor'))
 
