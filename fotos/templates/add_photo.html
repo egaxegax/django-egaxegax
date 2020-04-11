@@ -26,16 +26,16 @@ function toTranslit(text) {
 }
 </script>
 <p class="mtext hspace">Добавляйте свои фото и картинки.</p>
-  <form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
-    {% render_upload_data upload_data %}
+<form action="{{ upload_url }}" enctype="multipart/form-data" method="post">
+{% render_upload_data upload_data %}
 {% if request.user.is_authenticated %}
-    <table class="mtext formpost">
-      {{ form.as_table }}
-      <tr><th></th><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
-    </table>
+  <table class="mtext formpost">
+    {{ form.as_table }}
+    <tr><th></th><td><input type="submit" value="{% trans 'Add' %}"/></td></tr>
+  </table>
 {% else %}
-  <p class="hspace">{% trans "Please authorize to add photos" %}</p>
+  <p class="mtext hspace">{% trans "Please authorize to add photos" %}</p>
 {% endif %}
-    {{ form.title_hid }}{{ form.album_hid }}
-  </form>
+  {{ form.title_hid }}{{ form.album_hid }}
+</form>
 {% endblock %}

@@ -16,4 +16,5 @@ class AddArtForm(forms.ModelForm):
         exclude = ['count']
 
 class SearchForm(forms.Form):
-    search = forms.CharField(max_length=100, label=_('Search by title'))
+    art = forms.CharField(max_length=100, label=_('Search by artist'))
+    tit = forms.CharField(max_length=100, label=_('or title'))

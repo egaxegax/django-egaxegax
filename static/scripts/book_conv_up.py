@@ -1,9 +1,10 @@
 #!python
+# -*- coding: utf-8 -*-
 #
 # Extract .epub to text files for form upload.
 #
 
-import sys, os, re, datetime
+import sys, os, re
 import zlib, zipfile
 
 pth = os.path.abspath(sys.argv[0] + '/../../../vendor')

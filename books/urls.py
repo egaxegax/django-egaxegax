@@ -7,8 +7,6 @@ urlpatterns = [
     url(r'^read/(?P<ind>[0-9]*)/(?P<part>.*)/?$', views.read_book),
     url(r'^read/(?P<tr_wrt>[^/]*)/(?P<tr_titl>[^/]*)/(?P<ind>[0-9]*)/(?P<part>.*)/?$', views.read_book),
     url(r'^get_file/(?P<ind>[0-9]*)/?$', views.get_file),
-    url(r'^wrt/i/(?P<ind_wrt>[0-9]*)/?$', views.list_wrt),
-    url(r'^wrt/?$', views.list_wrt),
     url(r'^wrt/(?P<id_wrt>[0-9]*)/?$', views.list_books),
     url(r'^wrt/(?P<tr_wrt>[^/]*)/(?P<id_wrt>[0-9]*)/?$', views.list_books),
     url(r'^subj/?$', views.list_subj),

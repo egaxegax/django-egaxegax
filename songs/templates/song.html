@@ -6,7 +6,6 @@
 {% block keywords %}{{ song.artist }}, {{ song.title }}, {% trans 'chords' %}, {% endblock %}
 {% block title %}{{ song.artist }} - {{ song.title }}, {% trans 'chords' %} - {% endblock %}
 {% block pagestyle %}
-#id_search { height: 16px; margin-left: 10px; }
 .msgcont { line-height: 1.5em; width: 100; }
 .msgcont b { font-weight: 500; color: #5645ad; }
 .msgcell { display: table-cell; vertical-align: top; width: 50%; }
@@ -64,13 +63,9 @@ function addSongChords(opts) {
 
 {% block content %}
 
-<div class="indexlist wrap">
-  <a class="nodecor hspaced" href="{% url 'songs.views.list_art' %}">Все</a>
-  {% for i, v in art_index.items %}
-    <a class="nodecor hspaced" href="{% url 'songs.views.list_art' ind_art=i %}">{{ v|capfirst }}</a>
-    {% if forloop.counter == 26 %}<br>{% endif %}
-  {% endfor %}
+<div class="indexlist mtext wrap">
   <form class="search" action="{% url 'songs.views.list_songs' %}" method="get">{% csrf_token %}
+    <a class="nodecor hspaced" href="{% url 'songs.views.list_songs' %}?art=*">Все</a>
     {{ form }}
     <input class="submit" type="submit" value="Найти" />
   </form>
@@ -121,9 +116,9 @@ function addSongChords(opts) {
 
 {% endfor %}
 
-<p class="hspace">
+<p class="mtext hspace">
 {% if request.user.is_authenticated %}
-  <a class="mtext" href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a>
+  <a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a>
 {% else %}
   {% trans 'Please authorize to add songs' %}
 {% endif %}

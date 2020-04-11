@@ -10,7 +10,6 @@
 {% endblock %}
 {% block pagestyle%}
 .lside2 { min-width:200px; max-width:200px; }
-#id_search { height: 16px; margin-left: 12px; }
 {% endblock %}
 {% block booksclass %}wrap3{% endblock %}
 {% block pagescript %}
@@ -20,14 +19,10 @@
 
 {% block content %}
 
-<div class="indexlist wrap">
-  <a class="nodecor hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
-  <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' %}">Авторы</a>
-{% for i, v in wrt_index.items %}
-  <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
-{% if forloop.counter == 26 %}<br>{% endif %}
-{% endfor %}
+<div class="indexlist mtext wrap">
   <form class="search" action="{% url 'books.views.list_books' %}" method="get">{% csrf_token %}
+    <a class="nodecor hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
+    <a class="nodecor hspaced" href="{% url 'books.views.list_books' %}?wrt=*">Авторы</a>
     {{ form }}
     <input class="submit" type="submit" value="Найти" />
   </form>

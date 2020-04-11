@@ -6,7 +6,7 @@
 {% block keywords %}{% if not last_count and book_count %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %} {{ book_count }} книг, {% endif %}{% trans 'books' %}, {% endblock %}
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if book_count and not search_count and not last_count %}{% if subject %}Жанр {% trans subject.subject %}, {{ subject.subject }}{% else %}{% if wrt_key %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}{% endif %}{% endif %}
+{% if book_count and not search_count and not last_count %}{% if subject %}Жанр {% trans subject.subject %}, {{ subject.subject }}{% else %}{% if wrt_count %}Список авторов{% else %}{% with books.object_list|first as f %}{{ f.writer.writer|strans }}{% endwith %}{% endif %}{% endif %}{% endif %}
 {% if last_count or not book_count and not search_count %}{% trans 'Books' %}{% endif %}
  - {% trans 'books' %} - {% endblock %}
 {% block pagestyle %}
@@ -18,7 +18,6 @@
 .about * { display: table-cell; vertical-align: middle; }
 dt .cont { display: table; width: 100%; }
 .button { margin: 40px; }
-id_search { height: 16px; margin-left: 12px; }
 {% endblock %}
 {% block booksclass %}wrap3{% endblock %}
 {% block pageheader %}
@@ -26,14 +25,10 @@ id_search { height: 16px; margin-left: 12px; }
 {% block content %}
 
 {% if request.user.is_authenticated %}
-<div class="indexlist wrap">
-  <a class="nodecor hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
-  <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' %}">Авторы</a>
-{% for i, v in wrt_index.items %}
-  <a class="nodecor hspaced" href="{% url 'books.views.list_wrt' ind_wrt=i %}">{{ v|capfirst }}</a>
-{% if forloop.counter == 26 %}<br>{% endif %}
-{% endfor %}
+<div class="indexlist mtext wrap">
   <form class="search" action="{% url 'books.views.list_books' %}" method="get">{% csrf_token %}
+    <a class="nodecor hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
+    <a class="nodecor hspaced" href="{% url 'books.views.list_books' %}?wrt=*">Авторы</a>
     {{ form }}
     <input class="submit" type="submit" value="Найти" />
   </form>
@@ -61,9 +56,9 @@ id_search { height: 16px; margin-left: 12px; }
 </p>
 {% endif %}
 
-{% if search_count or wrt_count %}
+{% if wrt_count or search_count %}
 <p>
-  <h2 class="inl nomarg"></h2><span class="mtext hspace"> Найдено {% if search_count %} более {% endif %}{% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг{% endif %}</span>
+  <h2 class="inl nomarg"></h2><span class="mtext hspace"> Найдено {% if wrt_count %}<b>{{ wrt_count }}</b> писателей{% endif %}{% if book_count %}<b> {{ book_count }}</b> книг {% if search_count %}или более{% endif %}{% endif %}</span>
 </p>
 {% endif %}
 
@@ -95,12 +90,6 @@ id_search { height: 16px; margin-left: 12px; }
       </dt></dl>
     </div>
   {% endfor %}
-
-  {% if books.has_next %}
-    <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">
-      <div class="wrap cfloat">
-        <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" /></div></a>
-  {% endif %}
 
 {% else %}
 
@@ -180,11 +169,11 @@ id_search { height: 16px; margin-left: 12px; }
 
 {% endif %}
 
-<p class="hspace">
+<p class="mtext hspace">
 {% if request.user.is_authenticated %}
-  <a class="mtext" href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a>
+  <a href="{% url 'books.views.add_book' %}">{% trans 'Add book' %}</a>
   {% if writer %}
-    <a class="mtext hspace" href="{% url 'books.views.edit_wrt' id=writer.id %}">Править автора</a>
+    <a class="hspace" href="{% url 'books.views.edit_wrt' id=writer.id %}">Править автора</a>
   {% endif %}
 {% else %}
   {% trans 'Please authorize to get books' %}

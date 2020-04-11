@@ -69,8 +69,8 @@ msgstr "Весь список"
 msgid "Profile"
 msgstr "Профайл"
 
-msgid "Search by title"
-msgstr "Найти по названию"
+msgid "Search by writer"
+msgstr "Найти по автору"
 
 msgid "Search result"
 msgstr "Список найденого"

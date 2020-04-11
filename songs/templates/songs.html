@@ -6,7 +6,7 @@
 {% block keywords %}{% if song_count %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %} {{ song_count }} текстов, {% endif %}{% trans 'chords' %}, {% endblock %}
 {% block title %}
 {% if search_count %}{% trans 'Search result' %}{% endif %}
-{% if song_count and not search_count %}{% if art_key %}Список исполнителей{% else %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}, {% trans 'chords' %}{% endif %}{% endif %}
+{% if song_count and not search_count %}{% if art_count %}Список исполнителей{% else %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}, {% trans 'chords' %}{% endif %}{% endif %}
 {% if not song_count and not search_count %}{% trans 'Chords' %}{% endif %} - {% endblock %}
 {% block pagestyle %}
 .msgtext dt { border:0; }
@@ -14,7 +14,6 @@
 .about * { display: table-cell; vertical-align: middle; }
 ul.hr { display: table; }
 ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
-#id_search { height: 16px; margin-left: 12px; }
 {% endblock %}
 {% block songsclass %}wrap3{% endblock %}
 {% block pageheader %}
@@ -22,13 +21,9 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 
 {% block content %}
 
-<div class="indexlist wrap">
-  <a class="nodecor hspaced" href="{% url 'songs.views.list_art' %}">Все</a>
-  {% for i, v in art_index.items %}
-    <a class="nodecor hspaced" href="{% url 'songs.views.list_art' ind_art=i %}">{{ v|capfirst }}</a>
-    {% if forloop.counter == 26 %}<br>{% endif %}
-  {% endfor %}
+<div class="indexlist mtext wrap">
   <form class="search" action="{% url 'songs.views.list_songs' %}" method="get">{% csrf_token %}
+    <a class="nodecor hspaced" href="{% url 'songs.views.list_songs' %}?art=*">Все</a>
     {{ form }}
     <input class="submit" type="submit" value="Найти" />
   </form>
@@ -50,7 +45,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 
 {% if song_count %}
 <p>
-{% if search_count or art_key %}
+{% if art_count or search_count %}
   <h2 class="inl nomarg"></h2><span class="mtext hspace"> Найдено {% if art_count %}<b>{{ art_count }}</b> исполнителей и {% endif %}<b>{{ song_count }}</b> текстов</span>
 {% else %}
 {% with songs.object_list|first as f %}
@@ -129,7 +124,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
     <span class="lightgray">‹ {% trans 'previous' %}</span>
   {% endif %}
   {% if songs.paginator.num_pages > 1 %}
-    <span class="hspace2">{{ songs.number }} {% trans 'of' %} {{ songs.paginator.num_pages }}</span>
+    <span class="hspace2"><b>{{ songs.number }}</b> {% trans 'of' %} <b>{{ songs.paginator.num_pages }}</b></span>
   {% endif %}
   {% if songs.has_next %}
     <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
@@ -144,9 +139,9 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
 
 {% endif %}
 
-<p class="hspace">
+<p class="mtext hspace">
 {% if request.user.is_authenticated %}
-  <a class="mtext" href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
+  <a href="{% url 'songs.views.add_song' %}">{% trans 'Add song' %}</a></p>
 {% else %}
   {% trans 'Please authorize to add songs' %}
 {% endif %}

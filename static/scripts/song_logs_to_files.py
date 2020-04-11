@@ -2,7 +2,7 @@
 #
 # Transform GAE leveldb log format songs dumps to files .txt
 
-import os, sys, binascii, zlib, base64, fnmatch, time
+import os, binascii, zlib, base64, fnmatch, time
 from os.path import *
 
 def D_OS(text):

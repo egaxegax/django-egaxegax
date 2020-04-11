@@ -237,48 +237,13 @@ def IncSubjCount(**kw):
 
 # Controllers
 
-def list_wrt(request, **kw):
-    wrt_count = 0
-    book_count = 0
-    per_page = 100
-    wrt_list = []
-    wrt_key= ''
-    if kw.get('ind_wrt'):  # by index
-        i = ZI(kw.get('ind_wrt'))
-        if wrt_index.has_key(i):
-            wrt_key = wrt_index.get(i).capitalize()
-            if not cache.has_key('wrts:' + wrt_key):
-                wrt_list = Writer.objects.filter(writer__startswith=wrt_key).order_by('writer')
-                AddWrtListCache(wrt_key, wrt_list)
-            wrt_list = eval(cache.get('wrts:' + wrt_key))
-        else:
-            wrt_list = Writer.objects.none()
-        wrt_count = len(wrt_list)
-    else:  # full list
-        wrt_key = '.full_list'
-        if not cache.has_key('wrts:' + wrt_key):
-            wrt_list = Writer.objects.order_by('writer')
-            AddWrtListCache(wrt_key, wrt_list)
-        wrt_list = eval(cache.get('wrts:' + wrt_key))
-        wrt_count = len(wrt_list)
-    for wrt in wrt_list:  # sum book by wrt
-        book_count += wrt['count']
-    return render_to_response('books.html', 
-                              context_instance=RequestContext(request,
-                              {'request': request,
-                               'wrt_index': wrt_index,
-                               'wrt_key': wrt_key,
-                               'form': SearchForm(initial={'search':request.GET.get('search')}),
-                               'book_count': book_count,
-                               'wrt_count': wrt_count,
-                               'books': PageList(request, wrt_list, per_page),
-                               'logback': reverse('books.views.list_wrt')}))
-
 def list_books(request, **kw):
     book_count = 0
+    wrt_count = 0
     last_count = 0
     search_count = 0
     book_list = []
+    wrt_list = []
     subj_list = []
     subject = None
     writer = None
@@ -290,17 +255,17 @@ def list_books(request, **kw):
         wrt_id = ZI(kw.get('id_wrt'))
         wrt_key = str(wrt_id) + '.' + str(page_num)
         if not cache.has_key('books:' + wrt_key):
-            book_list = Book.objects.filter(Q(writer=wrt_id)).order_by('title')[page_bottom:page_top]
+            book_list = Book.objects.filter(writer=wrt_id).order_by('title')[page_bottom:page_top]
             AddBookListCache(wrt_key, book_list, page_num=page_num, per_page=per_page)
         book_list = eval(cache.get('books:' + wrt_key))
         if len(book_list):
             book_count = book_list[0]['writer']['count']
             if not cache.has_key('books:' + wrt_key):
-                book_list = Book.objects.filter(Q(writer=wrt_id)).order_by('title')[page_bottom:page_top]
+                book_list = Book.objects.filter(writer=wrt_id).order_by('title')[page_bottom:page_top]
                 AddBookListCache(wrt_key, book_list, page_num=page_num, per_page=per_page)
             book_list = eval(cache.get('books:' + wrt_key))
             if not cache.has_key('wrt:' + str(wrt_id)):
-                writer = Writer.objects.filter(Q(id=wrt_id))
+                writer = Writer.objects.filter(id=wrt_id)
                 if len(writer):
                     AddWrtCache(wrt_id, writer[0])
             writer = eval(cache.get('wrt:' + str(wrt_id)))
@@ -308,27 +273,38 @@ def list_books(request, **kw):
         subj_id = ZI(kw.get('id_subj'))
         subj_key = '.subj' + str(subj_id) + '.' + str(page_num)
         if not cache.has_key('books:' + subj_key):
-            book_list = Book.objects.filter(Q(subject=subj_id))[page_bottom:page_top]
+            book_list = Book.objects.filter(subject=subj_id)[page_bottom:page_top]
             AddBookListCache(subj_key, book_list, page_num=page_num, per_page=per_page)
         book_list = eval(cache.get('books:' + subj_key))
         if len(book_list):
             book_count = book_list[0]['subject']['count']
             subject = book_list[0]['subject']
-    elif request.GET.get('search'): # search
-        st = request.GET.get('search')
-        search_key = '.search' + to_translit(st) + '.' + str(page_num)
+    elif request.GET.get('wrt'):
+        st = request.GET.get('wrt').capitalize()
+        search_key = '.wrt' + to_translit(st)
+        if not cache.has_key('wrts:' + search_key):
+            if st == '*': wrt_list = Writer.objects.order_by('writer')
+            else:    wrt_list = Writer.objects.filter(writer__startswith=st).order_by('writer')
+            AddWrtListCache(search_key, wrt_list)
+        book_list = eval(cache.get('wrts:' + search_key))
+        wrt_count = len(book_list)
+        for wrt in book_list:  # sum book by wrt
+            book_count += wrt['count']
+    elif request.GET.get('tit'):
+        st = request.GET.get('tit').capitalize()
+        search_key = '.tit' + to_translit(st) + '.' + str(page_num)
         if not cache.has_key('books:' + search_key):
-            book_list = Book.objects.filter(Q(title__startswith=st.capitalize()))[page_bottom:page_top]
+            book_list = Book.objects.filter(title__startswith=st)[page_bottom:page_top]
             AddBookListCache(search_key, book_list, page_num=page_num, per_page=per_page)
         book_list = eval(cache.get('books:' + search_key))
         book_count = len(book_list)
         search_count = book_count
     else:  # last update
-        wrt_id = '.last_update'
-        wrt_key = str(wrt_id) + '.' + str(page_num)
         per_page = 10
         page_bottom = (page_num-1)*per_page
         page_top = page_bottom+per_page
+        wrt_id = '.last_update'
+        wrt_key = str(wrt_id) + '.' + str(page_num)
         if not cache.has_key('books:' + wrt_key):
             book_list = Book.objects.filter().order_by('-date')[page_bottom:page_top]
             AddBookListCache(wrt_key, book_list, page_num=page_num, per_page=per_page)
@@ -348,6 +324,7 @@ def list_books(request, **kw):
                                'wrt_index': wrt_index,
                                'form': SearchForm(initial={'search':request.GET.get('search')}),
                                'book_count': book_count,
+                               'wrt_count': wrt_count,
                                'last_count': last_count,
                                'search_count': search_count,
                                'books': {  # Paginator imitate
@@ -384,7 +361,7 @@ def get_book(request, **kw):
         if not request.user.is_authenticated() and part != '0' and part != 'cover.jpeg':
             part = '0'
         if not cache.has_key('book:' + book_ind + '.' + str(part)):
-            book = get_object_or_404(Book, Q(index=ZI(book_ind)))            
+            book = get_object_or_404(Book, index=ZI(book_ind))            
             content = GetBookContent(book, part)
             if not content:
                 raise Http404
@@ -445,7 +422,7 @@ def add_book(request):
                 book.author = request.user
             # uniques
             book.index = abs(zlib.crc32(writer.writer.encode('utf-8') + ' ' + book.title.encode('utf-8')))
-            book_list = Book.objects.filter(Q(index=book.index))
+            book_list = Book.objects.filter(index=book.index)
             if len(book_list) == 0:
                 book.writer = IncWrtCount(writer=writer.writer)
                 book.subject = IncSubjCount(subject=subject.subject)

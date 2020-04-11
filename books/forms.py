@@ -31,4 +31,5 @@ class AddSubjForm(forms.ModelForm):
         exclude = ['count']
 
 class SearchForm(forms.Form):
-    search = forms.CharField(max_length=100, label=_('Search by title'))
+    wrt = forms.CharField(max_length=100, label=_('Search by writer'))
+    tit = forms.CharField(max_length=100, label=_('or title'))

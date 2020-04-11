@@ -163,9 +163,9 @@ function viewphoto(photo_counter, photo_id, photo_date, photo_user_id){
 	dw.closelink.setAttributeNS('http://www.w3.org/1999/xlink', 'title', "{% trans 'Close' %}");
 	dw.prevlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1-photo_counter) + ')');
 	dw.nextlink.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'javascript:vc(' + (1+photo_counter) + ')');
-	dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/orig/' + photo_id);
-	if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/edit/' + photo_id);
-	if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/photos/del/' + photo_id);
+	dw.viewfull.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/fotos/orig/' + photo_id);
+	if(dw.viewedit) dw.viewedit.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/fotos/edit/' + photo_id);
+	if(dw.viewdel) dw.viewdel.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/fotos/del/' + photo_id);
 	for(var i=0; i<dw.caption.childNodes.length; i++){ dw.caption.removeChild(dw.caption.childNodes[i]); }
 	for(var i=0; i<dw.captiontop.childNodes.length; i++){ dw.captiontop.removeChild(dw.captiontop.childNodes[i]); }
 	dw.caption.appendChild(document.createTextNode(vphoto.title));
@@ -257,9 +257,9 @@ function vc(counter) {
 
 {% endif %}
 
-<p class="hspace">
+<p class="mtext hspace">
 {% if request.user.is_authenticated %}
-  <a class="mtext" href="{% url 'fotos.views.add_photo' %}">{% trans 'Add photo' %}</a>
+  <a href="{% url 'fotos.views.add_photo' %}">{% trans 'Add photo' %}</a>
 {% else %}
   {% trans 'Please authorize to add photos' %}
 {% endif %}

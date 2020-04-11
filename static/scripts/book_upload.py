@@ -4,7 +4,7 @@
 #
 # book_upload.py <path_to_files_txt>
 
-import urllib2, re, sys, os, time, zlib
+import urllib2, re, sys, os, time
 
 sys.path.insert(0, os.path.abspath(sys.argv[0] + '/../../../vendor'))
 

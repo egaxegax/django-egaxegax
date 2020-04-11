@@ -40,7 +40,7 @@
       <span class="lightgray">‹ {% trans 'previous' %}</span>
     {% endif %}
     {% if subjects.paginator.num_pages > 1 %}
-      <span class="hspace2">{{ subjects.number }} {% trans 'of' %} {{ subjects.paginator.num_pages }}</span>
+      <span class="hspace2"><b>{{ subjects.number }}</b> {% trans 'of' %} <b>{{ subjects.paginator.num_pages }}</b></span>
     {% endif %}
     {% if subjects.has_next %}
       <a href="?page={{ subjects.next_page_number }}">{% trans 'next' %} ›</a>
@@ -68,7 +68,7 @@
       </td></tr>
     </table>
 {% else %}
-  <p class="hspace">{% trans 'Please authorize to post messages' %}</p>
+  <p class="mtext hspace">{% trans 'Please authorize to post messages' %}</p>
 {% endif %}
   </form>
 </p>

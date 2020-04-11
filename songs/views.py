@@ -192,44 +192,8 @@ def copy_art(request):
         IncArtCount(**art)
     return HttpResponse('Done.')
 
-def list_art(request, **kw):
-    art_count = 0
-    song_count = 0
-    per_page = 1000
-    art_list = []
-    art_key = ''
-    if kw.get('ind_art'):  # by index
-        i = ZI(kw.get('ind_art'))
-        if art_index.has_key(i):
-            art_key = art_index.get(i).capitalize()
-            if not cache.has_key('arts:' + art_key):
-                art_list = Art.objects.filter(artist__startswith=art_key).order_by('artist')
-                AddArtListCache(art_key, art_list)
-            art_list = eval(cache.get('arts:' + art_key))
-        else:
-            art_list = Art.objects.none()
-        art_count = len(art_list)
-    else:  # full list
-        art_key = '.full_list'
-        if not cache.has_key('arts:' + art_key):
-            art_list = Art.objects.order_by('artist')
-            AddArtListCache(art_key, art_list)
-        art_list = eval(cache.get('arts:' + art_key))
-        art_count = len(art_list)
-    for art in art_list:  # sum song by art
-        song_count += art['count']
-    return render_to_response('songs.html', 
-                              context_instance=RequestContext(request,
-                              {'request': request,
-                               'art_index': art_index,
-                               'art_key': art_key,
-                               'form': SearchForm(initial={'search':request.GET.get('search')}),
-                               'song_count': song_count,
-                               'art_count': art_count,
-                               'songs': PageList(request, art_list, per_page),
-                               'logback': reverse('songs.views.list_art')}))
-
 def list_songs(request, **kw):
+    art_count = 0
     song_count = 0
     song_last_count = 0
     search_count = 0
@@ -243,11 +207,23 @@ def list_songs(request, **kw):
             AddSongListCache(artist, song_list)
         song_list = eval(cache.get('songs:' + artist))
         song_count = len(song_list)
-    elif request.GET.get('search'): # search
-        st = request.GET.get('search')
-        search_key = '.search' + to_translit(st)
+    elif request.GET.get('art'):
+        st = request.GET.get('art').capitalize()
+        search_key = '.art' + to_translit(st)
+        if not cache.has_key('arts:' + search_key):
+            if st == '*': art_list = Art.objects.order_by('artist')    
+            else:    art_list = Art.objects.filter(artist__startswith=st).order_by('artist')
+            AddArtListCache(search_key, art_list)
+        song_list = eval(cache.get('arts:' + search_key))
+        art_count = len(song_list)
+        for art in song_list:  # sum song by art
+            song_count += art['count']
+        per_page = 1000
+    elif request.GET.get('tit'):
+        st = request.GET.get('tit').capitalize()
+        search_key = '.tit' + to_translit(st)
         if not cache.has_key('songs:' + search_key):
-            song_list = Song.objects.filter(Q(title__startswith=st.capitalize()))
+            song_list = Song.objects.filter(title__startswith=st)
             AddSongListCache(search_key, song_list)
         song_list = eval(cache.get('songs:' + search_key))    
         song_count = len(song_list)
@@ -265,6 +241,7 @@ def list_songs(request, **kw):
                                'art_index': art_index,
                                'form': SearchForm(initial={'search':request.GET.get('search')}),
                                'song_count': song_count,
+                               'art_count': art_count,
                                'last_count': song_last_count,
                                'search_count': search_count,
                                'songs': PageList(request, song_list, per_page),                              

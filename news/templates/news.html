@@ -43,7 +43,7 @@
     <span class="lightgray">‹ {% trans 'previous' %}</span>
   {% endif %}
   {% if news.paginator.num_pages > 1 %}
-    <span class="hspace2">{{ news.number }} {% trans 'of' %} {{ news.paginator.num_pages }}</span>
+    <span class="hspace2"><b>{{ news.number }}</b> {% trans 'of' %} <b>{{ news.paginator.num_pages }}</b></span>
   {% endif %}
   {% if news.has_next %}
     <a href="?page={{ news.next_page_number }}">{% trans 'next' %} ›</a>
@@ -72,7 +72,7 @@
       <tr><th></th><td><input type="submit" value="{% trans 'Post' %}" /></td></tr>
     </table>
   {% else %}
-    <p class="hspace">{% trans 'Please authorize to post messages' %}</p>
+    <p class="mtext hspace">{% trans 'Please authorize to post messages' %}</p>
   {% endif %}
   </form>
 </p>
