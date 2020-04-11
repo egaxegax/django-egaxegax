@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os, sys
 
-sys.path.insert(0, 'vendor')
+sys.path.insert(0, '.')
+sys.path.insert(1, 'vendor')
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
