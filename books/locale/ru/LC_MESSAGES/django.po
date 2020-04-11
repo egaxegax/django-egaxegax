@@ -60,6 +60,9 @@ msgstr "Править"
 msgid "Edit book"
 msgstr "Править текст"
 
+msgid "Edit writer"
+msgstr "Править автора"
+
 msgid "Added"
 msgstr "Добавил"
 
