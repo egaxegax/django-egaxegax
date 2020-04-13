@@ -13,7 +13,8 @@ class Greeting(models.Model):
     class Meta:
         db_table = 'guestbook_greeting'
     author = models.ForeignKey(User, null=True, blank=True, verbose_name=_('user'))
-    subject = models.ForeignKey(Greeting_Subject, null=True, blank=True, verbose_name=_('subject'))
+    subject = models.ForeignKey(Greeting_Subject, verbose_name=_('subject'))
     title = models.CharField(max_length=150, null=True, blank=True, verbose_name=_('title'))
     content = models.TextField(verbose_name=_('content'))
     date = models.DateTimeField(null=True, blank=True, verbose_name=_('date'))
+    index = models.IntegerField(null=True, blank=True) # crc content

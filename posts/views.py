@@ -59,6 +59,9 @@ def AddPostCache(post):
 def AddPostListCache(subj_id, posts_list):
     cache_list = []
     for post in posts_list:
+        if post.index is None:
+            post.index = abs(zlib.crc32(post.content.encode('utf-8')))
+            post.save(force_update=True)
         cache_post = {
            'id': post.id,
            'author': (hasattr(post, 'author') and post.author and {'id': post.author.id, 'username': post.author.username}) or {},
@@ -193,22 +196,25 @@ def add_post(request):
     if request.method == 'POST':
         form_subject = AddSubjForm(request.POST)
         form = AddPostForm(request.POST)       
-        if form.is_valid():
+        if form.is_valid() and form_subject.is_valid():
             post = form.save(commit=False)
             post.content = PackContent(post)
+            post.index = abs(zlib.crc32(post.content.encode('utf-8')))
             if isinstance(request.user, User):
                 post.author = request.user
-            if post.title[:5] != 'about':
-                post.date = timezone.now()
-            if post.title[:3] == '___':
+            if post.title[:5] == 'about':
                 post.title = None
-            if form_subject.is_valid():
+            else:
+                post.date = timezone.now()
+            if post.title and post.title[:3] == '___':
+                post.title = None
+            posts_list = Greeting.objects.filter(index=post.index)
+            if len(posts_list) == 0:
                 subject = IncSubjCount(subject=request.POST['subject'])
                 post.subject = subject
                 ClearSubjListCache()
                 ClearPostListCache(subject.id)
-            ClearPostListCache('')
-            post.save()
+                post.save()
     if 'subject' in locals():
         return HttpResponseRedirect(reverse('posts.views.list_posts', kwargs={'id_subj': subject.id}))
     return HttpResponseRedirect(reverse('posts.views.list_posts'))
@@ -222,17 +228,12 @@ def edit_post(request, **kw):
             post = form.save(commit=False)
             if isinstance(request.user, User):
                 post.author = request.user
-#            post.date = datetime.datetime.today()
             post.save(force_update=True)
             if post.subject:
                 IncSubjCount(subject=post.subject.subject, count=0)
                 ClearSubjListCache()
                 ClearPostListCache(post.subject.id)
-            ClearPostListCache('')
-            ClearPostCache(post)
-            if post.subject is None:
-                return HttpResponseRedirect(reverse('posts.views.list_posts'))
-            else:
+                ClearPostCache(post)
                 return HttpResponseRedirect(reverse('posts.views.list_posts', kwargs={'id_subj': post.subject.id}))
     else:
         form = EditPostForm(initial={
@@ -253,11 +254,9 @@ def delete_post(request, **kw):
     if request.user.is_authenticated():
         post = get_object_or_404(Greeting, id=ZI(kw.get('id')))
         if request.user.is_superuser or hasattr(post, 'author') and request.user.username == post.author.username:
-            if hasattr(post, 'subject') and post.subject:
-                IncSubjCount(subject=post.subject.subject, count=-1)
-                ClearSubjListCache()
-                ClearPostListCache(post.subject.id)
-            ClearPostListCache('')
+            IncSubjCount(subject=post.subject.subject, count=-1)
+            ClearSubjListCache()
+            ClearPostListCache(post.subject.id)
             ClearPostCache(post)
             post.delete()
     if 'id_subj' in request.GET:

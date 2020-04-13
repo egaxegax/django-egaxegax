@@ -5,7 +5,7 @@ from posts.models import *
 class AddPostForm(forms.ModelForm):
     class Meta:
         model = Greeting
-        exclude = ['author', 'subject']
+        exclude = ['author', 'subject', 'index']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'formtext'}),
             'content': forms.Textarea(attrs={'rows': 10}),
@@ -14,7 +14,7 @@ class AddPostForm(forms.ModelForm):
 class EditPostForm(forms.ModelForm):
     class Meta:
         model = Greeting
-        exclude = ['author', 'subject']
+        exclude = ['author', 'subject', 'index']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'formtext'}),
             'content': forms.Textarea(attrs={'rows': 10}),
