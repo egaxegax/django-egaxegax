@@ -1,11 +1,10 @@
-from datetime import datetime
 from django.utils.timesince import timesince
 from django import template
+from datetime import datetime
 from transliterate import translit
+import re
 
 register = template.Library()
-
-import re
 
 @register.filter
 def time_since(strval):
@@ -28,4 +27,3 @@ def strip_text(s):
 @register.filter
 def to_translit(s):
     return re.sub('[^\w]', '', translit(s, 'ru', reversed=True).replace(" ", "_").lower())
-

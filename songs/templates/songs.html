@@ -82,11 +82,11 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
     <div class="wrap">
       <dl class="msgtext"><dt>
       {% if art_count %}
-        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
+        <img class="rounded" height="50px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
         <a class="nodecor" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
       {% endif %}
       {% if last_count or search_count%}
-        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
+        <img class="rounded" height="50px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
         <a class="nodecor pink" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
       {% endif %}
       {% if song.count %}

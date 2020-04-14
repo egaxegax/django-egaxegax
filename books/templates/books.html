@@ -76,7 +76,7 @@ dt .cont { display: table; width: 100%; }
     <div class="wrap">
       <dl class="msgtext"><dt>
       {% if wrt_count %}
-        <img class="rounded" width="60px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/books/{{ book.tr_wrt }}.jpg" alt=" " title="" />
+        <img class="rounded" height="50px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/books/{{ book.tr_wrt }}.jpg" alt=" " title="" />
         <a class="nodecor" href="{% url 'books.views.list_books' tr_wrt=book.tr_wrt id_wrt=book.id %}">{{ book.writer.writer }}</a>
       {% endif %}
       {% if book.count %}
