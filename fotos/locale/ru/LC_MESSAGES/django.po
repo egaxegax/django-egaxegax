@@ -40,6 +40,9 @@ msgstr "Фотки"
 msgid "Write to"
 msgstr "Написать"
 
+msgid "Log in"
+msgstr "Войти"
+
 #: templates/photos.html
 
 msgid "All photos"
