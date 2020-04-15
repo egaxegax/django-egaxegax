@@ -15,10 +15,11 @@
 {% if subjects.object_list %}
   {% for subj in subjects.object_list %}
     <div class="wrap">
-    <dl class="msgtext"><dt>
-      <a class="nodecor" href="{% url 'books.views.list_books' tr_subj=subj.tr_subj id_subj=subj.id %}">
-        {{ subj.subject }} </a> [{{ subj.count }}] </span>
-        <div class="gray smaller">{% trans subj.subject%}</div></dt>
+      <dl class="msgtext tabl"><dt class="lfloat minw">
+        <a class="nodecor" href="{% url 'books.views.list_books' tr_subj=subj.tr_subj id_subj=subj.id %}">
+          {{ subj.subject }} </a></dt>
+        <dt> [{{ subj.count }}] </dt>
+        <div class="gray smaller">{% trans subj.subject%}</div>
       </dl>
     </div>
   {% endfor %}

@@ -9,11 +9,9 @@
 {% if song_count and not search_count %}{% if art_count %}Список исполнителей{% else %}{% with songs.object_list|first as f %}{{ f.artist }}{% endwith %}, {% trans 'chords' %}{% endif %}{% endif %}
 {% if not song_count and not search_count %}{% trans 'Chords' %}{% endif %} - {% endblock %}
 {% block pagestyle %}
-.msgtext dt { border:0; }
 .about { display: table; }
 .about * { display: table-cell; vertical-align: middle; }
-ul.hr { display: table; }
-ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
+ul.hr li { padding: 0 20px; }
 {% endblock %}
 {% block songsclass %}wrap3{% endblock %}
 {% block pageheader %}
@@ -34,12 +32,10 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
   В базе свыше <b>26000</b> текстов песен с аккордами и просто стихов.
 </p>
 <ul class="mtext hr hspace2">
-<li class="inl"><a class="nodecor" href="/posts/5691594208444416#id5691594208444416">Аккорды</a>
 <li class="inl"><a class="nodecor" href="/posts/5657300505198592#id5657300505198592">Таблица аккордов</a>
 <li class="inl"><a class="nodecor" href="/posts/5707820058017792#id5707820058017792">Транспонирование аккордов</a>
 <li class="inl"><a class="nodecor" href="/posts/5752329273868288#id5752329273868288">Переборы</a>
 <li class="inl"><a class="nodecor" href="/posts/5642340328800256#id5642340328800256">Гитарные бои</a>
-<li class="inl"><a class="nodecor" href="/songs/art/5170602126082048">Мои тексты</a>
 </ul>
 {% endif %}
 
@@ -80,7 +76,7 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
     </div>
   {% else %}
     <div class="wrap">
-      <dl class="msgtext"><dt>
+      <dl class="msgtext tabl"><dt class="lfloat minw">
       {% if art_count %}
         <img class="rounded" height="50px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
         <a class="nodecor" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
@@ -89,27 +85,25 @@ ul.hr li { padding: 0 10px; display: table-cell; width: 140px; }
         <img class="rounded" height="50px" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="" />
         <a class="nodecor pink" href="{% url 'songs.views.list_songs' tr_art=song.tr_art id_art=song.art_id %}">{{ song.artist }}</a>
       {% endif %}
-      {% if song.count %}
-        [{{ song.count }}]
-      {% else %}
+      {% if song.title %}
         <a class="nodecor" href="{% url 'songs.views.get_song' tr_art=song.tr_art tr_title=song.tr_title id=song.id %}">{{ song.title|escape }}</a>
       {% endif %}
-      {% if not art_count and song.audio %}
-        [<a class="nodecor" title="{% trans 'Listen' %}" href="{% url 'songs.views.get_song' id=song.id %}?a=1">{% trans 'Listen' %}</a>]
+        </dt>
+      {% if song.count %}
+        <dt class="lfloat"> [{{ song.count }}] </dt>
       {% endif %}
       {% if not last_count %}
-        <div class="rfloat">
+        <dt class="rfloat">
         {% if request.user.is_authenticated and not song.count %}
           <a class="nodecor hspace" href="{% url 'songs.views.get_song' id=song.id %}?asfile=1" title="Сохранить файл" >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="#4d3ca0" stroke-width="3" stroke-linecap="round" stroke-linejoin="arcs" fill="none"><path transform="scale(0.85 0.85) translate(-1 0)" d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"/></svg>
           </a>
         {% endif %}
-          <span class="counter lightgray hspace">{{ song.index }}</span>
-        </div>
+          <span class="counter lightgray"> {{ song.index }} </span>
+        </dt>
       {% endif %}
-      </dt>
       {% if last_count %}
-        <dd class="smaller"><acronym title="{{ song.date }}">{{ song.date|time_since }}</acronym></dd>
+        <dd class="row"><acronym class="hspace2 smaller" title="{{ song.date }}">{{ song.date|time_since }}</acronym></dd>
       {% endif %}
       </dl>
     </div>

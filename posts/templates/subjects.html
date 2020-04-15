@@ -14,17 +14,16 @@
 {% if subjects.object_list %}
 
   {% for subj in subjects.object_list %}
-    {% if subj.subject %}
-      <div class="wrap">
-      <dl class="msgtext"><dt>
+    <div class="wrap">
+      <dl class="msgtext tabl"><dt class="lfloat minw">
         <a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subj.id %}">
-          {{ subj.subject|escape }} </a> [{{ subj.count }}] </dt>
-        <dd class="smaller">
-          <acronym title="{{ subj.date }}">{{ subj.date|time_since }}</acronym>
+          {{ subj.subject|escape }} </a></dt>
+        <dt> [{{ subj.count }}] </dt>
+        <dd class="row">
+          <acronym class="hspace2 smaller" title="{{ subj.date }}">{{ subj.date|time_since }}</acronym>
         </dd>
       </dl>
-      </div>
-    {% endif %}
+    </div>
   {% endfor %}
   
   <p class="mtext hspace"><a href="{% url 'posts.views.list_posts' %}">Все статьи</a></p>
