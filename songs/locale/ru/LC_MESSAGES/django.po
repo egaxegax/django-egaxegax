@@ -85,10 +85,10 @@ msgid "Profile"
 msgstr "Профайл"
 
 msgid "Search by artist"
-msgstr "Найти по автору"
+msgstr "Автор"
 
 msgid "or title"
-msgstr "или названию"
+msgstr "или название"
 
 msgid "Search result"
 msgstr "Найдено"

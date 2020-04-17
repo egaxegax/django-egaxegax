@@ -9,7 +9,7 @@
 table.cont { width:100%; padding: 10px 2px; }
 table.cont td { text-align: center; vertical-align: top; }
 #viewtab { visibility: hidden; border-collapse: collapse; position: fixed; left: 0; top: 0; background-color: rgba(100,100,100,0.8);
-    padding:0 margin: 0; width: 100%; height: 100%; font-size: 40pt; }
+  padding:0 margin: 0; width: 100%; height: 100%; font-size: 40pt; }
 .imcont { position: relative; display: table-cell; vertical-align: middle; height:150px; width:200px; }
 .photocont .imcont { background: #f8f9fa; border:1px solid rgba(0,0,0,0.1); border-radius:2px; padding:4px; }
 .albcont .mb { border: 1px dashed rgba(0,0,0,0.1);  height:200px; width: 400px; }
@@ -230,12 +230,12 @@ function vc(counter) {
           </div>
           </a>
         </td>
-      {% else %}
+      {% elif not photo.memberonly or request.user.is_superuser %}
         <td class="albcont">
-          <a class="nodecor" href="{% if not photo.memberonly or request.user.is_superuser %}{% url 'fotos.views.list_photos' id_album=photo.id %}{% endif %}">
-          <div class="imcont {% if photo.memberonly %}mb{% endif %}">
-            <img class="rounded1 bigger" id="thumb{{ forloop.counter }}" src="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.thumb_url|get_im_thumb:'400' }}{% endif %}" title="{% if not photo.memberonly or request.user.is_superuser %}{{ photo.title }}{% endif %}" alt="{% if photo.memberonly %}&#128274;{% else %}&nbsp;{% endif %}"/><br/>
-            <span class="caption mid bigger white">{% if not photo.memberonly or request.user.is_superuser %}{{ photo.album }}{% endif %}</span>
+          <a class="nodecor" href="{% url 'fotos.views.list_photos' id_album=photo.id %}">
+          <div class="imcont">
+            <img class="rounded1 bigger" id="thumb{{ forloop.counter }}" src="{{ photo.thumb_url|get_im_thumb:'300' }}" title="{{ photo.title }}" alt=" "/><br/>
+            <span class="caption mid bigger white">{{ photo.album }}</span>
             <span class="caption ne bigger"> {{ photo.album_count }}</span>
             <span class="caption se">{{ photo.date|time_since }}</span>
           </div>

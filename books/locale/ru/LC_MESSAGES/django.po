@@ -73,7 +73,7 @@ msgid "Profile"
 msgstr "Профайл"
 
 msgid "Search by writer"
-msgstr "Найти по автору"
+msgstr "Автор"
 
 msgid "Search result"
 msgstr "Список найденого"

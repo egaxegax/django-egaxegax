@@ -17,7 +17,7 @@ from fotos.models import *
 from fotos.templatetags.filters import *
 from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
-import datetime, re
+import datetime, re, operator
 
 CACHE_TIMEOUT = 60*60*3  # lifetime in sec 3h
 
@@ -50,11 +50,11 @@ def FromTranslit(s):
     return re.sub(pattern, lambda m: r[m.group()], s)
 
 def AddAlbumListCache(allkey, photos_list):
-    album_list = {}
+    albums = {}
     for photo in photos_list:
-        if not photo.album in album_list:
-            album_list[photo.album] = {
-               'album_count': 1,     
+        if not photo.album in albums:
+            albums[photo.album] = {
+               'album_count': 1,
                'id': photo.id,
                'title': photo.title,
                'album': photo.album,
@@ -63,12 +63,13 @@ def AddAlbumListCache(allkey, photos_list):
                'date': photo.date,
                'memberonly': photo.memberonly }
         else:
-            album_list[photo.album]['album_count'] += 1
-            if photo.date > album_list[photo.album]['date']:
-                album_list[photo.album]['title'] = photo.title
-                album_list[photo.album]['thumb_url'] = get_im_url(photo.thumb_url)
-                album_list[photo.album]['date'] = photo.date
-                album_list[photo.album]['memberonly'] = photo.memberonly
+            albums[photo.album]['album_count'] += 1
+            if photo.date > albums[photo.album]['date']:
+                albums[photo.album]['title'] = photo.title
+                albums[photo.album]['thumb_url'] = get_im_url(photo.thumb_url)
+                albums[photo.album]['date'] = photo.date
+                albums[photo.album]['memberonly'] = photo.memberonly
+    album_list = sorted(albums.values(), key=operator.itemgetter('memberonly'))
     cache.add('photos:' + allkey, str(album_list), CACHE_TIMEOUT)
 
 def UpdateAlbumListCache(photo):
@@ -161,14 +162,14 @@ def list_photos(request, **kw):
                 AddPhotosListCache(tr_alb, photos_list)
             photos_list = eval(cache.get('photos:' + tr_alb))
     else: # full list by album
-        rows = 100
-        cols = 2
+        rows = 5
+        cols = 3
         photos_list = {}
         allkey = '.full_list'
         if not cache.has_key('photos:' + allkey):
             photos_list = Photo.objects.all()
             AddAlbumListCache(allkey, photos_list)
-        photos_list = eval(cache.get('photos:' + allkey)).values()
+        photos_list = eval(cache.get('photos:' + allkey))
     return render_to_response('photos.html', 
                               context_instance=RequestContext(request,
                               {'request': request,

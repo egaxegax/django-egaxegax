@@ -27,7 +27,7 @@ dt .cont { display: table; width: 100%; }
 <div class="indexlist mtext wrap">
   <form class="search" action="{% url 'books.views.list_books' %}" method="get">{% csrf_token %}
     <a class="nodecor hspaced" href="{% url 'books.views.list_subj' %}">Жанры</a>
-    <a class="nodecor hspaced" href="{% url 'books.views.list_books' %}?wrt=*">Авторы</a>
+    <a class="nodecor hspaced" href="{% url 'books.views.list_books' %}?wrt=*">Все</a>
     {{ form }}
     <input class="submit" type="submit" value="Найти" />
   </form>
