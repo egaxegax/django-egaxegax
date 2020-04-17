@@ -65,7 +65,7 @@ dt .cont { display: table; width: 100%; }
 {% if wrt_count %}
 
   {% if books.has_previous %}
-    <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">
+    <a href="?{% if request.GET.tit %}tit={{ request.GET.tit|urlencode }}&{% endif %}page={{ books.previous_page_number }}">
       <div class="wrap cfloat">
         <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" />
       </div>
@@ -80,7 +80,7 @@ dt .cont { display: table; width: 100%; }
         <a class="nodecor" href="{% url 'books.views.list_books' tr_wrt=book.tr_wrt id_wrt=book.id %}">{{ book.writer.writer }}</a>
       {% endif %}
       {% if book.count %}
-        <dt class="lfloat"> [{{ book.count }}] </dt>
+        <dt class="lfloat">&nbsp;[{{ book.count }}]&nbsp;</dt>
       {% endif %}
         <dt class="rfloat">
           <span class="counter lightgray hspace"> {{ book.counter }} </span>
@@ -92,7 +92,7 @@ dt .cont { display: table; width: 100%; }
 {% else %}
 
   {% if books.has_previous %}
-    <a href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% elif writer %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.previous_page_number }}">
+    <a href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% elif writer %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?{% if request.GET.tit %}tit={{ request.GET.tit|urlencode }}&{% endif %}page={{ books.previous_page_number }}">
     <div class="wrap cfloat">
       <img src='{{ MEDIA_URL }}img/s_up.png' title="{% trans 'previous' %}" alt="{% trans 'previous' %}" /></div></a>
   {% endif %}
@@ -152,7 +152,7 @@ dt .cont { display: table; width: 100%; }
   {% endfor %}
 
   {% if books.has_next or last_count or search_count %}
-    <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% elif writer %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ books.next_page_number }}">      
+    <a id="pagenext" class="nodecor" href="{% if subject %}{% url 'books.views.list_books' id_subj=subject.id %}{% elif writer %}{% url 'books.views.list_books' id_wrt=writer.id %}{% endif %}?{% if request.GET.tit %}tit={{ request.GET.tit|urlencode }}&{% endif %}page={{ books.next_page_number }}">      
       <div class="wrap cfloat">
         <img src='{{ MEDIA_URL }}img/s_down.png' title="{% trans 'next' %}" alt="{% trans 'next' %}" />
       </div>

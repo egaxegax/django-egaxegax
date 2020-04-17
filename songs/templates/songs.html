@@ -90,7 +90,7 @@ ul.hr li { padding: 0 20px; }
       {% endif %}
         </dt>
       {% if song.count %}
-        <dt class="lfloat"> [{{ song.count }}] </dt>
+        <dt class="lfloat">&nbsp;[{{ song.count }}]&nbsp;</dt>
       {% endif %}
       {% if not last_count %}
         <dt class="rfloat">
@@ -113,7 +113,7 @@ ul.hr li { padding: 0 20px; }
 
   <p class="mtext cfloat">
   {% if songs.has_previous %}
-    <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
+    <a href="?{% if request.GET.tit %}tit={{ request.GET.tit|urlencode }}&{% endif %}page={{ songs.previous_page_number }}">‹ {% trans 'previous' %}</a>
   {% elif songs.has_next  %}
     <span class="lightgray">‹ {% trans 'previous' %}</span>
   {% endif %}
@@ -121,7 +121,7 @@ ul.hr li { padding: 0 20px; }
     <span class="hspace2"><b>{{ songs.number }}</b> {% trans 'of' %} <b>{{ songs.paginator.num_pages }}</b></span>
   {% endif %}
   {% if songs.has_next %}
-    <a href="?{% if request.GET.search %}search={{ request.GET.search|urlencode }}&{% endif %}page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
+    <a href="?{% if request.GET.tit %}tit={{ request.GET.tit|urlencode }}&{% endif %}page={{ songs.next_page_number }}">{% trans 'next' %} ›</a>
   {% elif songs.has_previous %}
     <span class="lightgray">{% trans 'next' %} ›</span>
   {% endif %}

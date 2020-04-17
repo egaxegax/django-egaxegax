@@ -239,7 +239,9 @@ def list_songs(request, **kw):
                               context_instance=RequestContext(request,
                               {'request': request,
                                'art_index': art_index,
-                               'form': SearchForm(initial={'search':request.GET.get('search')}),
+                               'form': SearchForm(initial={
+                                   'art':request.GET.get('art'),
+                                   'tit':request.GET.get('tit') }),
                                'song_count': song_count,
                                'art_count': art_count,
                                'last_count': song_last_count,
@@ -368,10 +370,11 @@ def get_song(request, **kw):
                                   context_instance=RequestContext(request,
                                   {'request': request,
                                    'art_index': art_index,
-                                   'form': SearchForm(initial={'search':request.GET.get('search')}),
+                                   'form': SearchForm(initial={
+                                       'art':request.GET.get('art'),
+                                       'tit':request.GET.get('tit') }),
                                    'songs': song_list,
                                    'song': song,
-                                   'autoplay': request.GET.get('a', 0),
                                    'logback': reverse('songs.views.get_song', kwargs={'id': song_id}) }))
 
 def user_profile(request, **kw):

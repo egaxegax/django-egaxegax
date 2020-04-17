@@ -322,7 +322,9 @@ def list_books(request, **kw):
                               context_instance=RequestContext(request,
                               {'request': request,
                                'wrt_index': wrt_index,
-                               'form': SearchForm(initial={'search':request.GET.get('search')}),
+                               'form': SearchForm(initial={
+                                   'wrt':request.GET.get('wrt'),
+                                   'tit':request.GET.get('tit') }),
                                'book_count': book_count,
                                'wrt_count': wrt_count,
                                'last_count': last_count,
@@ -388,7 +390,9 @@ def read_book(request, **kw):
                               context_instance=RequestContext(request,
                               {'request': request,
                                'wrt_index': wrt_index,
-                               'form': SearchForm(initial={'search':request.GET.get('search')}),
+                                'form': SearchForm(initial={
+                                   'wrt':request.GET.get('wrt'),
+                                   'tit':request.GET.get('tit') }),
                                'book': book,
                                'logback': reverse('books.views.read_book', kwargs={'ind': book['index'], 'part': book['part']}) }))
 
