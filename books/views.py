@@ -20,11 +20,6 @@ from math import ceil
 import datetime, re
 import zlib, zipfile, base64, mimetypes
 
-wrt_index = {
-    20:'a',21:'b',22:'c',23:'d',24:'e',25:'f',26:'g',27:'h',28:'i',29:'j',30:'k',31:'l',32:'m',33:'n',34:'o',35:'p',36:'q',37:'r',38:'s',39:'t',40:'u',41:'v',42:'w',43:'x',44:'y',45:'z',
-    50:u'а',51:u'б',52:u'в',53:u'г',54:u'д',55:u'е',57:u'ж',58:u'з',59:u'и',60:u'к',61:u'л',62:u'м',63:u'н',64:u'о',65:u'п',66:u'р',67:u'с',68:u'т',69:u'у',70:u'ф',71:u'х',72:u'ц',73:u'ч',74:u'ш',75:u'щ',76:u'э',77:u'ю',78:u'я'
-}
-
 def E_OS(text):
     "Convert To Unicode"
     return text.decode('utf-8')
@@ -207,7 +202,7 @@ def IncWrtCount(**kw):
             wrt.count += kw.get('count', 1)
             wrt.save(force_update=True)
             if wrt.count < 1:
-                ClearWrtListCache(wrt.writer[0].capitalize())
+                ClearWrtListCache(wrt.writer[0])
                 wrt.delete()
         except:
             form = AddWrtForm()
@@ -280,7 +275,7 @@ def list_books(request, **kw):
             book_count = book_list[0]['subject']['count']
             subject = book_list[0]['subject']
     elif request.GET.get('wrt'):
-        st = request.GET.get('wrt').capitalize()
+        st = request.GET.get('wrt')
         search_key = '.wrt' + to_translit(st)
         if not cache.has_key('wrts:' + search_key):
             if st == '*': wrt_list = Writer.objects.order_by('writer')
@@ -291,7 +286,7 @@ def list_books(request, **kw):
         for wrt in book_list:  # sum book by wrt
             book_count += wrt['count']
     elif request.GET.get('tit'):
-        st = request.GET.get('tit').capitalize()
+        st = request.GET.get('tit')
         search_key = '.tit' + to_translit(st) + '.' + str(page_num)
         if not cache.has_key('books:' + search_key):
             book_list = Book.objects.filter(title__startswith=st)[page_bottom:page_top]
@@ -321,7 +316,6 @@ def list_books(request, **kw):
     return render_to_response('books.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
-                               'wrt_index': wrt_index,
                                'form': SearchForm(initial={
                                    'wrt':request.GET.get('wrt'),
                                    'tit':request.GET.get('tit') }),
@@ -389,8 +383,7 @@ def read_book(request, **kw):
     return render_to_response('book.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
-                               'wrt_index': wrt_index,
-                                'form': SearchForm(initial={
+                               'form': SearchForm(initial={
                                    'wrt':request.GET.get('wrt'),
                                    'tit':request.GET.get('tit') }),
                                'book': book,
@@ -431,7 +424,7 @@ def add_book(request):
                 book.writer = IncWrtCount(writer=writer.writer)
                 book.subject = IncSubjCount(subject=subject.subject)
                 book.save()
-                ClearWrtListCache(book.writer.writer[0].capitalize())
+                ClearWrtListCache(book.writer.writer[0])
                 ClearBookListWrtCache(book.writer.id)
                 ClearBookListSubjCache(book.subject.id)
                 ClearBookCache(book.index)
@@ -513,9 +506,9 @@ def delete_book(request, **kw):
             if len(book_list) == 1:
                 IncWrtCount(writer=book.writer.writer, count=-1)
                 IncSubjCount(subject=book.subject.subject, count=-1)
-#                 ClearWrtListCache(book.writer.writer[0].capitalize())
+#                 ClearWrtListCache(book.writer.writer[0])
 #                 ClearBookListWrtCache(book.writer.id)
-#                 ClearBookListSubjCache(book.subject.id)                
+#                 ClearBookListSubjCache(book.subject.id)
             ClearBookCache(book.index)
             book.delete()
             if hasattr(book, 'file') and book.file:

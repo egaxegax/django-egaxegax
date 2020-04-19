@@ -17,11 +17,6 @@ from filetransfers.api import prepare_upload
 from filetransfers.api import serve_file
 import datetime, re, base64, zlib
 
-art_index = {
-    20:'a',21:'b',22:'c',23:'d',24:'e',25:'f',26:'g',27:'h',28:'i',29:'j',30:'k',31:'l',32:'m',33:'n',34:'o',35:'p',36:'q',37:'r',38:'s',39:'t',40:'u',41:'v',42:'w',43:'x',44:'y',45:'z',
-    50:u'а',51:u'б',52:u'в',53:u'г',54:u'д',55:u'е',57:u'ж',58:u'з',59:u'и',60:u'к',61:u'л',62:u'м',63:u'н',64:u'о',65:u'п',66:u'р',67:u'с',68:u'т',69:u'у',70:u'ф',71:u'х',72:u'ц',73:u'ч',74:u'ш',75:u'щ',76:u'э',77:u'ю',78:u'я'
-}
-
 def ZI(s):
     try:
         s=int(s)
@@ -161,7 +156,7 @@ def IncArtCount(**kw):
             art.count += kw.get('count', 1)
             art.save(force_update=True)
             if art.count < 1:
-                ClearArtListCache(art.artist[0].capitalize())
+                ClearArtListCache(art.artist[0])
                 ClearArtListCache('.id' + str(art.id))
                 ClearArtListCache('.art' + art.artist)
                 art.delete()
@@ -208,7 +203,7 @@ def list_songs(request, **kw):
         song_list = eval(cache.get('songs:' + artist))
         song_count = len(song_list)
     elif request.GET.get('art'):
-        st = request.GET.get('art').capitalize()
+        st = request.GET.get('art')
         search_key = '.art' + to_translit(st)
         if not cache.has_key('arts:' + search_key):
             if st == '*': art_list = Art.objects.order_by('artist')    
@@ -220,7 +215,7 @@ def list_songs(request, **kw):
             song_count += art['count']
         per_page = 1000
     elif request.GET.get('tit'):
-        st = request.GET.get('tit').capitalize()
+        st = request.GET.get('tit')
         search_key = '.tit' + to_translit(st)
         if not cache.has_key('songs:' + search_key):
             song_list = Song.objects.filter(title__startswith=st)
@@ -238,7 +233,6 @@ def list_songs(request, **kw):
     return render_to_response('songs.html', 
                               context_instance=RequestContext(request,
                               {'request': request,
-                               'art_index': art_index,
                                'form': SearchForm(initial={
                                    'art':request.GET.get('art'),
                                    'tit':request.GET.get('tit') }),
@@ -267,7 +261,7 @@ def add_song(request):
                 if song.title[:5] != 'about':
                     song.date = timezone.now()
                 song.save()
-                ClearArtListCache(song.artist[0].capitalize())
+                ClearArtListCache(song.artist[0])
                 ClearSongListCache(song.artist)
                 return HttpResponseRedirect(reverse('songs.views.list_songs'))
             else:
@@ -316,7 +310,7 @@ def delete_song(request, **kw):
         song = get_object_or_404(Song, id=ZI(kw.get('id')))
         if request.user.is_superuser or hasattr(song, 'author') and request.user.username == song.author.username:
             IncArtCount(artist=song.artist, count=-1)
-            ClearArtListCache(song.artist[0].capitalize())
+            ClearArtListCache(song.artist[0])
             ClearSongListCache(song.artist)
             ClearSongCache(song)
             song.delete()
@@ -332,7 +326,7 @@ def delete_art(request, **kw):
     if song_list:
         for s in song_list:
             for song in Song.objects.filter(id=s['id']):
-                ClearArtListCache(song.artist[0].capitalize())
+                ClearArtListCache(song.artist[0])
                 ClearSongListCache(song.artist)
                 ClearSongCache(song)
                 song.delete()
@@ -369,7 +363,6 @@ def get_song(request, **kw):
         return render_to_response('song.html', 
                                   context_instance=RequestContext(request,
                                   {'request': request,
-                                   'art_index': art_index,
                                    'form': SearchForm(initial={
                                        'art':request.GET.get('art'),
                                        'tit':request.GET.get('tit') }),

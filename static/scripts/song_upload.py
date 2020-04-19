@@ -68,7 +68,7 @@ for root, dirs, files in os.walk(path, topdown=False):
       register_openers()
       datagen, headers = multipart_encode(param)
 
-      uri = "http://egaxegax.appspot.com/songs/add"
+      uri = "https://egaxegax.appspot.com/songs/add"
       if os.getenv('EGAX_DEBUG') == '1':
           uri = "http://127.0.0.1:8800/songs/add"
 

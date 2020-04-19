@@ -195,7 +195,7 @@ def list_subjects(request):
 def add_post(request):
     if request.method == 'POST':
         form_subject = AddSubjForm(request.POST)
-        form = AddPostForm(request.POST)       
+        form = AddPostForm(request.POST)
         if form.is_valid() and form_subject.is_valid():
             post = form.save(commit=False)
             post.content = PackContent(post)

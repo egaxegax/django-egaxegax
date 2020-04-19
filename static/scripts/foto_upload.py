@@ -58,7 +58,7 @@ for root, dirs, files in os.walk(path, topdown=False):
       register_openers()
       datagen, headers = multipart_encode(param)
 
-      url = "http://egaxegax.appspot.com/photos/add"
+      url = "https://egaxegax.appspot.com/photos/add"
       if os.getenv('EGAX_DEBUG') == '1':
           url = "http://127.0.0.1:8800/photos/add"
 
