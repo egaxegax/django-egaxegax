@@ -24,18 +24,19 @@
 {% if subject.subject %}
   {% if posts_title|length > 1 %}
     <div class="wrap">
-      <div class="msgtext">
-        <a class="nodecor" href="#" onclick="if(document.getElementById('posttitle').style.display=='none') { document.getElementById('posttitle').style.display = ''; } else { document.getElementById('posttitle').style.display = 'none'; } return false;">Содержимое</a>
-           [{{ posts_title|length }}]
-        <div id="posttitle" style="display:none">
+      <dl class="msgtext tabl"><dt class="lfloat minw">
+        <a class="nodecor" href="#" onclick="if(document.getElementById('posttitle').style.display=='none') { document.getElementById('posttitle').style.display = ''; } else { document.getElementById('posttitle').style.display = 'none'; } return false;">
+          Содержимое</a></dt>
+        <dt> [{{ posts_title|length }}] </dt>
+        <dd class="row" id="posttitle" style="display:none">
           {% for title, post_id in posts_title %}
             {% if forloop.counter == 1 %}<br>{% endif %}
             <div class="subtitle"> 
               <a class="nodecor" href="{% url 'posts.views.list_posts' id=post_id %}">{{ title }}</a>
             </div>
           {% endfor %}
-        </div>
-      </div>
+        </dd>
+      </dl>
     </div>
   {% endif %}
 {% else %}
