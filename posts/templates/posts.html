@@ -27,7 +27,7 @@
       <dl class="msgtext tabl"><dt class="lfloat minw">
         <a class="nodecor" href="#" onclick="if(document.getElementById('posttitle').style.display=='none') { document.getElementById('posttitle').style.display = ''; } else { document.getElementById('posttitle').style.display = 'none'; } return false;">
           Содержимое</a></dt>
-        <dt> [{{ posts_title|length }}] </dt>
+        <dt><b> {{ posts_title|length }} </b></dt>
         <dd class="row" id="posttitle" style="display:none">
           {% for title, post_id in posts_title %}
             {% if forloop.counter == 1 %}<br>{% endif %}

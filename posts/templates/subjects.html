@@ -18,7 +18,7 @@
       <dl class="msgtext tabl"><dt class="lfloat minw">
         <a class="nodecor" href="{% url 'posts.views.list_posts' id_subj=subj.id %}">
           {{ subj.subject|escape }} </a></dt>
-        <dt> [{{ subj.count }}] </dt>
+        <dt>&nbsp;<b>{{ subj.count }}</b>&nbsp;</dt>
         <dd class="row">
           <acronym class="hspace2 smaller" title="{{ subj.date }}">{{ subj.date|time_since }}</acronym>
         </dd>

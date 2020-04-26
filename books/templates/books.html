@@ -80,7 +80,7 @@ dt .cont { display: table; width: 100%; }
         <a class="nodecor" href="{% url 'books.views.list_books' tr_wrt=book.tr_wrt id_wrt=book.id %}">{{ book.writer.writer }}</a>
       {% endif %}
       {% if book.count %}
-        <dt class="lfloat">&nbsp;[{{ book.count }}]&nbsp;</dt>
+        <dt class="lfloat">&nbsp;<b>{{ book.count }}</b>&nbsp;</dt>
       {% endif %}
         <dt class="rfloat">
           <span class="counter lightgray hspace"> {{ book.counter }} </span>
