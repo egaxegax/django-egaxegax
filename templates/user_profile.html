@@ -5,18 +5,19 @@
 {% block title %}{% trans 'Profile' %} пользователя {{ record.username }} - {% endblock %}
 {% block pagestyle %}
 div.myview { height: 300px; }
+div.myview dt { height: 30px; }
 {% endblock %}
 {% block aboutsclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'Profile' #}{% endblock %}
 {% block content %}
 <p class="mtext hspace">{% trans 'Profile' %} пользователя <b>{{ record.username }}</b></p>
  <div class="myview wrap">
- <dl class="myview msgtext">
-   <dt>{% trans 'avatar'|capfirst %}&nbsp; <img width="26px" height="26px" src="{% url 'fotos.views.get_avatar' id=record.id %}" title="{{ record.username }}"/></dt>
-   <dt>{% trans 'name'|capfirst %}&nbsp; <span class="smaller">{{ record.username }}</span></dt>
-   <dt>{% trans 'last login'|capfirst %}&nbsp; <span class="smaller"><acronym title="{{ record.last_login }}">{{ record.last_login|time_since }}</acronym></span></dt>
-   <dt>{% trans 'date joined'|capfirst %}&nbsp; <span class="smaller">{{ record.date_joined }}</span></dt>
-   <dt>{% trans 'posts'|capfirst %}&nbsp; <span class="smaller">{{ record_count }}</span></dt>
+ <dl class="myview msgtext tabl">
+   <dt class="lfloat minw">{% trans 'avatar'|capfirst %}</dt> <dt><img width="26px" height="26px" src="{% url 'fotos.views.get_avatar' id=record.id %}" title="{{ record.username }}"/></dt>
+   <dt class="lfloat minw">{% trans 'name'|capfirst %}</dt> <dt class="lightgray">{{ record.username }}</dt>
+   <dt class="lfloat minw">{% trans 'last login'|capfirst %}</dt> <dt class="lightgray"><acronym title="{{ record.last_login }}">{{ record.last_login|time_since }}</acronym></dt>
+   <dt class="lfloat minw">{% trans 'date joined'|capfirst %}</dt> <dt class="lightgray">{{ record.date_joined }}</dt>
+   <dt class="lfloat minw">Статей</dt> <dt class="lightgray">{{ record_count }}</dt>
  </dl>
  </div>
 {% endblock %}
