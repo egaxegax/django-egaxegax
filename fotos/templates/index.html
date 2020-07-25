@@ -4,8 +4,7 @@
 {% block keywords %}{% trans 'About' %}, {% trans 'info, contacts' %}, {% endblock %}
 {% block title %}{% trans 'About' %} - {% endblock %}
 {% block pagestyle %}
-div.myview { height: 300px; }
-dl.myview { background: url({{ MEDIA_URL }}img/egaxegax.png) no-repeat 10px 20px; padding: 0 0 0 200px; }
+.about { height: 300px; background: url({{ MEDIA_URL }}img/egaxegax.png) no-repeat 30px 20px; padding: 0 0 0 200px; }
 {% endblock %}
 {% block aboutclass %}wrap3{% endblock %}
 {% block pageheader %}{# trans 'About' #}{% endblock %}
@@ -13,18 +12,18 @@ dl.myview { background: url({{ MEDIA_URL }}img/egaxegax.png) no-repeat 10px 20px
 <p class="mtext hspace">
   Портал Григория Еремина. Фото, тексты и сообщения от автора.
 </p>
-<div class="myview wrap">
+<div class="about wrap">
   <div class="msgtext">
-    <dl class="myview nomarg">
+    <dl class="nomarg">
       <dt>Обычный инженер-программист. Также люблю читать и сочинять.</dt>
       <dt></dt>
       <dt>Контакты:</dt>
-      <dd></dd>
-      <dd>Личная: <a href="http://vk.com/egaxegax">http://vk.com/egaxegax</a></dd>
+      <dt></dt>
+      <dd>Личная: <a href="http://vk.com/egaxegax">https://vk.com/egaxegax</a></dd>
       <dd>Проекты: <a href="http://github.com/egaxegax">https://github.com/egaxegax</a></dd>
       <dd>Почта: <a href="mailto:egax@bk.ru?subject=О%20сайте%20egaxegax.appspot.com&body=Хочу%20написать" target="_blank">egax@bk.ru</a>, 
         <a href="mailto:egaxegax@gmail.com?subject=About%20egaxegax.appspot.com&body=Good%20site" target="_blank">egaxegax@gmail.com</a></dd>
-      <dd>&nbsp;</dd>
+      <dt></dt>
       <dt class="hspace1 smaller"><i>"Делай что можешь, с тем что имеешь, там где ты есть." <a href="http://egaxegax.appspot.com/posts/5702939616215040">Теодор Рузвельт</a></i>.</dt>
     </dl>
   </div>
