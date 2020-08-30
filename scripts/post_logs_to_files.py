@@ -44,6 +44,8 @@ for fn in os.listdir('.'):
       subject = hx[ns:ne]
       ns = i+11*2
     if ns > ne and hx[i:i+7*2] == '636F6E74656E74': #content
+      print hx[ns-2:ns+10]
+      continue
       ln = int(hx[ns-2:ns], 16)*2
       if i in [252266, 260308]: ln = 292
       ne = ns+ln

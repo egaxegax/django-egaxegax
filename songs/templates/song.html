@@ -80,7 +80,7 @@ function addSongChords(opts) {
   {% if not song.date and song.content %}
     <div class="wrap">
       <div class="about msgtext">
-        <img class="hmarg rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
+        <img class="hmarg rounded" src="https://raw.githubusercontent.com/egaxegax/FotoSite/master/songs/{{ song.tr_art }}.jpg" alt=" " title="{{ song.artist }}" />
         {{ song.content|markdown:"codehilite,extra" }}
       </div>
       <div class="msgfooter gray">
